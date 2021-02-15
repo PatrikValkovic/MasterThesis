@@ -1,0 +1,15 @@
+# LaTeX
+thesis/**/*.aux
+thesis/**/*.synctex.gz
+thesis/**/*.toc
+thesis/thesis.pdf
+thesis/abstract.pdf
+thesis/**/*.out
+thesis/**/*.log
+thesis/pdfa.xmpi
+thesis/**/*.bbl
+thesis/**/*.blg
+thesis/**/*.lof
+thesis/**/*.lot
+
+

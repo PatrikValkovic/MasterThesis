@@ -25,75 +25,52 @@
 % \setlength\headheight{0mm}
 % \let\openright=\cleardoublepage
 
-%% Generate PDF/A-2u
-\usepackage[a-2u]{pdfx}
 
-%% Character encoding: usually latin2, cp1250 or utf8:
-\usepackage[utf8]{inputenc}
-
-%% Prefer Latin Modern fonts
-\usepackage{lmodern}
-
-%% Further useful packages (included in most LaTeX distributions)
-\usepackage{amsmath}        % extensions for typesetting of math
-\usepackage{amsfonts}       % math fonts
-\usepackage{amsthm}         % theorems, definitions, etc.
-\usepackage{bbding}         % various symbols (squares, asterisks, scissors, ...)
-\usepackage{bm}             % boldface symbols (\bm)
-\usepackage{graphicx}       % embedding of pictures
-\usepackage{fancyvrb}       % improved verbatim environment
-\usepackage{natbib}         % citation style AUTHOR (YEAR), or AUTHOR [NUMBER]
-\usepackage[nottoc]{tocbibind} % makes sure that bibliography and the lists
-			    % of figures/tables are included in the table
-			    % of contents
-\usepackage{dcolumn}        % improved alignment of table columns
-\usepackage{booktabs}       % improved horizontal lines in tables
-\usepackage{paralist}       % improved enumerate and itemize
-\usepackage{xcolor}         % typesetting in color
+\include{packages}
 
 %%% Basic information on the thesis
 
 % Thesis title in English (exactly as in the formal assignment)
-\def\ThesisTitle{Thesis title}
+\def\ThesisTitle{GPU Parallelization of Evolutionary Algorithms}
 
 % Author of the thesis
-\def\ThesisAuthor{Name Surname}
+\def\ThesisAuthor{Patrik Valkovič}
 
 % Year when the thesis is submitted
-\def\YearSubmitted{YEAR}
+\def\YearSubmitted{2021}
 
 % Name of the department or institute, where the work was officially assigned
 % (according to the Organizational Structure of MFF UK in English,
 % or a full name of a department outside MFF)
-\def\Department{Name of the department}
+\def\Department{Department of Theoretical Computer Science and Mathematical Logic}
 
 % Is it a department (katedra), or an institute (ústav)?
 \def\DeptType{Department}
 
 % Thesis supervisor: name, surname and titles
-\def\Supervisor{Supervisor's Name}
+\def\Supervisor{Mgr. Martin Pilát, Ph.D.}
 
 % Supervisor's department (again according to Organizational structure of MFF)
-\def\SupervisorsDepartment{department}
+\def\SupervisorsDepartment{Department of Theoretical Computer Science and Mathematical Logic}
 
 % Study programme and specialization
-\def\StudyProgramme{study programme}
-\def\StudyBranch{study branch}
+\def\StudyProgramme{Computer Science}
+\def\StudyBranch{Artificial Intelligence}
 
 % An optional dedication: you can thank whomever you wish (your supervisor,
 % consultant, a person who lent the software, etc.)
 \def\Dedication{%
-Dedication.
+Dedication.  % TODO dedication
 }
 
 % Abstract (recommended length around 80-200 words; this is not a copy of your thesis assignment!)
 \def\Abstract{%
-Abstract.
+Abstract.  % TODO dopsat abstract
 }
 
 % 3 to 5 keywords (recommended), each enclosed in curly braces
 \def\Keywords{%
-{key} {words}
+{evolution algorithm}, {parallelization}, {GPU computing}
 }
 
 %% The hyperref package for clickable links in PDF and also for storing
@@ -114,11 +91,9 @@ Abstract.
 \tableofcontents
 
 %%% Each chapter is kept in a separate file
-\include{preface}
-\include{chap01}
-\include{chap02}
+\include{chap_intro}
 
-\include{epilog}
+\include{chap_conclusion}
 
 %%% Bibliography
 \include{bibliography}
@@ -148,7 +123,8 @@ Abstract.
 \appendix
 \chapter{Attachments}
 
-\section{First Attachment}
+\section{First Attachment} 
+//TODO make sure attachments check
 
 \openright
 \end{document}

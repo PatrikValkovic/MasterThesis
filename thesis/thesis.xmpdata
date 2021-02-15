@@ -1,7 +1,7 @@
 % Metadata to be stored in PDF, see documentation of the pdfx package for more details.
 
-\Author{Name Surname}
-\Title{Thesis title}
-\Keywords{keywords\sep more such\sep yet another}
-\Subject{Abstract of thesis}
+\Author{Patrik Valkovič}
+\Title{GPU Parallelization of Evolutionary Algorithms}
+\Keywords{evolution algorithm \sep parallelization \sep GPU computing}
+\Subject{Abstract of thesis} % TODO doplnit abstrakt
 \Publisher{Charles University}
