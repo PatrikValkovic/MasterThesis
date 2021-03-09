@@ -82,6 +82,9 @@ Abstract.  % TODO dopsat abstract
 % Definitions of macros (see description inside)
 \include{macros}
 
+% Definition of acronyms
+\include{acronyms}
+
 % Title page and various mandatory informational pages
 \begin{document}
 \include{title}
@@ -107,7 +110,9 @@ Abstract.  % TODO dopsat abstract
 
 %%% Abbreviations used in the thesis, if any, including their explanation
 %%% In mathematical theses, it could be better to move the list of abbreviations to the beginning of the thesis.
-\chapwithtoc{List of Abbreviations}
+%\chapwithtoc{List of Abbreviations}
+\printglossary
+\printglossary[type=\acronymtype]
 
 %%% Attachments to the master thesis, if any. Each attachment must be
 %%% referred to at least once from the text of the thesis. Attachments
