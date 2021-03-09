@@ -196,5 +196,6 @@
         "*.ist",
         "*.synctex.gz",
         "*.xdv"
-    ]
+    ],
+    "editor.wordWrap": "on"
 }
