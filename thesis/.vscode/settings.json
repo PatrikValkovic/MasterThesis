@@ -196,5 +196,18 @@
         "*.xdv",
         "*.glsdefs"
     ],
-    "editor.wordWrap": "on"
+    "editor.wordWrap": "on",
+    "cSpell.ignorePaths": [
+        "**/package-lock.json",
+        "**/node_modules/**",
+        "**/vscode-extension/**",
+        "**/.git/objects/**",
+        ".vscode",
+        ".vscode-insiders",
+        "thesis.bbl",
+        "bibliography.bib"
+    ],
+    "cSpell.words": [
+        "pdfx"
+    ]
 }
