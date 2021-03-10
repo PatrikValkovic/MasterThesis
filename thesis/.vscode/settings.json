@@ -115,11 +115,39 @@
             "command": "makeglossaries",
             "args": [
                 "%DOCFILE%"
-            ]
+            ],
+            "env": {}
         }
     ],
     "latex-workshop.latex.recipes": [
-
+        {
+            "name": "pdflatex ➞ glossaries ➞ bibtex ➞ pdflatex × 2",
+            "tools": [
+                "pdflatex",
+                "makeglossaries",
+                "bibtex",
+                "pdflatex",
+                "pdflatex"
+            ]
+        },
+        {
+            "name": "pdflatex",
+            "tools": [
+                "pdflatex"
+            ]
+        },
+        {
+            "name": "glossaries",
+            "tools": [
+                "makeglossaries"
+            ]
+        },
+        {
+            "name": "bibtex",
+            "tools": [
+                "bibtex"
+            ]
+        },
         {
             "name": "latexmk 🔃",
             "tools": [
@@ -133,39 +161,9 @@
             ]
         },
         {
-            "name": "pdflatex",
-            "tools": [
-                "pdflatex"
-            ]
-        },
-        {
             "name": "latexmk (lualatex)",
             "tools": [
                 "lualatexmk"
-            ]
-        },
-        {
-            "name": "pdflatex ➞ glossaries ➞ bibtex ➞ pdflatex × 2",
-            "tools": [
-                "pdflatex",
-                "makeglossaries",
-                "bibtex",
-                "pdflatex",
-                "pdflatex"
-            ]
-        },
-        {
-            "name": "Compile Rnw files",
-            "tools": [
-                "rnw2tex",
-                "latexmk"
-            ]
-        },
-        {
-            "name": "Compile Jnw files",
-            "tools": [
-                "jnw2tex",
-                "latexmk"
             ]
         }
     ],
@@ -195,7 +193,8 @@
         "creationdate.*",
         "*.ist",
         "*.synctex.gz",
-        "*.xdv"
+        "*.xdv",
+        "*.glsdefs"
     ],
     "editor.wordWrap": "on"
 }

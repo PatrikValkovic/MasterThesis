@@ -11,3 +11,11 @@ thesis/**/*.bbl
 thesis/**/*.blg
 thesis/**/*.lof
 thesis/**/*.lot
+thesis/**/*.acn
+thesis/**/*.acr
+thesis/**/*.alg
+thesis/**/*.glg
+thesis/**/*.glo
+thesis/**/*.gls
+thesis/**/*.ist
+

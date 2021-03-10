@@ -26,48 +26,11 @@
 % \let\openright=\cleardoublepage
 
 
-\include{packages}
-
-%%% Basic information on the thesis
-
-% Thesis title in English (exactly as in the formal assignment)
-\def\ThesisTitle{GPU Parallelization of Evolutionary Algorithms}
-
-% Author of the thesis
-\def\ThesisAuthor{Patrik Valkovič}
-
-% Year when the thesis is submitted
-\def\YearSubmitted{2021}
-
-% Name of the department or institute, where the work was officially assigned
-% (according to the Organizational Structure of MFF UK in English,
-% or a full name of a department outside MFF)
-\def\Department{Department of Theoretical Computer Science and Mathematical Logic}
-
-% Is it a department (katedra), or an institute (ústav)?
-\def\DeptType{Department}
-
-% Thesis supervisor: name, surname and titles
-\def\Supervisor{Mgr. Martin Pilát, Ph.D.}
-
-% Supervisor's department (again according to Organizational structure of MFF)
-\def\SupervisorsDepartment{Department of Theoretical Computer Science and Mathematical Logic}
-
-% Study programme and specialization
-\def\StudyProgramme{Computer Science}
-\def\StudyBranch{Artificial Intelligence}
-
-\include{dedication}
-
-% Abstract (recommended length around 80-200 words; this is not a copy of your thesis assignment!)
-\def\Abstract{%
-Abstract.  % TODO dopsat abstract
-}
-
-% 3 to 5 keywords (recommended), each enclosed in curly braces
-\def\Keywords{%  TODO sjednotit keywords
-{evolution algorithm}, {parallelization}, {GPU computing}, {genetic algorithms}
-}
+\input{packages}
+\input{definitions}
+\input{dedication}
+\input{macros}
+\input{acronyms}
 
 %% The hyperref package for clickable links in PDF and also for storing
 %% metadata to PDF (including the table of contents).
@@ -75,23 +38,15 @@ Abstract.  % TODO dopsat abstract
 \hypersetup{unicode}
 \hypersetup{breaklinks=true}
 
-% Definitions of macros (see description inside)
-\include{macros}
-
-% Definition of acronyms
-\include{acronyms}
-
 % Title page and various mandatory informational pages
 \begin{document}
 \include{title}
 
 %%% A page with automatically generated table of contents of the master thesis
-
 \tableofcontents
 
 %%% Each chapter is kept in a separate file
 \include{chap_intro}
-
 \include{chap_conclusion}
 
 %%% Bibliography
@@ -108,7 +63,7 @@ Abstract.  % TODO dopsat abstract
 %%% In mathematical theses, it could be better to move the list of abbreviations to the beginning of the thesis.
 %\chapwithtoc{List of Abbreviations}
 \printglossary
-\printglossary[type=\acronymtype]
+\printglossary[type=\acronymtype, nonumberlist]
 
 %%% Attachments to the master thesis, if any. Each attachment must be
 %%% referred to at least once from the text of the thesis. Attachments
