@@ -5,3 +5,24 @@
 Although industrial applications has been known before, like checks processing at the beginning of 2020s \cite{ChecksDocumentRecognition}, and speaker recognition \cite{HECK2000181}, it were successes in 2011 and 2012 that get closer attention of academia and broader community. The progress is getting at pace since then and we can see new results on a daily basis. Current state-of-the-art system already exceed human performance and traditional methods in number of various tasks -- like image recognition \cite{pham2021meta}\cite{ZawadzkaGosk2019}, object detection \cite{ghiasi2020simple}\cite{lehner2019patch}, natural language processing \cite{gpt3}, video editing \cite{lu2020layered}, question answering \cite{yamada2020luke}\cite{yamada2020luke}, and many more. Thanks to the rise of generative models, results in the field of image synthesis \cite{StateOfTheArtImageSythesis} \cite{esser2020taming}\cite{dalle}, super-resolution \cite{Sun_2020}\linebreak\cite{Chadha_2020}, text generation \cite{gpt3}\cite{malmi2019encode},\linebreak and countless more amaze scientists with accuracy and attention to details.
 
 \acrshort{acc:ann} find their way into fields, that traditional machine learning methods have not consider -- fluid simulation \cite{um2018liquid}\cite{Kim_2019}, cloth simulation \cite{lee2019efficient}\cite{SRBO20}, or even whole physics \cite{PhysicsSimulation}\cite{sanchezgonzalez2020learning} and movement of virtual entities \cite{PhysicsBasedCharaterSImulation}\cite{zhang2020vid2player}. Because of that, \acrshort{acc:ann} are used in robotics \cite{pierson2017deep}\cite{Lee_2020},Hollywood \cite{aiinhollywood},  healthcare \cite{fakoor2013using}\cite{BreastCancerAISystem}, and learning computer games \cite{openai2019dota}\cite{alphastar}.
+
+This long and incomplete list of successes would not be possible without the computation power of computers and data centers nowadays. In fact, the achievement of \acrshort{acc:dann} in 2011 and 2012 was driven mainly by the effective implementation of \acrfull{acc:cnn} in kernels and running them inside the \acrfull{acc:gpu} \cite{CIRESAN2012333}. Since then, the \acrshort{acc:gpu} and more recently the \acrfull{acc:tpu} take completely over traditional processors and allowed this advancements in the field of \acrshort{acc:ann}, that we can see now.
+
+Another field of \acrlong{acc:ai} with stochastic optimization characteristic is the evolutionary computation. Evolutionary algorithms and their variations have been successfully applied in variety of fields -- for example 
+electronic circuits design \cite{NASAantenaDesign}\allowbreak\cite{circuitdesignoptimizationea},
+robotics \cite{EvolutionaryRobotics}\allowbreak\cite{RoboticsInPhysX}\allowbreak\cite{nygaard2018realworld},
+design of neural networks and learning weights \cite{NEAT}\allowbreak\cite{Floreano2008NeuroevolutionFA},
+combinatorial problems \cite{GeneticAssambleLineBalancingProblem}\allowbreak\cite{ALBAYRAK20111313}, 
+real-parameter optimization \cite{IntroNaturalEvolutionStrategies}, and many more.
+
+There has been attempts to implement and run evolutionary algorithms on \acrshort{acc:gpu} \cite{cheng2019accelerating}\allowbreak\cite{CHENG2019514} and use the computation power available. However, most of these methods focus on \acrfull{acc:cuda} or similar technology. \acrshort{acc:cuda} and alike technologies have drawbacks -- they use low-end languages like C or C\texttt{++}, require deep knowledge of the underlying hardware and algorithms are harder to modify.
+
+Goal of this work is to analyze existing implementations of evolutionary algorithms and propose their implementations on \acrshort{acc:gpu}. The implementation needs to be easy to understand, extend, and modify. In order to meet given criteria, implementation should reuse existing frameworks available for neural networks if possible.
+
+The rest of this thesis is organized as follows. 
+In the next Section, the evolutionary algorithms and their variants are introduced. 
+Section 3 describes \acrshort{acc:cuda} programming in order to  design efficient implementation.
+Proposed implementation and design decisions are given in Section 4. 
+In Section 5, set of problems is presented for the purpose of test, comparison and benchmark of the implementation.
+Section 6 evaluates the proposed implementation and compare it to standard methods.
+Finally, conclusion and main ideas are given in section 7.
