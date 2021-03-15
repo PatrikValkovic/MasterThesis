@@ -4,22 +4,23 @@
 # 3/11/2021
 #
 ###############################
-from typing import Tuple, Any, Dict, Union
+from typing import Tuple, Any, Dict, Union, Callable
 import torch as t
 from ffeat import Pipe
 
-# TODO tests
-class Tournament(Pipe):
-    def __init__(self, num_select: Union[int, float] = None):
-        self.num_select = num_select
+_IFU = Union[int, float]
 
-    def __call__(self, population, fitnesses, **kwargs) -> Tuple[Tuple[Any, ...], Dict[str, Any]]:
+class Tournament(Pipe):
+    def __init__(self, num_select: Union[_IFU, Callable[..., _IFU]] = None):
+        self.num_select = self._handle_parameter(num_select)
+
+    def __call__(self, fitnesses, population, *args, **kwargs) -> Tuple[Tuple[Any, ...], Dict[str, Any]]:
         originally = len(population)
-        to_select = self.num_select
-        if self.num_select is None:
+        to_select = self.num_select(fitnesses, population, *args, **kwargs)
+        if to_select is None:
             to_select = originally
-        if isinstance(self.num_select, float):
-            to_select = int(originally * self.num_select)
+        if isinstance(to_select, float):
+            to_select = int(originally * to_select)
         if not isinstance(to_select, int):
             raise ValueError(f"Number of members to select needs to be int, {type(to_select)} instead")
 
@@ -30,5 +31,4 @@ class Tournament(Pipe):
             indices[1, t.logical_not(comparison)]
         ])
         new_population = population[better]
-
-        return (new_population,), kwargs
+        return (new_population, *args), kwargs
