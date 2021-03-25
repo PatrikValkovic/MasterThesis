@@ -208,6 +208,12 @@
         "bibliography.bib"
     ],
     "cSpell.words": [
-        "pdfx"
+        "amsthm",
+        "fancyvrb",
+        "makechapterhead",
+        "makeschapterhead",
+        "multiset",
+        "pdfx",
+        "pseudocode"
     ]
 }

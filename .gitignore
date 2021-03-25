@@ -18,4 +18,8 @@ thesis/**/*.glg
 thesis/**/*.glo
 thesis/**/*.gls
 thesis/**/*.ist
+thesis/**/*.idx
+thesis/**/*.ilg
+thesis/**/*.ind
+thesis/**/*.loa
 
