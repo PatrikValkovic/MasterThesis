@@ -45,17 +45,17 @@ In this section, I will introduce necessary terminology that I am going to use t
 
 \defterm{Search space} is the space of phenotype.
 
-\defterm{Objective function} is the function the algorithm optimize. For previous example of real function optimization, the function itself can be the objective function.
+\defterm{Objective function} is the function the algorithm optimize. For previous example of real function optimization, the function itself can be the objective function. I will denote objective function $\objectivefn$.
 
-\defterm{Fitness function}\index{fitness function} is the measure of quality of the solution. Note that the domain of the function is the search space. Unlike the objective function, the fitness function should guide the algorithm during the optimization. It can use the objective function directly, but other options are possible as well. For example, if the goal is to maximize objective function $f_o(x)$, but the algorithm is written such that it minimize the fitness function, one may specify the fitness function as $f(x)=\frac{1}{f_o(x)}$.
+\defterm{Fitness function}\index{fitness function} is the measure of quality of the solution. Note that the domain of the function is the search space. Unlike the objective function, the fitness function should guide the algorithm during the optimization. It can use the objective function directly, but other options are possible as well. For example, if the goal is to maximize objective function $\objectivefn(x)$, but the algorithm is written such that it minimize the fitness function, one may specify the fitness function as $\fitnessfn(x)=\frac{1}{\objectivefn(x)}$. I will denote fitness function $\fitnessfn$.
 
 \defterm{Evaluation} is the process of obtaining fitness value for the genotype.
 
-\defterm{Individual} is genotype with it's fitness value.
+\defterm{Individual} is genotype with it's fitness value. I will denote individual by $\individual$.
 
 \defterm{Fitness value} of individual is it's evaluation. 
 
-\defterm{Population} is multiset of individuals -- it is possible to have same genotype in the population multiple time. However, I will still distinguish different individuals with the same genotype.
+\defterm{Population} is multiset of individuals -- it is possible to have same genotype in the population multiple time. However, I will still distinguish different individuals with the same genotype. I will denote the whole population as $\population$.
 
 \defterm{Initialization} is the process of creating the first population.
 
@@ -74,3 +74,29 @@ In this section, I will introduce necessary terminology that I am going to use t
 \defterm{Variation operators}\index{variation operator} are operators, that change the variation of the population, but not the mean. Variation operators are the exploration steps in the algorithm and should balance the exploitation strength of the selection. Both crossover and mutation are variation operators \citep{SelfAdaptiveFeaturesInRealParameterEvolutionaryAlgorithms}.
 
 \defterm{Memetic operator} is operator, that uses local optimization in every iteration. Alternatively, \enquote{memetic algorithms uses local optimizer to every solution before evaluation}\citep{HowToSolveItModernHeuristics}. One of such example is the \acrlong{acc:tsp} problem mentioned earlier. Another example is the problem of searching for weights in \acrshort{acc:ann}, where one step of backpropagation algorithm is performed as part of the mutation.
+
+% TODO maybe clear page
+%\clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                      %%
+%%  GENETIC ALGORITHMS  %%
+%%                      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{\texorpdfstring{\acrlong*{acc:ga}}{}}
+
+\acrfull{acc:ga} are probably the simplest \acrfull{acc:ea} out there. The father of \acrshort{acc:ga} is considered \citet{HollandGA}. In the \acrshort{acc:ga}, individual are binary string of length $n$, formally
+$$ \individual \in \left\{0,1\right\}^{n} $$
+
+Fitness function maps genotype into real values
+$$ \fitnessfn:\left\{0,1\right\}^{n}\rightarrow\mathbb{R} $$
+
+The crossover operator is usually one point crossover\index{crossover!one--point}. This type of crossover require two parents and produces two offsprings. First of all, algorithm uniformly sample random integer $s$ in the range $\left[ 1, n-1 \right]$. The first offspring will receive genetic material up to index $s$ from the first parent, and rest of it from the second one. The second offspring is created the same way, except the parents are exchanged. Example for $n=10$ is in figure \ref{fig:gaonepointcrossover}. In order not to modify all the individuals in the population, only $p_c\in\left[0,1\right]$ \citep{IntroductionToEA}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\textwidth]{img/master_onepointcrossover.pdf}
+    \caption{One point crossover}
+    \label{fig:gaonepointcrossover}
+\end{figure}
+
