@@ -123,7 +123,7 @@ The pseudocode of simple genetic algorithm described above is depict in algorith
 \begin{algorithm}
     \KwIn{$d$ problem dimension, $l$ population size, $g$ generations, $\fitnessfn$, $p_c$, $p_m$}
     \KwResult{evolved population}
-    population $\leftarrow$ randomnly inicialized\;
+    population $\leftarrow$ randomly initialized\;
     \ForEach{$gen$ in $0$..$g$}{
         \ForEach{individual in $0$..$l$}{
             \If(){$rand()<p_c$}{One point crossover with random individual}
@@ -139,6 +139,8 @@ The pseudocode of simple genetic algorithm described above is depict in algorith
 
 I will refer to algorithm described above as \enquote{Simple Genetic Algorithm}. In reality, scientists come up with various operators, that can improve convergence or can help in specific types of problems. Thorough following paragraphs, I will focus on these techniques, inspired mainly by the book of authors \citet*{IntroToGA}.
 
+%%  CROSSOVERS  %%
+%%%%%%%%%%%%%%%%%%
 \subsection{Advanced crossover operators}
 
 Simple genetic algorithm used one point crossover. It is straightforward to extend it into two point crossover\index{crossover!two point} where each genome is split into three parts. Each offspring then receives first and third part of the genome from one parent, and the middle one from the second one. Example of two point crossover is in the picture \ref{fig:gatwopointcrossover}.
@@ -161,5 +163,9 @@ Simple genetic algorithm used one point crossover. It is straightforward to exte
 Sometimes, the crossover operator is generalized even more and forms $k$--point crossover. The genotype partitions into $k$ parts and these parts are interleaved in the offsprings. Special case is uniform crossover\index{crossover!uniform} -- the offsprings are constructed in such a way that they are uniform combination if their parents. Each gene in the offspring have equal probability whether it will be received from the first, or second parent. Second offspring will follow the same pattern, except with parents exchanged. Example of uniform crossover is in figure \ref{fig:uniformcrossover}.
 % TODO Introduction into GA presents few more types - three parents crossover, crossover with reduced surrogate, and shuffle crossover. These are irrelevant for my implementation, but can be potentially described here.
 
+I have described the crossover operators such that the offsprings replace their parents. That is a common design decision, however one does not need to enforce that and may decide to create offsprings in addition to the parents. To ensure the population does not increase in size, the selection operator can be implemented in a way that specified number of individuals will be picked up.
+
+%%  SELECTION  %%
+%%%%%%%%%%%%%%%%%
 \subsection{Selection operators}
 
