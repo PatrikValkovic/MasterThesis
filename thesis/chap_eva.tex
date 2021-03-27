@@ -39,6 +39,8 @@ In this section, I will introduce necessary terminology that I am going to use t
 
 \defterm{Genotype}\index{genotype} is encoding of the solution. It is equivalent of the \acrshort{acc:dna} -- it compress all the data needed to produce solution.
 
+\defterm{Gene} is one part of the genotype. It may be one bit if the genotype is encoded as binary string or scalar, if the genotype is vector. 
+
 \defterm{Representation or genotype space} is the space of genotype.
 
 \defterm{Phenotype}\index{phenotype} is the solution built from genotype. Genotype and phenotype can be equivalent -- for example real function optimization problem may have as a genotype vector of real numbers, that represent one of the solution. Generally, however, genotype and phenotype can be different.
@@ -75,8 +77,8 @@ In this section, I will introduce necessary terminology that I am going to use t
 
 \defterm{Memetic operator} is operator, that uses local optimization in every iteration. Alternatively, \enquote{memetic algorithms uses local optimizer to every solution before evaluation}\citep{HowToSolveItModernHeuristics}. One of such example is the \acrlong{acc:tsp} problem mentioned earlier. Another example is the problem of searching for weights in \acrshort{acc:ann}, where one step of backpropagation algorithm is performed as part of the mutation.
 
-% TODO maybe clear page
-%\clearpage
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                      %%
@@ -85,18 +87,52 @@ In this section, I will introduce necessary terminology that I am going to use t
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\texorpdfstring{\acrlong*{acc:ga}}{}}
 
-\acrfull{acc:ga} are probably the simplest \acrfull{acc:ea} out there. The father of \acrshort{acc:ga} is considered \citet{HollandGA}. In the \acrshort{acc:ga}, individual are binary string of length $n$, formally
+\acrfull{acc:ga} are probably the simplest \acrfull{acc:ea} out there and as their father is usually considered \citefullauthor{HollandGA}. In the \acrshort{acc:ga}, individual are binary string of length $n$, formally
 $$ \individual \in \left\{0,1\right\}^{n} $$
 
 Fitness function maps genotype into real values
 $$ \fitnessfn:\left\{0,1\right\}^{n}\rightarrow\mathbb{R} $$
 
-The crossover operator is usually one point crossover\index{crossover!one--point}. This type of crossover require two parents and produces two offsprings. First of all, algorithm uniformly sample random integer $s$ in the range $\left[ 1, n-1 \right]$. The first offspring will receive genetic material up to index $s$ from the first parent, and rest of it from the second one. The second offspring is created the same way, except the parents are exchanged. Example for $n=10$ is in figure \ref{fig:gaonepointcrossover}. In order not to modify all the individuals in the population, only $p_c\in\left[0,1\right]$ \citep{IntroductionToEA}.
+The typical crossover operator is one point crossover\index{crossover!one--point}. This type of crossover require two parents and produces two offsprings. As the first step, the algorithm uniformly sample random integer $s$ in the range $\left[ 1, n-1 \right]$. The first offspring will receive genetic material up to index $s$ from the first parent, and the rest from the second one. The second offspring is created the same way, except the position of parents is exchanged. Example for $n=10$ is in figure \ref{fig:gaonepointcrossover}. In order not to modify all the individuals in the population, only $p_c\in\left[0,1\right]$ percent of individuals undergo the crossover and the children replace their parents\citep{IntroductionToEA}.
 
-\begin{figure}
-    \centering
-    \includegraphics[width=0.5\textwidth]{img/master_onepointcrossover.pdf}
-    \caption{One point crossover}
-    \label{fig:gaonepointcrossover}
-\end{figure}
+\begin{figure}[!tbp]
+    \begin{subfigure}[b]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{img/master_onepointcrossover.pdf}
+        \caption{One point crossover}
+        \label{fig:gaonepointcrossover}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{img/master_bitflipmutation.pdf}
+        \caption{Bit-flip mutation}
+        \label{fig:bitflipmutation}
+    \end{subfigure}
+    \caption{Genetic algorithm operators}
+  \end{figure}
 
+The mutation\index{mutation} operator for \acrshort{acc:ga} is in most cases bit-flip mutation\index{mutation!bit-flip}. During this mutation, each gene in the genotype is mutated with probability $p_m$. One example of mutation is in figure \ref{fig:bitflipmutation}. Mutation has two objectives -- it makes sure the algorithm is not trapped in local optima, and it sustains genetic disparity in the population. As a side effect, mutation serves as minor search operator\citep{IntroToGA}.
+
+The difference between crossover and mutation is such that crossover is rather \enquote{search} exploitation technique. It combines individuals from current population and exploit them to find possibly better individuals. Mutation, on the other hand, is more local search technique and based on the probability $p_b$ it search over the whole representation space.
+
+Finally, the selection stage takes place. There are various selection techniques and in this particular case, I will use tournament selection\index{selection!tournament}. During tournament selection, fitness values of two random individuals are compared and the better individual is copied into the new population. This repeats as many times, as specified number of individuals form a new population \citep{IntroToGA}.
+
+For cases where the size of the new population equals to the size of the old one, there is high probability that the same individual will be in the following population multiple times. Nevertheless, because of crossover and mutation operators that doesn't matter, because they keep divergence in the population.
+
+The pseudocode of simple genetic algorithm described above is depict in algorithm \ref{alg:SGA}. The population if firstly randomly initialized and then undergo crossover, mutation, evaluation, and selection operators in the loop. Finally, evolved population is returned from the algorithm.
+
+\begin{algorithm}
+    \KwIn{$d$ problem dimension, $l$ population size, $g$ generations, $\fitnessfn$, $p_c$, $p_m$}
+    \KwResult{evolved population}
+    population $\leftarrow$ randomnly inicialized\;
+    \ForEach{$gen$ in $0$..$g$}{
+        \ForEach{individual in $0$..$l$}{
+            \If(){$rand()<p_c$}{One point crossover with random individual}
+            \If(){$rand()<p_m$}{Bit-flip mutation}
+        }
+        Evaluate population using $\fitnessfn$\;
+        population $\leftarrow$ pick up $l$ individuals using tournament\;
+    }
+    \Return{population}
+    \caption{Simple genetic algorithm}
+    \label{alg:SGA}
+\end{algorithm}
