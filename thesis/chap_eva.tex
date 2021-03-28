@@ -87,13 +87,13 @@ In this section, I will introduce necessary terminology that I am going to use t
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\texorpdfstring{\acrlong*{acc:ga}}{}}
 
-\acrfull{acc:ga} are probably the simplest \acrfull{acc:ea} out there and as their father is usually considered \citefullauthor{HollandGA}. In the \acrshort{acc:ga}, individual are binary string of length $n$, formally
+\acrfull{acc:ga}\index{genetic algorithm} are probably the simplest \acrfull{acc:ea} out there and as their father is usually considered \citefullauthor{HollandGA}. In the \acrshort{acc:ga}, individual are binary string of length $n$, formally
 $$ \individual \in \left\{0,1\right\}^{n} $$
 
 Fitness function maps genotype into real values
 $$ \fitnessfn:\left\{0,1\right\}^{n}\rightarrow\mathbb{R} $$
 
-The typical crossover operator is one point crossover\index{crossover!one--point}. This type of crossover require two parents and produces two offsprings. As the first step, the algorithm uniformly sample random integer $s$ in the range $\left[ 1, n-1 \right]$. The first offspring will receive genetic material up to index $s$ from the first parent, and the rest from the second one. The second offspring is created the same way, except the position of parents is exchanged. Example for $n=10$ is in figure \ref{fig:gaonepointcrossover}. In order not to modify all the individuals in the population, only $p_c\in\left[0,1\right]$ percent of individuals undergo the crossover and the children replace their parents\citep{IntroductionToEA}.
+The typical crossover operator is \emph{one point crossover}\index{crossover!one--point}. This type of crossover require two parents and produces two offsprings. As the first step, the algorithm uniformly sample random integer $s$ in the range $\left[ 1, n-1 \right]$. The first offspring will receive genetic material up to index $s$ from the first parent, and the rest from the second one. The second offspring is created the same way, except the position of parents is exchanged. Example for $n=10$ is in figure \ref{fig:gaonepointcrossover}. In order not to modify all the individuals in the population, only $p_c\in\left[0,1\right]$ percent of individuals undergo the crossover and the children replace their parents\citep{IntroductionToEA}.
 
 \begin{figure}
     \begin{subfigure}[b]{0.4\textwidth}
@@ -143,7 +143,7 @@ I will refer to algorithm described above as \enquote{Simple Genetic Algorithm}.
 %%%%%%%%%%%%%%%%%%
 \subsection{Advanced crossover operators}
 
-Simple genetic algorithm used one point crossover. It is straightforward to extend it into two point crossover\index{crossover!two point} where each genome is split into three parts. Each offspring then receives first and third part of the genome from one parent, and the middle one from the second one. Example of two point crossover is in the picture \ref{fig:gatwopointcrossover}.
+Simple genetic algorithm used one point crossover. It is straightforward to extend it into \emph{two point crossover}\index{crossover!two point} where each genome is split into three parts. Each offspring then receives first and third part of the genome from one parent, and the middle one from the second one. Example of two point crossover is in the picture \ref{fig:gatwopointcrossover}.
 
 \begin{figure}
     \begin{subfigure}[b]{0.4\textwidth}
@@ -160,12 +160,61 @@ Simple genetic algorithm used one point crossover. It is straightforward to exte
     \caption{Advanced crossover operators}
 \end{figure}
 
-Sometimes, the crossover operator is generalized even more and forms $k$--point crossover. The genotype partitions into $k$ parts and these parts are interleaved in the offsprings. Special case is uniform crossover\index{crossover!uniform} -- the offsprings are constructed in such a way that they are uniform combination if their parents. Each gene in the offspring have equal probability whether it will be received from the first, or second parent. Second offspring will follow the same pattern, except with parents exchanged. Example of uniform crossover is in figure \ref{fig:uniformcrossover}.
-% TODO Introduction into GA presents few more types - three parents crossover, crossover with reduced surrogate, and shuffle crossover. These are irrelevant for my implementation, but can be potentially described here.
+Sometimes, the crossover operator is generalized even more and forms $k$--point crossover. The genotype partitions into $k$ parts and these parts are interleaved in the offsprings. Special case is \emph{uniform crossover}\index{crossover!uniform} -- the offsprings are constructed in such a way that they are uniform combination if their parents. Each gene in the offspring have equal probability whether it will be received from the first, or second parent. Second offspring will follow the same pattern, except with parents exchanged. Example of uniform crossover is in figure \ref{fig:uniformcrossover}.
+% Introduction into GA presents few more types - three parents crossover, crossover with reduced surrogate, and shuffle crossover. These are irrelevant for my implementation, but can be potentially described here.
 
-I have described the crossover operators such that the offsprings replace their parents. That is a common design decision, however one does not need to enforce that and may decide to create offsprings in addition to the parents. To ensure the population does not increase in size, the selection operator can be implemented in a way that specified number of individuals will be picked up.
+I have described the crossover operators such that the offsprings replace their parents. That is a common design decision, however one does not need to enforce it and may decide to create offsprings in addition to the parents. To ensure the population does not increase in size, the selection operator can be implemented in a way that specified number of individuals will be picked up.
 
 %%  SELECTION  %%
 %%%%%%%%%%%%%%%%%
 \subsection{Selection operators}
 
+Selection operator is one of the most important one, as it is the only operator working with fitness values and therefore the operator responsible for exploitation part of the algorithm. Simple genetic algorithm presented in algorithm \ref{alg:SGA} uses tournament selection -- I will analyze another types of selections thorough following paragraphs.
+
+Selection operators are equivalent of Darwin's selection process in nature. It allows to preserve perspective genetic traits and discard the bad ones. That answer to the \enquote{Survival of the fittest} idea. The distinction between good and bad individual is in respect to the fitness function, selection operators therefore favor individuals with better fitness value.
+
+The degree into which operators endorse better individuals is called \emph{selection pressure}\index{selection pressure}. Selection pressure is major indicator of the algorithm and needs to be balanced with other variation operators. Too big selection pressure may cause the algorithm to converge prematurely. Too low selection pressure, on the other hand, may prolong the convergence and the algorithm may need unnecessary steps before convergence.
+
+\emph{Tournament selection}\index{selection!tournament} is one of the most popular selection operators, because it is easy to implement, the absolute values of fitness are not important (rather relative difference to the other individuals is what matter), and can therefore keep the selection pressure constant. Tournament selection can be naturally extend using $k$ parents -- it increase probability for better individuals and thus increase selection pressure of the operator.
+
+Another popular operator is \emph{Roulette Wheel selection}\index{selection!roulette}. In this operator, the probability of selection is equal to the absolute value of the fitness.
+$$ P\left[\individual_i\right] = \frac{\fitnessfn(\individual_i)}{\sum_{j=0}^{l}\fitnessfn(\individual_j)} $$
+This can be imagined as roulette wheel, where individuals represent sector of a wheel. Size of sector is proportional to the fitness value of the individual. The selection procedure to pick up $n$ individuals simply spin the roulette $n$--times and select the individuals, on which the roulette stopped. Example of roulette wheel selection is in figure \ref{fig:roulettewheelselection}.
+
+Slightly improvement of roulette wheel selection is \emph{Stochastic Universal Sampling}\index{selection!stochastic universal sampling}. Because roulette wheel selection samples individuals independently, it may select the same individuals more time that would be expected given its proportion to the rest of the population. In the example in figure \ref{fig:roulettewheelselection}, expected draws of individual $p_3$ is one, however, it has been drawn two times. Stochastic Universal Sampling handles this issue by sampling only one number in the range $\left[0,\frac{\sum_i^l\fitnessfn(p_i)}{l} \right]$ and draw each new individual with $\frac{\sum_i^l\fitnessfn(p_i)}{l}$ offset. The stochastic universal sampling is unbiased and the distribution of drawn individuals is closer to the fitness values distribution in comparison to the roulette wheel selection. Example of stochastic universal sampling is in figure \ref{fig:USB}.
+
+\begin{figure}
+    \begin{subfigure}[t]{0.47\textwidth}
+        \includegraphics[width=0.8\textwidth]{img/master_roulettewheel.pdf}
+        \caption{Roulette wheel selection. Red lines represents sampled individuals.}
+        \label{fig:roulettewheelselection}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.47\textwidth}
+        \includegraphics[width=0.8\textwidth]{img/master_stochasticuniversalsampling.pdf}
+        \caption{Stochastic universal sampling. Red line represent sampled number and dotted lines are sampled individuals with $\frac{1}{7}$ offset.}
+        \label{fig:USB}
+    \end{subfigure}
+    \caption{Roulette based selections}
+\end{figure}
+
+Notice that for both selection operators with higher fitness value the probability of being picked up to the next population increases. These operators are therefore intended for maximization problems. Also, because the fitness value directly affect the size of the circle sector, the fitness function must be positive over the whole domain. It is possible to discard individuals with non positive fitness values, however then the whole selection procedure lose relevance.
+
+One more drawback of both roulette wheel selection and stochastic universal sampling is that the probabilities depends on the absolute values of fitness. Lets look at two cases:
+\begin{itemize}
+    \item The population fitness values are distributed in the range $\left[ 99,100 \right]]$.
+    \item The population fitness values are distributed in the range $\left[ 1, 2\right]$.
+\end{itemize}
+In both cases, the expected difference of fitness between any two individuals is the same, however, because roulette wheel selection takes into account absolute values of fitness, probability for drawing best individual from the first case is much smaller in comparison to the second case. This effect is usually called \emph{proportional based selection} and it describes situation, where selection probability depends not on the absolute values of fitness function.
+
+Drawback of proportional based selection is that it does not create enough selection pressure when the population has roughly same fitness value. This is problem also to the end of the evolution, because all the individuals are optimized over the generations and have usually very similar fitness value. Note that tournament selection does not suffer by this, as only the relative order between individuals decide about the selection.
+
+One way to eliminate this problem is to rescale fitness to have more desired properties\index{fitness scaling}. One common example is linear scaling into interval $\left[ l,u \right]$ so that individual with $\min\fitnessfn(x_i)=l; \max\fitnessfn(x_i)=u$ and rest of them is scaled linearly between them. Alternatively, logarithmic respectively exponential scale is possible as well, so there will be more emphasis on individuals from the beginning of their sorted sequence, respectively lesser importance of individuals from the end.
+
+Special example of fitness scaling is \emph{rank selection}\index{selection!rank}. 
+%TODO
+
+
+Rank selection
+Boltzman Selection - Anneailing
+Elitism
