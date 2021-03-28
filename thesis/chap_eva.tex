@@ -75,7 +75,7 @@ In this section, I will introduce necessary terminology that I am going to use t
 
 \defterm{Variation operators}\index{variation operator} are operators, that change the variation of the population, but not the mean. Variation operators are the exploration steps in the algorithm and should balance the exploitation strength of the selection. Both crossover and mutation are variation operators \citep{SelfAdaptiveFeaturesInRealParameterEvolutionaryAlgorithms}.
 
-\defterm{Memetic operator} is operator, that uses local optimization in every iteration. Alternatively, \enquote{memetic algorithms uses local optimizer to every solution before evaluation}\citep{HowToSolveItModernHeuristics}. One of such example is the \acrlong{acc:tsp} problem mentioned earlier. Another example is the problem of searching for weights in \acrshort{acc:ann}, where one step of backpropagation algorithm is performed as part of the mutation.
+\defterm{Memetic operator} is operator, that uses local optimization in every iteration. Alternatively, \enquote{memetic algorithms uses local optimizer to every solution before evaluation} \citep{HowToSolveItModernHeuristics}. One of such example is the \acrlong{acc:tsp} problem mentioned earlier. Another example is the problem of searching for weights in \acrshort{acc:ann}, where one step of backpropagation algorithm is performed as part of the mutation.
 
 
 
@@ -93,7 +93,7 @@ $$ \individual \in \left\{0,1\right\}^{n} $$
 Fitness function maps genotype into real values
 $$ \fitnessfn:\left\{0,1\right\}^{n}\rightarrow\mathbb{R} $$
 
-The typical crossover operator is \emph{one point crossover}\index{crossover!one--point}. This type of crossover require two parents and produces two offsprings. As the first step, the algorithm uniformly sample random integer $s$ in the range $\left[ 1, n-1 \right]$. The first offspring will receive genetic material up to index $s$ from the first parent, and the rest from the second one. The second offspring is created the same way, except the position of parents is exchanged. Example for $n=10$ is in figure \ref{fig:gaonepointcrossover}. In order not to modify all the individuals in the population, only $p_c\in\left[0,1\right]$ percent of individuals undergo the crossover and the children replace their parents\citep{IntroductionToEA}.
+The typical crossover operator is \emph{one point crossover}\index{crossover!one--point}. This type of crossover require two parents and produces two offsprings. As the first step, the algorithm uniformly sample random integer $s$ in the range $\left[ 1, n-1 \right]$. The first offspring will receive genetic material up to index $s$ from the first parent, and the rest from the second one. The second offspring is created the same way, except the position of parents is exchanged. Example for $n=10$ is in figure \ref{fig:gaonepointcrossover}. In order not to modify all the individuals in the population, only $p_c\in\left[0,1\right]$ percent of individuals undergo the crossover and the children replace their parents \citep{IntroductionToEA}.
 
 \begin{figure}
     \begin{subfigure}[b]{0.4\textwidth}
@@ -110,7 +110,7 @@ The typical crossover operator is \emph{one point crossover}\index{crossover!one
     \caption{Genetic algorithm operators}
 \end{figure}
 
-The mutation\index{mutation} operator for \acrshort{acc:ga} is in most cases bit-flip mutation\index{mutation!bit-flip}. During this mutation, each gene in the genotype is mutated with probability $p_m$. One example of mutation is in figure \ref{fig:bitflipmutation}. Mutation has two objectives -- it makes sure the algorithm is not trapped in local optima, and it sustains genetic disparity in the population. As a side effect, mutation serves as minor search operator\citep{IntroToGA}.
+The mutation\index{mutation} operator for \acrshort{acc:ga} is in most cases bit-flip mutation\index{mutation!bit-flip}. During this mutation, each gene in the genotype is mutated with probability $p_m$. One example of mutation is in figure \ref{fig:bitflipmutation}. Mutation has two objectives -- it makes sure the algorithm is not trapped in local optima, and it sustains genetic disparity in the population. As a side effect, mutation serves as minor search operator \citep{IntroToGA}.
 
 The difference between crossover and mutation is such that crossover is rather \enquote{search} exploitation technique. It combines individuals from current population and exploit them to find possibly better individuals. Mutation, on the other hand, is more local search technique and based on the probability $p_b$ it search over the whole representation space.
 
@@ -179,7 +179,7 @@ The degree into which operators endorse better individuals is called \emph{selec
 
 Another popular operator is \emph{Roulette Wheel selection}\index{selection!roulette}. In this operator, the probability of selection is equal to the absolute value of the fitness.
 $$ P\left[\individual_i\right] = \frac{\fitnessfn(\individual_i)}{\sum_{j=0}^{l}\fitnessfn(\individual_j)} $$
-This can be imagined as roulette wheel, where individuals represent sector of a wheel. Size of sector is proportional to the fitness value of the individual. The selection procedure to pick up $n$ individuals simply spin the roulette $n$--times and select the individuals, on which the roulette stopped. Example of roulette wheel selection is in figure \ref{fig:roulettewheelselection}.
+This can be imagined as roulette wheel, where individuals represent sector of a wheel. Size of sector is proportional to the fitness value of the individual. The selection procedure to pick up $n$ individuals simply spin the roulette $n$--times and select the individuals, on which the roulette stopped. Example of roulette wheel selection is in figure \ref{fig:roulettewheelselection}. Selection operators that depends on the absolute values of fitness value are usually called proportional--based selection\index{selection!proportional--based}.
 
 Slightly improvement of roulette wheel selection is \emph{Stochastic Universal Sampling}\index{selection!stochastic universal sampling}. Because roulette wheel selection samples individuals independently, it may select the same individuals more time that would be expected given its proportion to the rest of the population. In the example in figure \ref{fig:roulettewheelselection}, expected draws of individual $p_3$ is one, however, it has been drawn two times. Stochastic Universal Sampling handles this issue by sampling only one number in the range $\left[0,\frac{\sum_i^l\fitnessfn(p_i)}{l} \right]$ and draw each new individual with $\frac{\sum_i^l\fitnessfn(p_i)}{l}$ offset. The stochastic universal sampling is unbiased and the distribution of drawn individuals is closer to the fitness values distribution in comparison to the roulette wheel selection. Example of stochastic universal sampling is in figure \ref{fig:USB}.
 
@@ -209,12 +209,36 @@ In both cases, the expected difference of fitness between any two individuals is
 
 Drawback of proportional based selection is that it does not create enough selection pressure when the population has roughly same fitness value. This is problem also to the end of the evolution, because all the individuals are optimized over the generations and have usually very similar fitness value. Note that tournament selection does not suffer by this, as only the relative order between individuals decide about the selection.
 
-One way to eliminate this problem is to rescale fitness to have more desired properties\index{fitness scaling}. One common example is linear scaling into interval $\left[ l,u \right]$ so that individual with $\min\fitnessfn(x_i)=l; \max\fitnessfn(x_i)=u$ and rest of them is scaled linearly between them. Alternatively, logarithmic respectively exponential scale is possible as well, so there will be more emphasis on individuals from the beginning of their sorted sequence, respectively lesser importance of individuals from the end.
+One way to eliminate this problem is to rescale fitness to have more desired properties\index{fitness scaling}. One common example is linear scaling into interval $\left[ l,u \right]$ so that individual with $\min\fitnessfn(x_i)=l; \max\fitnessfn(x_i)=u$ and rest of them is scaled linearly between them. 
+$$
+f_{scale}(\individual)=\frac{\fitnessfn(\individual) - \min\limits_{i}\fitnessfn(\individual_i)}{\max\limits_{i}\fitnessfn(\individual_i)}\cdot(u-l)+l 
+$$
+Alternatively, logarithmic respectively exponential scale is possible as well, so there will be more emphasis on individuals from the beginning of the sorted sequence, respectively lesser importance of individuals from the end.
 
-Special example of fitness scaling is \emph{rank selection}\index{selection!rank}. 
-%TODO
+Special example of fitness scaling is \emph{rank selection}\index{selection!rank}. To eliminate dependency on the absolute values of fitness function, rank selection assign artificial fitness values to the individuals based on their order in the sorted sequence. One common rank evaluation function is linear -- it assign new fitness values in interval $\left[l,u\right]$ such that best individual has new fitness value $l$, the worst one $u$ and rest of the population is uniformly distributed in this interval (in case of minimization) \citep{razali2011genetic}. Different scaling schemas are possible as well. 
 
+Advantage of rank selection is steady selection pressure and unlike roulette wheel selection can handle negative fitness function. Moreover, is is easy to control selection pressure using interval width, as shown in table \ref{tab:rankselection}. It also does not suffer of outliers -- individuals with very high or low fitness in comparison to the rest of the population. Rank selection can therefore avoid premature convergence, but computation costs can be very costly, because the population needs to be sorted, fitness values reevaluated, and another proportional--based selection operator needs to follow.
 
-Rank selection
+\begin{table}
+    \centering
+    \begin{tabular}{|c c | c c | c c |}
+        \hline
+        \thead{Fitness\\value} & Rank & 
+        \thead{New fitness\\for $\left[1,2\right]$}  & 
+        \thead{Selection\\probability\\for $\left[1,2\right]$} &
+        \thead{New fitness\\for $\left[1,10\right]$} &
+        \thead{Selection\\probability\\for $\left[1,10\right]$} \\
+        \hline
+        12   & 1   & 2     & $27\%$ & 10    & $38\%$ \\
+        7    & 2   & 1.75  & $23\%$ & 7.5   & $29\%$ \\
+        1    & 3   & 1.5   & $20\%$ & 5     & $19\%$ \\
+        0    & 4   & 1.25  & $17\%$ & 2.5   & $10\%$ \\
+        -5   & 5   & 2     & $13\%$ & 1     & $4\%$  \\
+        \hline
+    \end{tabular}
+    \caption{Rank selection pressure}
+    \label{tab:rankselection}
+\end{table}
+
 Boltzman Selection - Anneailing
 Elitism
