@@ -141,8 +141,9 @@ The pseudocode of simple genetic algorithm described above is depict in algorith
 
 I will refer to algorithm described above as \enquote{Simple Genetic Algorithm}. In reality, scientists come up with various operators, that can improve convergence or can help in specific types of problems. Thorough following paragraphs, I will focus on these techniques, inspired mainly by the book of authors \citet*{IntroToGA}.
 
-%%  CROSSOVERS  %%
-%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%
+%%%%  CROSSOVERS  %%%%
+%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Advanced crossover operators}
 
 Simple genetic algorithm used one point crossover. It is straightforward to extend it into \emph{two point crossover}\index{crossover!two point} where each genome is split into three parts. Each offspring then receives first and third part of the genome from one parent, and the middle one from the second one. Example of two point crossover is in the picture \ref{fig:gatwopointcrossover}.
@@ -167,8 +168,9 @@ Sometimes, the crossover operator is generalized even more and forms $k$--point 
 
 I have described the crossover operators such that the offsprings replace their parents. That is a common design decision, however one does not need to enforce it and may decide to create offsprings in addition to the parents. To ensure the population does not increase in size, the selection operator can be implemented in a way that specified number of individuals will be picked up.
 
-%%  SELECTION  %%
-%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%
+%%%%  SELECTION  %%%%
+%%%%%%%%%%%%%%%%%%%%%
 \subsection{Selection operators}
 
 Selection operator is one of the most important one, as it is the only operator working with fitness values and therefore the operator responsible for exploitation part of the algorithm. Simple genetic algorithm presented in algorithm \ref{alg:SGA} uses tournament selection -- I will analyze another types of selections thorough following paragraphs.
@@ -272,4 +274,24 @@ Origin of \acrlong{acc:es} dates to 1970s at Technical University in Technische 
 
 This section takes inspiration mainly in the work of \citet*{IntroductionToEA} and \citet*{EScomprehensiveintroduction}.
 
+\acrshort{acc:es} can use same selection and crossover operators as \acrshort{acc:ga}, although it is not recommended \citet{IntroductionToEA}. In general, good crossover operators should
+\begin{itemize}
+    \item preserve population mean, because crossover operators does not work with a fitness function and therefore should introduce bias in the search space,
+    \item slightly increase variance of the population, to balance pressure of selection operators, that usually decrease variance of the population,
+    \item increase variety of the population, so the algorithm effectively search neighborhood solutions,
+    \item allow reachability of any solution in the search space.
+\end{itemize}
+Crossover operators from \acrshort{acc:ga} may fulfil this requirements, however real--coded encoding allows more diverse set of operators. I will describe them a bit later.
+
+\acrshort{acc:ea} also introduced two different selection schemas\index{selection schema}:
+\begin{itemize}
+    \item $\left(\mu+\lambda\right)$ evolution strategy, also known as \emph{plus selection}.
+    \item  $\left(\mu,\lambda\right)$ evolution strategy, also known as \emph{comma selection}.
+\end{itemize}
+Here, the $\mu$ represents number of parents and $\lambda$ number of offsprings. In both cases, $\abs{\mu}$ individuals are selected to the next generation, but in the first case, these individuals are taken from both parents and offsprings. For the comma selection, $\abs{\mu}$ individuals are drawn only from the offsprings and parents are discarded. Obviously, to have at least $\abs{\mu}$ distinct individuals in the next generation, it must hold $\lambda\geq\mu$. For stochastic selection operators, where is possibility to draw same individual multiple times, it may be beneficial to have slightly more offsprings than parents.
+
+%%%%%%%%%%%%%%%%%%%%%%
+%%%%  CROSSOVERS  %%%%
+%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\texorpdfstring{\acrshort*{acc:ea} crossovers}{}}
 
