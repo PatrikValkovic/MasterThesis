@@ -26,6 +26,8 @@ In general, \acrshort{acc:ea} repeat steps above until sufficiently good solutio
 \end{algorithm}
 
 
+
+
 %%%%%%%%%%%%%%%%%%%
 %%               %%
 %%  TERMINOLOGY  %%
@@ -240,7 +242,21 @@ Advantage of rank selection is steady selection pressure and unlike roulette whe
     \label{tab:rankselection}
 \end{table}
 
-Selection operators may use traditional approaches from search algorithms -- for example \emph{simulated annealing}\index{selection!simulated annealing}. Simulated annealing is analogy to metallurgy, where by precise control of heating and cooling of material is improving it's physical and chemical properties. 
+Selection operators may use traditional approaches from search algorithms -- for example \emph{simulated annealing}\index{selection!simulated annealing}. Simulated annealing is analogy to metallurgy, where by precise control of heating and cooling of material are improved it's physical and chemical properties. In general it accepts worse solutions as long as the temperature $\tau$ is high enough. The temperature $\tau$ starts high so almost all the solutions are accepted from the beginning, and decrease over time to zero. Decrease is usually exponential: $\tau_g=\tau_0(1-\alpha)^{1+\frac{\beta\cdot g}{G}}$ where $g$ is current generation, $G$ maximum number of generations, $\alpha\in\left[0,1\right]$, $\beta\in\mathbb{R}^+$, and $\tau_0\in\mathbb{R}^+$ are parameters. 
 
-Boltzman Selection - Anneailing
-Elitism
+Example of simulated annealing is Boltzmann selection operator. The individual is picked up with probability 
+$P=exp\left(-\frac{f_{max} - \fitnessfn(\individual)}{\tau}\right)$
+where $f_{max}$ is best fitness in the population and $\tau$ is current temperature (known as Boltzmann probability). Note that Boltzmann selection is once again proportional--based selection operator and may suffer from the same problems as roulette wheel selection.
+
+Last selection operator, I would like to discuss, is \emph{elitism}\index{elitism}. For some problems may be beneficial to preserve best individuals from the population. This is especially helpful for problems, where can be optimal solution found using small local steps. Mutation and crossover may destroy the best individual in the population and it may be difficult for the algorithm to found it once again, if it's genetic material have not been propagated yet. 
+
+Elitism mechanism is operator, which makes sure the best individuals remains in the population. It is usually implemented in a way it copies the $k$ best individuals from the population before all other operators, and copy them back afterward. Note that elitism is not really selection operator, but rather insure mechanism not to loose best individuals from the population. Traditional selection operator still needs to be present in order for algorithm to work. 
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                        %%
+%%  EVOLUTION STRATEGIES  %%
+%%                        %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
