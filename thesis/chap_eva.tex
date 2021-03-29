@@ -249,6 +249,7 @@ Selection operators may use traditional approaches from search algorithms -- for
 Example of simulated annealing is Boltzmann selection operator. The individual is picked up with probability 
 $P=exp\left(-\frac{f_{max} - \fitnessfn(\individual)}{\tau}\right)$
 where $f_{max}$ is best fitness in the population and $\tau$ is current temperature (known as Boltzmann probability). Note that Boltzmann selection is once again proportional--based selection operator and may suffer from the same problems as roulette wheel selection.
+% TODO Boltzmann selection not implemented
 
 Last selection operator, I would like to discuss, is \emph{elitism}\index{elitism}. For some problems may be beneficial to preserve best individuals from the population. This is especially helpful for problems, where can be optimal solution found using small local steps. Mutation and crossover may destroy the best individual in the population and it may be difficult for the algorithm to found it once again, if it's genetic material have not been propagated yet. 
 
@@ -294,4 +295,40 @@ Here, the $\mu$ represents number of parents and $\lambda$ number of offsprings.
 %%%%  CROSSOVERS  %%%%
 %%%%%%%%%%%%%%%%%%%%%%
 \subsection{\texorpdfstring{\acrshort*{acc:ea} crossovers}{}}
+
+Encoding genotype as a vector of real numbers allows, except crossover operators from \acrshort{acc:ga}, additional crossover operators using real numbers. One argument may be exploitation of correlation within the population.
+
+\begin{figure}
+    \begin{subfigure}[t]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{img/render_separable.pdf}
+        \caption{Separable ellipsoid function.}
+        \label{fig:separableelipsoid}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{img/render_nonseparable.pdf}
+        \caption{Non--separable ellipsoid function.}
+        \label{fig:nonseparableelipsoid}
+    \end{subfigure}
+    \caption{Difference between separable and non--separable function for optimization. Trajectories of hill climbing algorithm are depict orange.}
+    \label{fig:separationfucntions}
+\end{figure}
+
+Lets take for example two functions:
+\begin{align*}
+    f_{sep}(x,y)&=x^2+3y^2 \\
+    f_{nosep}(x,y)&=x^2+3y^2+2xy
+\end{align*}
+These functions are shown in figure \ref{fig:separationfucntions}. Running simple hill climber algorithm \citep{HandbookOfMetaheuristics}, one may get trajectories displayed in the figure by orange color. Notice, that the trajectory of the function $f_{nosep}$ is much longer -- it took $200$ steps to achieve global minimum for the function $f_{sep}$, however up to $400$ steps for the function $f_{nosep}$ (the step size was set equally). The cause of this is that the first function is separable -- it can be written in the form $f_{sep}(x,y)=f(x)+f(y)$. Hill climber algorithm can easily find optimum, because $\min f_{sep}=\min f(x)+\min f(y)$, therefore it can find the optimum for each of the variable independently. That is not true for the function $f_{nosep}$, because it is not separable and using local search technique is not as straightforward. Separable functions are more challenging harder in some sense, the problem \acrshort{acc:ea} should solve efficiently.
+
+Problem of crossover operators from \acrshort{acc:ga} is exactly the same as I just shown you. These operators works on the genes independently, they do not use knowledge about the correlation of the genotype space within the population. It is necessary to use different crossover operators tailored for the \acrshort{acc:ea}.
+
+Arithmetic crossover
+Blend Crossover
+Simplex crossover
+Simple ale s hypersphere
+
+Simulated Binary Crossover
+Unimodal Normal Distribution Crossover
+
 
