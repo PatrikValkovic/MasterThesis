@@ -45,7 +45,7 @@ In this section, I will introduce necessary terminology that I am going to use t
 
 \defterm{Representation or genotype space} is the space of genotype.
 
-\defterm{Phenotype}\index{phenotype} is the solution built from genotype. Genotype and phenotype can be equivalent -- for example real function optimization problem may have as a genotype vector of real numbers, that represent one of the solution. Generally, however, genotype and phenotype can be different.
+\defterm{Phenotype}\index{phenotype} is the solution built from genotype. Genotype and phenotype can be equivalent -- for example real function optimization problem may have as a genotype vector of real numbers, that represent one of the solution. Generally, however, genotype and phenotype can be different \citep{GeneticAlgorithmEssentials}.
 
 \defterm{Search space} is the space of phenotype.
 
@@ -252,7 +252,7 @@ Last selection operator, I would like to discuss, is \emph{elitism}\index{elitis
 
 Elitism mechanism is operator, which makes sure the best individuals remains in the population. It is usually implemented in a way it copies the $k$ best individuals from the population before all other operators, and copy them back afterward. Note that elitism is not really selection operator, but rather insure mechanism not to loose best individuals from the population. Traditional selection operator still needs to be present in order for algorithm to work. 
 
-
+% TODO schemata are not discussed in the text, it may be worth mention them
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -260,3 +260,16 @@ Elitism mechanism is operator, which makes sure the best individuals remains in 
 %%  EVOLUTION STRATEGIES  %%
 %%                        %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{\texorpdfstring{\acrlong*{acc:es}}{}}
+
+\acrfull{acc:es} are natural extension of \acrshort{acc:ga} by extension of genotype into real numbers.
+$$
+\individual \in \mathbb{R}^{n}
+$$
+Alternatively the relaxed definition allows genotype of arbitrary number of dimension. That may be helpful for problems, which expect particular structure of the solution -- for example image processing filters \citep{WVDF}. Note that using different structure of genotype disallow direct use of some operators, like one and two point crossovers, because the split point may be ambitious. On the other hand, some operators, like uniform crossover, can easily handle multidimensional genotype without much change.
+
+Origin of \acrlong{acc:es} dates to 1970s at Technical University in Technische Universität Berlin, where \citeauthor*{ES-original} presented \acrshort{acc:es} \citep{ES-original}. Originally, \acrshort{acc:ea} has not been used as optimization algorithm for real function, but \enquote{rather as a set of rules for the automatic design and analysis of consecutive experiments with stepwise variable adjustement driving a suitable object/system into the optimal state in spite of enviornmental noise} \citep{EScomprehensiveintroduction}. It turned out thi simple stochastic search technique outperformed traditional--based methods. Although there is no guarantee \acrshort{acc:es} will find optimal solution, they are in most cases able to find near--optimal and sufficiently good enough solution.
+
+This section takes inspiration mainly in the work of \citet*{IntroductionToEA} and \citet*{EScomprehensiveintroduction}.
+
+
