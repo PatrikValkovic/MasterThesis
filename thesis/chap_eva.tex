@@ -378,12 +378,30 @@ Here, the $\alpha$ is user specified parameter and algorithms is sometimes calle
     \caption{\acrshort*{acc:es} crossover operators}
 \end{figure}
 
+ANother type of crossover operator is \emph{simplex crossover}\index{crossover \acrshort*{acc:es}!simplex}. It uses simplex to sample sample offsprings. Simplex is a generalization of triangle into more dimensions. It is defined in $n$--dimensional space using $n+1$ points. For two dimensional space is simplex triangle, for three dimensional space is simplex tetrahydron and so on. From the definition, the simplex crossover require $n+1$ parents $\mathbf{p_1}, \mathbf{p_2}, \dots, \mathbf{p_n}, \mathbf{p_{n+1}}$. It calculate their centroid
+$$
+\mathbf{k}=\frac{\sum_{i=1}^{n+1} \mathbf{p_i}}{n+1}
+$$
+and then expand the simplex by $\varepsilon$ along each of the direction $\mathbf{p_k} - \mathbf{k}$. As a result, this new, expanded, simplex is defined by the points
+\boldmath$$
+p'_i = p_i + \varepsilon\left( p_i - k \right).
+$$
+From this simplex, the offspring are sampled. Example of simplex in two dimensional space is in the figure \ref{fig:simplexcrossoverexample} with $\varepsilon=1.5$.
+I would argue, that the hypersphere sample space can be used as well, as is shown in figure \ref{fig:simplexcrossoverexample} as well with $\varepsilon=1.2$.
+% TODO not implemented
+% In the Introduction to Evolutionary Algorithms, another types of crossovers like Simulated Binary Crossover and Unimodal Normal Distribution Crossover are described as well. I can discuss them when they become relevant.
 
+%%%%%%%%%%%%%%%%%%%%
+%%%%  MUTATION  %%%%
+%%%%%%%%%%%%%%%%%%%%
+\subsection{\texorpdfstring{\acrshort*{acc:ea} mutation operators}{}}
 
-Simplex crossover
-Simple ale s hypersphere
+%%%%%%%%%%%%%%%%%%%%%%
+%%%%  ADAPTATION  %%%%
+%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Adaptive operators}
 
-Simulated Binary Crossover
-Unimodal Normal Distribution Crossover
-
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%  DIFFERENTIAL EVOLUTION  %%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Differential evolution}
