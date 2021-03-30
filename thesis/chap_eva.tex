@@ -106,19 +106,19 @@ The typical crossover operator is \emph{one point crossover}\index{crossover \ac
     \hfill
     \begin{subfigure}[b]{0.4\textwidth}
         \includegraphics[width=\textwidth]{img/master_bitflipmutation.pdf}
-        \caption{Bit-flip mutation}
+        \caption{Bit--flip mutation}
         \label{fig:bitflipmutation}
     \end{subfigure}
     \caption{Genetic algorithm operators}
 \end{figure}
 
-The mutation\index{mutation} operator for \acrshort{acc:ga} is in most cases bit-flip mutation\index{mutation!bit-flip}. During this mutation, each gene in the genotype is mutated with probability $p_m$. One example of mutation is in figure \ref{fig:bitflipmutation}. Mutation has two objectives -- it makes sure the algorithm is not trapped in local optima, and it sustains genetic disparity in the population. As a side effect, mutation serves as minor search operator \citep{IntroToGA}.
+The mutation\index{mutation \acrshort*{acc:ga}} operator for \acrshort{acc:ga} is in most cases bit--flip mutation\index{mutation \acrshort*{acc:ga}!bit--flip}. During this mutation, each gene in the genotype is mutated with probability $p_m$. One example of mutation is in figure \ref{fig:bitflipmutation}. Mutation has two objectives -- it makes sure the algorithm is not trapped in local optima, and it sustains genetic disparity in the population. As a side effect, mutation serves as minor search operator \citep{IntroToGA}.
 
 The difference between crossover and mutation is such that crossover is rather \enquote{search} exploitation technique. It combines individuals from current population and exploit them to find possibly better individuals. Mutation, on the other hand, is more local search technique and based on the probability $p_b$ it search over the whole representation space.
 
 Finally, the selection stage takes place. There are various selection techniques and in this particular case, I will use tournament selection\index{selection!tournament}. During tournament selection, fitness values of two random individuals are compared and the better individual is copied into the new population. This repeats as many times, as specified number of individuals form a new population.
 
-For cases where the size of the new population equals to the size of the old one, there is high probability that the same individual will be in the following population multiple times. Nevertheless, because of crossover and mutation operators that doesn't matter, because they keep divergence in the population.
+For cases where the size of the new population equals to the size of the old one, there is high probability that the same individual will be in the following population multiple times. Nevertheless, because of crossover and mutation operators that does not matter, because variation operators keep divergence in the population.
 
 The pseudocode of simple genetic algorithm described above is depict in algorithm \ref{alg:SGA}. The population if firstly randomly initialized and then undergo crossover, mutation, evaluation, and selection operators in the loop. Finally, evolved population is returned from the algorithm.
 
@@ -129,7 +129,7 @@ The pseudocode of simple genetic algorithm described above is depict in algorith
     \ForEach{$gen$ in $0$..$g$}{
         \ForEach{individual in $0$..$l$}{
             \If(){$rand()<p_c$}{One point crossover with random individual}
-            \If(){$rand()<p_m$}{Bit-flip mutation}
+            \If(){$rand()<p_m$}{Bit--flip mutation}
         }
         Evaluate population using $\fitnessfn$\;
         population $\leftarrow$ pick up $l$ individuals using tournament\;
@@ -378,14 +378,16 @@ Here, the $\alpha$ is user specified parameter and algorithms is sometimes calle
     \caption{\acrshort*{acc:es} crossover operators}
 \end{figure}
 
-ANother type of crossover operator is \emph{simplex crossover}\index{crossover \acrshort*{acc:es}!simplex}. It uses simplex to sample sample offsprings. Simplex is a generalization of triangle into more dimensions. It is defined in $n$--dimensional space using $n+1$ points. For two dimensional space is simplex triangle, for three dimensional space is simplex tetrahydron and so on. From the definition, the simplex crossover require $n+1$ parents $\mathbf{p_1}, \mathbf{p_2}, \dots, \mathbf{p_n}, \mathbf{p_{n+1}}$. It calculate their centroid
+Another type of crossover operator is \emph{simplex crossover}\index{crossover \acrshort*{acc:es}!simplex}. It uses simplex to sample sample offsprings. Simplex is a generalization of triangle into more dimensions. It is defined in $n$--dimensional space using $n+1$ points. For two dimensional space is simplex triangle, for three dimensional space is simplex tetrahydron and so on. From the definition, the simplex crossover require $n+1$ parents $\mathbf{p_1}, \mathbf{p_2}, \dots, \mathbf{p_n}, \mathbf{p_{n+1}}$. It calculate their centroid
 $$
 \mathbf{k}=\frac{\sum_{i=1}^{n+1} \mathbf{p_i}}{n+1}
 $$
 and then expand the simplex by $\varepsilon$ along each of the direction $\mathbf{p_k} - \mathbf{k}$. As a result, this new, expanded, simplex is defined by the points
-\boldmath$$
+\boldmath
+$$
 p'_i = p_i + \varepsilon\left( p_i - k \right).
 $$
+\unboldmath
 From this simplex, the offspring are sampled. Example of simplex in two dimensional space is in the figure \ref{fig:simplexcrossoverexample} with $\varepsilon=1.5$.
 I would argue, that the hypersphere sample space can be used as well, as is shown in figure \ref{fig:simplexcrossoverexample} as well with $\varepsilon=1.2$.
 % TODO not implemented
@@ -394,7 +396,44 @@ I would argue, that the hypersphere sample space can be used as well, as is show
 %%%%%%%%%%%%%%%%%%%%
 %%%%  MUTATION  %%%%
 %%%%%%%%%%%%%%%%%%%%
-\subsection{\texorpdfstring{\acrshort*{acc:ea} mutation operators}{}}
+\subsection{\texorpdfstring{\acrshort*{acc:es} mutation operators}{}}
+
+Equivalent of bit--flip mutation in \acrshort{acc:ga} is \emph{uniform mutation}\index{mutation \acrshort*{acc:es}!uniform}. It replaces gene by random value sampled from $U(l,u)$ with small probability $p_m$, where interval $\left[l,u\right]$ is the domain of the scalar. This operator basically tries random numbers and can rarely lead to good solution. Moreover, it does not exploit distribution of the population.
+% TODO check whether is implemented
+
+More successful and frequently used is \emph{normal mutation}\index{mutation \acrshort*{acc:es}!normal}. It performs small change of the individual by adding sample from normal distribution with zero mean to each gene.
+$$
+p_i = p_i + N(0,\sigma)
+$$
+The $\sigma$ is mutation strength parameter and is usually kept low. Notice that normal mutation does not use mutation probability $p_m$. Because the $\sigma$ is usually small and the distribution has zero mean, the changes does not influence the population too much.
+
+Normal mutation can be further extended to adapt to more complicated problems. Instead of $\sigma$ variable, it is possible to introduce $\boldsymbol{\sigma}$ vector, that allows different deviation in each dimension.
+$$
+p_i = p_i + N(0,\sigma_i)
+$$ 
+To address non--separable functions, we may need the whole covariance matrix $\Sigma^{n \times n}$ for successful adaptation. Normal mutation with covariance matrix is sometimes called correlated mutation. Notice that in order to use correlated mutation in $n$ dimensions, the algorithm needs $\frac{n\left(n+1\right)}{2}$ parameters just for the correlation matrix and therefore correlated mutation has just a small practical usage on its own. Another algorithms addressed this issue -- probably the best well--known is the \acrfull{acc:cma}.
+
+Normal distribution is probably the most used mutation distribution, but other distributions are possible as well. \citet*{CauchyDistributionMutation} used Cauchy distribution to faster the search. As shown in figure \ref{fig:mutationdistributionnormalcacuchy}, Cauchy distribution does not  decrease as fast as normal distribution and therefore search bigger genotype space. On the other hand, if we desire to shrink the searching space, we may use polynomial distribution, which probability density function is defined as
+$$
+p(x)=0.5 \left(n + 1\right)\left( 1 - \abs{x} \right)^n
+$$ 
+where $n$ user--defined parameter and function domain is interval $\left[-1,1\right]$. Example of polynomial distribution is in figure \ref{fig:mutationdistributionpolynomial}.
+
+\begin{figure}
+    \begin{subfigure}[t]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{img/render_distributions_normalcauchy.pdf}
+        \caption{Normal and Cauchy distributions.}
+        \label{fig:mutationdistributionnormalcacuchy}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{img/render_distributions_polynomial.pdf}
+        \caption{Polynomial distributions.}
+        \label{fig:mutationdistributionpolynomial}
+    \end{subfigure}
+    \caption{Mutation distributions}
+\end{figure}
+
 
 %%%%%%%%%%%%%%%%%%%%%%
 %%%%  ADAPTATION  %%%%
