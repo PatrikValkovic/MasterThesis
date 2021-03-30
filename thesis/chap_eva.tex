@@ -95,7 +95,7 @@ $$ \individual \in \left\{0,1\right\}^{n} $$
 Fitness function maps genotype into real values
 $$ \fitnessfn:\left\{0,1\right\}^{n}\rightarrow\mathbb{R} $$
 
-The typical crossover operator is \emph{one point crossover}\index{crossover!one--point}. This type of crossover require two parents and produces two offsprings. As the first step, the algorithm uniformly sample random integer $s$ in the range $\left[ 1, n-1 \right]$. The first offspring will receive genetic material up to index $s$ from the first parent, and the rest from the second one. The second offspring is created the same way, except the position of parents is exchanged. Example for $n=10$ is in figure \ref{fig:gaonepointcrossover}. In order not to modify all the individuals in the population, only $p_c\in\left[0,1\right]$ percent of individuals undergo the crossover and the children replace their parents \citep{IntroductionToEA}.
+The typical crossover operator is \emph{one point crossover}\index{crossover \acrshort*{acc:ga}!one--point}. This type of crossover require two parents and produces two offsprings. As the first step, the algorithm uniformly sample random integer $s$ in the range $\left[ 1, n-1 \right]$. The first offspring will receive genetic material up to index $s$ from the first parent, and the rest from the second one. The second offspring is created the same way, except the position of parents is exchanged. Example for $n=10$ is in figure \ref{fig:gaonepointcrossover}. In order not to modify all the individuals in the population, only $p_c\in\left[0,1\right]$ percent of individuals undergo the crossover and the children replace their parents \citep{IntroductionToEA}.
 
 \begin{figure}
     \begin{subfigure}[b]{0.4\textwidth}
@@ -146,7 +146,7 @@ I will refer to algorithm described above as \enquote{Simple Genetic Algorithm}.
 %%%%%%%%%%%%%%%%%%%%%%
 \subsection{Advanced crossover operators}
 
-Simple genetic algorithm used one point crossover. It is straightforward to extend it into \emph{two point crossover}\index{crossover!two point} where each genome is split into three parts. Each offspring then receives first and third part of the genome from one parent, and the middle one from the second one. Example of two point crossover is in the picture \ref{fig:gatwopointcrossover}.
+Simple genetic algorithm used one point crossover. It is straightforward to extend it into \emph{two point crossover}\index{crossover \acrshort*{acc:ga}!two point} where each genome is split into three parts. Each offspring then receives first and third part of the genome from one parent, and the middle one from the second one. Example of two point crossover is in the picture \ref{fig:gatwopointcrossover}.
 
 \begin{figure}
     \begin{subfigure}[b]{0.4\textwidth}
@@ -163,7 +163,7 @@ Simple genetic algorithm used one point crossover. It is straightforward to exte
     \caption{Advanced crossover operators}
 \end{figure}
 
-Sometimes, the crossover operator is generalized even more and forms $k$--point crossover. The genotype partitions into $k$ parts and these parts are interleaved in the offsprings. Special case is \emph{uniform crossover}\index{crossover!uniform} -- the offsprings are constructed in such a way that they are uniform combination if their parents. Each gene in the offspring have equal probability whether it will be received from the first, or second parent. Second offspring will follow the same pattern, except with parents exchanged. Example of uniform crossover is in figure \ref{fig:uniformcrossover}.
+Sometimes, the crossover operator is generalized even more and forms $k$--point crossover. The genotype partitions into $k$ parts and these parts are interleaved in the offsprings. Special case is \emph{uniform crossover}\index{crossover \acrshort*{acc:ga}!uniform} -- the offsprings are constructed in such a way that they are uniform combination if their parents. Each gene in the offspring have equal probability whether it will be received from the first, or second parent. Second offspring will follow the same pattern, except with parents exchanged. Example of uniform crossover is in figure \ref{fig:uniformcrossover}.
 % Introduction into GA presents few more types - three parents crossover, crossover with reduced surrogate, and shuffle crossover. These are irrelevant for my implementation, but can be potentially described here.
 
 I have described the crossover operators such that the offsprings replace their parents. That is a common design decision, however one does not need to enforce it and may decide to create offsprings in addition to the parents. To ensure the population does not increase in size, the selection operator can be implemented in a way that specified number of individuals will be picked up.
@@ -279,17 +279,27 @@ This section takes inspiration mainly in the work of \citet*{IntroductionToEA} a
 \begin{itemize}
     \item preserve population mean, because crossover operators does not work with a fitness function and therefore should introduce bias in the search space,
     \item slightly increase variance of the population, to balance pressure of selection operators, that usually decrease variance of the population,
-    \item increase variety of the population, so the algorithm effectively search neighborhood solutions,
+    \item\label{enum:espopulationvariance} \snipescondition, so the algorithm effectively search neighborhood solutions,
     \item allow reachability of any solution in the search space.
 \end{itemize}
 Crossover operators from \acrshort{acc:ga} may fulfil this requirements, however real--coded encoding allows more diverse set of operators. I will describe them a bit later.
 
 \acrshort{acc:ea} also introduced two different selection schemas\index{selection schema}:
 \begin{itemize}
-    \item $\left(\mu+\lambda\right)$ evolution strategy, also known as \emph{plus selection}.
-    \item  $\left(\mu,\lambda\right)$ evolution strategy, also known as \emph{comma selection}.
+    \item $\left(\mu+\lambda\right)$ evolution strategy, also known as \emph{plus schema}.
+    \item  $\left(\mu,\lambda\right)$ evolution strategy, also known as \emph{comma schema},
+    \item steady--state evolution strategy.
 \end{itemize}
-Here, the $\mu$ represents number of parents and $\lambda$ number of offsprings. In both cases, $\abs{\mu}$ individuals are selected to the next generation, but in the first case, these individuals are taken from both parents and offsprings. For the comma selection, $\abs{\mu}$ individuals are drawn only from the offsprings and parents are discarded. Obviously, to have at least $\abs{\mu}$ distinct individuals in the next generation, it must hold $\lambda\geq\mu$. For stochastic selection operators, where is possibility to draw same individual multiple times, it may be beneficial to have slightly more offsprings than parents.
+Here, the $\mu$ represents number of parents and $\lambda$ number of offsprings. In the first two cases, $\abs{\mu}$ individuals are selected to the next generation, but in the plus schema these individuals are taken from both parents and offsprings. For the comma schema, $\abs{\mu}$ individuals are drawn only from the offsprings and parents are discarded. Obviously, to have at least $\abs{\mu}$ distinct individuals in the next generation, it must hold $\lambda\geq\mu$. For stochastic selection operators, where is possibility to draw same individual multiple times, it may be beneficial to have more offsprings than parents.
+
+Both plus and comma selection schemas generates number of offsprings and resample the whole population for the next generation. Steady--state evolution strategy, on the other hand, generates just one (or a very few) individuals in each generation and try to reintegrate them back into the population. The steps of the algorithm are:
+\begin{enumerate}
+    \item Generate new individual and evaluate it using fitness function.
+    \item\label{enum:steadystateparentpickup} Choose individual from the population, that can be replaced by the new one.
+    \item\label{enum:steadystatereplacement} Decide whether the old individual should be replaced.
+\end{enumerate}
+The step \ref{enum:steadystateparentpickup} is known as the replacement strategy and some of the common variants are to replace the oldest, worst, or random individual. The step \ref{enum:steadystatereplacement} is known as the replacement condition. The most common variant is to replace the old individual only if the new one is better, however is it possible to use simulated annealing as well.
+The steady state refer express the idea, that the population undergo only a small change each step \citep{SteadyStateEvolutionStrategy}.
 
 %%%%%%%%%%%%%%%%%%%%%%
 %%%%  CROSSOVERS  %%%%
@@ -323,8 +333,53 @@ These functions are shown in figure \ref{fig:separationfucntions}. Running simpl
 
 Problem of crossover operators from \acrshort{acc:ga} is exactly the same as I just shown you. These operators works on the genes independently, they do not use knowledge about the correlation of the genotype space within the population. It is necessary to use different crossover operators tailored for the \acrshort{acc:ea}.
 
-Arithmetic crossover
-Blend Crossover
+One of the simplest \acrshort{acc:es} crossover is \emph{arithmetic crossover}\index{crossover \acrshort*{acc:es}!arithmetic}. For parents $\mathbf{p_1}$ and $\mathbf{p_2}$, the offspring $o$ is created using following formula.
+$$
+\mathbf{o} = \alpha\mathbf{p_1}+\left(1-\alpha\right)\mathbf{p_2}
+$$
+where $\alpha \sim U(0,1)$ (uniformly distributed variable in interval $\left[0,1\right]$). Is is possible to generate second offspring by setting $\beta=1-\alpha$ and substitute $\beta$ for $\alpha$. This operator uses same $\alpha$ for every dimension of the vector, so it is sometimes called \emph{whole arithmetic crossover}. Easy extension is to use $\boldsymbol{\alpha}=(\alpha_1,\alpha_2,\dots,\alpha_n)$ vector, where $\alpha_i\sim U(0,1)$ and create offspring using similar formula.
+$$
+\mathbf{o} = \boldsymbol{\alpha}\cdot\mathbf{p_1}+\left(1-\boldsymbol{\alpha}\right)\cdot\mathbf{p_2}
+$$
+where $\cdot$ is element--wise multiplication of vectors.
+Natural extension of the algorithm is to use up to $k$ parents $\mathbf{p_1}, \mathbf{p_2},\dots,\mathbf{p_k}$ and create offspring by their linear combination.
+$$
+\mathbf{o} = 
+\boldsymbol{\alpha}_1\cdot\mathbf{p_1}+
+\boldsymbol{\alpha}_2\cdot\mathbf{p_2}+
+\cdots +
+\boldsymbol{\alpha}_k\cdot\mathbf{p_k}
+$$
+where $\sum_{i=1}^{k}\boldsymbol{\alpha}_i=\boldsymbol{1}$.
+% TODO make sure the implementation checks
+
+Arithmetic crossover is just a linear combination of it's parent, it does not satisfy condition on page \pageref{enum:espopulationvariance} to \enquote{\snipescondition}. Authors \citeauthor*{BlendCrossoverOriginal} address this issue in \emph{blend crossover}\index{crossover \acrshort*{acc:es}!blend} operator. For parents $\mathbf{x}$ and $\mathbf{y}$, the genes of offspring $\mathbf{o}$ is generated randomly from uniform distribution specified by it's parents.
+$$
+o_i = U\left( 
+    x_i - \alpha \left( y_i - x_i \right),
+    y_i + \alpha \left( y_i - x_i \right)
+\right)
+$$
+Here, the $\alpha$ is user specified parameter and algorithms is sometimes called \acrshort{acc:blx}--$\alpha$ crossover. Example of \acrshort{acc:blx} is in the figure \ref{fig:blendcrossoverexample}.
+% TODO not implemented
+
+\begin{figure}
+    \begin{subfigure}[t]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{img/BLX.pdf}
+        \caption{Blend crossover sample space with $\alpha=0.5$ (orange) and $\alpha=-0.3$ (blue) in two dimensions.}
+        \label{fig:blendcrossoverexample}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{img/render_nonseparable.pdf}
+        \caption{Simplex crossover example in two dimensions.}
+        \label{fig:simplexcrossoverexample}
+    \end{subfigure}
+    \caption{\acrshort*{acc:es} crossover operators.}
+\end{figure}
+
+
+
 Simplex crossover
 Simple ale s hypersphere
 
