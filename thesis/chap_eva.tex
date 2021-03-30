@@ -1,4 +1,4 @@
-\chapter{\texorpdfstring{\acrlong*{acc:ea}}{}}
+\chapter{\texorpdfstring{\acrlong*{acc:ea}}{Evolution algorithms}}
 
 Optimization. What better word would describe the ultimate goal of all the people, our civilization, and maybe even the Universe. With a bit of exaggeration, optimization is the cause of all the ramifications we can see around. Because what else are Physic laws than minimization processes, our pursuit of knowledge and self improvement than maximization of self-worth, industrial revolutions than minimization of human labour, maximization of goods production and standard of living at the same time. In my opinion, optimization is the reason what drives us forward, makes us better, and guides our decisions.
 
@@ -87,7 +87,7 @@ In this section, I will introduce necessary terminology that I am going to use t
 %%  GENETIC ALGORITHMS  %%
 %%                      %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{\texorpdfstring{\acrlong*{acc:ga}}{}}
+\section{\texorpdfstring{\acrlong*{acc:ga}}{Genetic algorithms}}
 
 \acrfull{acc:ga}\index{genetic algorithm} are probably the simplest \acrfull{acc:ea} out there and as their father is usually considered \citefullauthor{HollandGA}. In the \acrshort{acc:ga}, individual are binary string of length $n$, formally
 $$ \individual \in \left\{0,1\right\}^{n} $$
@@ -263,7 +263,7 @@ Elitism mechanism is operator, which makes sure the best individuals remains in 
 %%  EVOLUTION STRATEGIES  %%
 %%                        %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{\texorpdfstring{\acrlong*{acc:es}}{}}
+\section{\texorpdfstring{\acrlong*{acc:es}}{Evolution strategies}}
 
 \acrfull{acc:es} are natural extension of \acrshort{acc:ga} by extension of genotype into real numbers.
 $$
@@ -304,7 +304,7 @@ The steady state refer express the idea, that the population undergo only a smal
 %%%%%%%%%%%%%%%%%%%%%%
 %%%%  CROSSOVERS  %%%%
 %%%%%%%%%%%%%%%%%%%%%%
-\subsection{\texorpdfstring{\acrshort*{acc:ea} crossovers}{}}
+\subsection{\texorpdfstring{\acrshort*{acc:ea} crossovers}{Crossovers}}
 
 Encoding genotype as a vector of real numbers allows, except crossover operators from \acrshort{acc:ga}, additional crossover operators using real numbers. One argument may be exploitation of correlation within the population.
 
@@ -396,7 +396,7 @@ I would argue, that the hypersphere sample space can be used as well, as is show
 %%%%%%%%%%%%%%%%%%%%
 %%%%  MUTATION  %%%%
 %%%%%%%%%%%%%%%%%%%%
-\subsection{\texorpdfstring{\acrshort*{acc:es} mutation operators}{}}
+\subsection{\texorpdfstring{\acrshort*{acc:es} mutation operators}{Mutation operators}}
 
 Equivalent of bit--flip mutation in \acrshort{acc:ga} is \emph{uniform mutation}\index{mutation \acrshort*{acc:es}!uniform}. It replaces gene by random value sampled from $U(l,u)$ with small probability $p_m$, where interval $\left[l,u\right]$ is the domain of the scalar. This operator basically tries random numbers and can rarely lead to good solution. Moreover, it does not exploit distribution of the population.
 % TODO check whether is implemented
@@ -418,6 +418,7 @@ $$
 p(x)=0.5 \left(n + 1\right)\left( 1 - \abs{x} \right)^n
 $$ 
 where $n$ user--defined parameter and function domain is interval $\left[-1,1\right]$. Example of polynomial distribution is in figure \ref{fig:mutationdistributionpolynomial}.
+% TODO make sure is implemented
 
 \begin{figure}
     \begin{subfigure}[t]{0.45\textwidth}
@@ -439,6 +440,38 @@ where $n$ user--defined parameter and function domain is interval $\left[-1,1\ri
 %%%%  ADAPTATION  %%%%
 %%%%%%%%%%%%%%%%%%%%%%
 \subsection{Adaptive operators}
+
+It is usually helpful to alter algorithm parameters thorough the evolution, so it can better adjust to the problem in hand. For example, one may decrease the deviation of normal distribution in the normal mutation, as the population is converging to the optimum. \emph{Adaptive operators}\index{adaptive operators} is a general term for operators, which tweak their parameters based on the progress of the algorithm.
+
+Decay operators\index{adaptive operators!decay} decrease their value based on the generations. It may decrease the mutation and crossover probability \citep{DecayGA}, mutation strength, population size and many more parameters. The major idea behind is that as algorithm proceed, the changes to the individuals are getting smaller and the algorithm has better chance to converge.
+
+One of the simplest decay function is linear, that linearly decrease value of parameter from $u$ to $l$.
+$$
+decay_l(u,l) = u - \frac{g}{G}\cdot\left( u - l \right)
+$$
+where $g$ is current generation and $G$ is total number of generation. Another popular decay function is exponential:
+$$
+decay_e(s,r) = s\cdot r^g
+$$
+where $s$ is starting value of the parameter and $r\in\left[0,1\right]$ is a decay rate. Note that in order to get same decay rate for different number of generations, the rate must be recomputed.
+Final decay rate I would like to mention is polynomial decay.
+$$
+decay_p(s,p) = s \cdot\left(1 - \frac{g}{G}\right)^p
+$$
+where $s$ is starting value and $p$ is adjustable parameter. Examples of decays are starting at value $5$ and taking $400$ generations are shown in figure \ref{fig:decayrates}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\textwidth]{img/render_decayrate.pdf}
+    \caption{Decay rates}
+    \label{fig:decayrates}
+\end{figure}
+
+Another popular approach to adaptive operators is the \emph{one--fifth rule}\index{adaptive operators!one--fifth rule} \citep{onefifthrule}. The main idea behind is to increase mutation deviation (usually called step--size) after successful mutation and decrease it otherwise. The reasoning behind is that if too many individuals are better, than the search is probably too local and by increasing the step size, we increase the search domain. Consequently, a little success individuals indicate that the step is too big and should be decreased.
+
+As a rule, authors \citet*{onefifthruleoriginal} suggested $1/5$ success rate as the threshold value. If at least $1.5$ offsprings are better, than the step--size should be increased by a factor of $1.5$ and decreased by a factor of $1.5^{-1/4}$ otherwise \citep{onefifthrule}.
+
+However, the proof of this rule by \citeauthor*{onefifthruleoriginal} were done only for unimodal function and small populations. It is generally not a good balance for more complex problems. Better results can be achieved using more advanced techniques to adapt parameters, such as \acrshort{acc:cma}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%  DIFFERENTIAL EVOLUTION  %%%%

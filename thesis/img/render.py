@@ -9,6 +9,19 @@ import scipy.stats as stats
 os.chdir(os.path.dirname(sys.argv[0]))
 FIGSIZE=8,6
 
+# decays
+STEPS = 400
+x = np.arange(0.0, STEPS + 1)
+plt.figure(figsize=FIGSIZE)
+plt.plot(x, 5 - 5 * (x / STEPS), c='tab:blue', label='Linear')
+plt.plot(x, 5 * 0.9**x, c='tab:orange', label='Exponential $r=0.9$')
+plt.plot(x, 5 * 0.99**x, c='tab:green', label='Exponential $r=0.99$')
+plt.plot(x, 5 * (1 - x/STEPS)**2, c='tab:red', label='Polynomial $p=2$')
+plt.plot(x, 5 * (1 - x/STEPS)**7, c='tab:purple', label='Polynomial $p=7$')
+plt.legend()
+plt.savefig('render_decayrate.pdf')
+exit()
+
 # normal, cauchy distributions
 x = np.linspace(-3,3,1000)
 plt.figure(figsize=FIGSIZE)
@@ -30,7 +43,6 @@ plt.plot(x, 0.5 * (n+1) * (1-np.abs(x))**n, c='tab:green', label='Polynomial $n=
 plt.legend()
 plt.savefig('render_distributions_polynomial.pdf')
 plt.close()
-exit()
 
 # render elipsoids
 fn = lambda x,y: x**2+3*y**2
