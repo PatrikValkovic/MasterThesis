@@ -611,3 +611,49 @@ Notice that all these topologies are static and does not change during run of th
 %%%%  VELOCITY  %%%%
 %%%%%%%%%%%%%%%%%%%%
 \subsection{Velocity update}
+
+Difference between \acrshort{acc:spso2006} and \acrshort{acc:spso2011} is the way they change velocity. In \acrshort{acc:spso2006}, the velocity update is
+$$
+\mathbf{v_i} = \omega\mathbf{v_i} 
++ c_l U_d\left( 0,1 \right) \cdot \left( \mathbf{L_i} - \mathbf{p_i} \right)
++ c_g U_d\left( 0,1 \right) \cdot \left( \mathbf{G_i} - \mathbf{p_i} \right)
+$$ 
+where $\omega$ is inertia weight, $c_l$ and $c_g$ are cognitive respectively social acceleration coefficients, and $U_d(0,1)$ is independent and uniformly distributed random vector in the range $\left[ 0,1 \right]$ with dimension $d$. The $\cdot$ is element--wise multiplication. The inertia weight prevent from explosion of the velocity. Constants $c_l$ and $c_g$ controls, how much the local best respectively the global best attracts the particle, and are specified by the user. The particle position it then updated simply by adding applying velocity to the particle.
+$$
+\mathbf{p_i} = \mathbf{p_i} + \mathbf{v_i}
+$$
+
+Except inertia weight, one may limit the position of the particle to fit into interval of interest, respectively limit velocity. We may limit the velocity using its magnitude (then no particle can move faster than specified threshold), or per coordinate, similarly to the position \citep{PSOvelocitylimit}.
+
+\begin{figure}
+    \begin{subfigure}[t]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{img/pso2006.pdf}
+        \caption{\acrshort*{acc:spso2006} sampling space}
+        \label{fig:samplingspso2006}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{img/pso2011.pdf}
+        \caption{\acrshort*{acc:spso2011} sampling space}
+        \label{fig:samplingspso2011}
+    \end{subfigure}
+    \caption{Sampling space of \acrshort*{acc:spso2006} and \acrshort*{acc:spso2011}}
+\end{figure}
+
+Because the velocity update in \acrshort{acc:spso2006} is done dimension by dimension, the performance of the algorithm is rotation sensitive and depends is coordinate system dependent. This phenomena is visible in figure \ref{fig:samplingspso2006}. The sampled point for local respectively global best position is sampled from the blue respectively orange region. As these regions are aligned with axes, the resulting sampling is aligned with axes as well. It has been shown \citep{psobiasinzero} that it is easier for \acrshort{acc:spso2006} to find optimum, if it lies in the center of coordinate systems or on the axis.
+
+\acrshort{acc:spso2011} address this issue by sampling the point from hypersphere. First of all, it finds center of gravity $\mathbf{T}$ between current, local best, and global best positions.
+\begin{align*}
+    \mathbf{l_i} &= \mathbf{p_i} + c_l U_d\left( 0,1 \right) \cdot \left( \mathbf{L_i} - \mathbf{p_i} \right) \\
+    \mathbf{g_i} &= \mathbf{p_i} + c_g U_d\left( 0,1 \right) \cdot \left( \mathbf{G_i} - \mathbf{p_i} \right) \\
+    \mathbf{T_i} &= \frac{\mathbf{p_i}+\mathbf{l_i}+\mathbf{g_i}}{3}
+\end{align*}
+Random point is then sampled from the hypersphere with the center $\mathbf{T_i}$ and radius $\norm{\mathbf{P_i} - \mathbf{T_i}}$
+$$
+\mathbf{u_i} = \mathcal{H}_i\left(\mathbf{T_i}, \norm{\mathbf{P_i} - \mathbf{T_i}}\right)
+$$
+Velocity update then simply add direction to this point to the previous velocity.
+$$
+\mathbf{v_i} = \omega\mathbf{v_i}+\mathbf{u_i}-\mathbf{p_i}
+$$
+The sample space for two dimensions is depict in figure \ref{fig:samplingspso2011}.
