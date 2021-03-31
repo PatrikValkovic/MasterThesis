@@ -7,7 +7,8 @@ import scipy.stats as stats
 
 # move to the current directory
 os.chdir(os.path.dirname(sys.argv[0]))
-FIGSIZE=8,6
+FIGSIZE=6.4, 4.8
+exit()
 
 # differential evolution example
 gen = np.random.default_rng(42)
@@ -16,6 +17,7 @@ x = np.linspace(-3,3,1000)
 y = np.linspace(-3,3,1000)
 X, Y = np.meshgrid(x,y)
 Z = fn(X,Y)
+plt.figure(figsize=FIGSIZE)
 contours = plt.contour(X,Y,Z, levels=[0.1, 0.2, 0.4, 0.8, 1.5, 3.0, 6.0, 12.0], colors='black', alpha=0.2)
 pop = gen.multivariate_normal([0,0],[[0.7, -0.5],[-0.5, 0.7]], size=16)
 plt.scatter(pop[:,0],pop[:,1], c='tab:blue', marker='x', alpha=0.5, label='population', s=32)
@@ -37,7 +39,6 @@ plt.ylim(-1,2)
 plt.legend()
 plt.savefig('render_differential.pdf')
 plt.close()
-exit()
 
 # decays
 STEPS = 400
