@@ -258,6 +258,8 @@ Elitism mechanism is operator, which makes sure the best individuals remains in 
 % TODO schemata are not discussed in the text, it may be worth mention them
 
 
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                        %%
 %%  EVOLUTION STRATEGIES  %%
@@ -435,7 +437,6 @@ where $n$ user--defined parameter and function domain is interval $\left[-1,1\ri
     \caption{Mutation distributions}
 \end{figure}
 
-
 %%%%%%%%%%%%%%%%%%%%%%
 %%%%  ADAPTATION  %%%%
 %%%%%%%%%%%%%%%%%%%%%%
@@ -507,9 +508,106 @@ After the crossover, \acrshort{acc:de} performs uniform crossover between the tr
 
 
 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                               %%
-%%  Particle swarm optimisation  %%
+%%  Particle swarm optimization  %%
 %%                               %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\texorpdfstring{\acrlong*{acc:pso}}{Particle swarm optimization}}
+
+\acrfull{acc:pso}\index{particle swarm optimization} is another population--based stochastic optimization technique inspired by a flocking of birds and schooling of fish in Nature. It was introduced by \citet*{PSOOriginal}. The \acrshort{acc:pso} is somehow similar to the \acrshort{acc:es} in a sense that the individuals are vector of real numbers. In the \acrshort{acc:pso} terminology, the individuals are called \emph{particles}.
+
+Thorough the time, the \acrshort{acc:pso} went through number of improvements. Two major versions, namely \acrfull{acc:spso2006} and \acrfull{acc:spso2011}, were released as a baseline for further improvements. I will focus on these versions as specified by \citet{SPSO}.
+
+Expect the position, each particle $\mathbf{p_i}$ has velocity vector $\mathbf{v_i}$, which defines position of the particle in the following step. Unlike \acrshort{acc:es}, modification to the particles are made directly, but through manipulating with the velocity vector. These two components are cause why the \acrshort{acc:pso} get its name.
+
+Additionally to velocity, each particle $\mathbf{p_i}$ remember it's own best position, usually called \emph{local best}\index{particle swarm optimization!local best} and denoted by $\mathbf{L_i}$. This variable is updated after every step, if the fitness value of particle's current position is better then the fitness value of $\mathbf{L_i}$.
+
+Similarly, each particle remember best position it received from the swarm, usually called \emph{global best}\index{particle swarm optimization!global best} and denoted by $\mathbf{G_i}$. After each step, each particle informs surrounding particles about it's position and fitness value. Each particle may inform different set of particles. Which particles to inform is defined by particle's \emph{neighborhood} and I will focus on in a bit later. Each particle then accumulate information from it's surrounding and may update it's global best position $\mathbf{G_i}$.
+
+The algorithm of general \acrshort{acc:pso} algorithm is in algorithm \ref{alg:PSOgeneral}. The difference between \acrshort{acc:spso2006} and \acrshort{acc:spso2011} is in the way they update the velocity $\mathbf{v_i}$.
+
+\begin{algorithm}
+    \KwIn{$s$ population size, $steps$ number of steps, $\fitnessfn$ fitness function}
+    \ForEach{particle $i$ in $1$..$s$}{
+        Initialize particle position $\mathbf{p_i}$\;
+        Initialize particle velocity $\mathbf{v_i}$\;
+        Initialize local and best positions $\mathbf{L_i}=\mathbf{G_i}=\mathbf{p_i}$\;
+    }
+    \ForEach{$step$ in $0$..$steps$}{
+        \ForEach{particle $i$ in $1$..$s$}{
+            Update velocity $\mathbf{v_i}$ based on $\mathbf{p_i}$, $\mathbf{L_i}$, and $\mathbf{G_i}$\;
+            Update position $\mathbf{p_i}$ based on $\mathbf{v_i}$\;
+            \If{$\fitnessfn(\mathbf{p_i})$ is better than $\fitnessfn(\mathbf{L_i})$}{
+                $\mathbf{L_i}\leftarrow\mathbf{p_i}$\;
+            }
+            \ForEach{particle $j$ in $Neighborhood(i)$}{
+                \If{$\fitnessfn(\mathbf{p_i})$ is better than $\fitnessfn(\mathbf{G_j})$}{
+                    $\mathbf{G_j}\leftarrow\mathbf{p_i}$\;
+                }
+            }
+        }
+    }
+    \Return{particle $\mathbf{p_k}$ such that $k = \argmin\limits_{i}\fitnessfn(\mathbf{p_i})$}
+    \caption{General \acrfull*{acc:pso} algorithm}
+    \label{alg:PSOgeneral}
+\end{algorithm}
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%  NEIGHBORHOOD  %%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Neighborhood}
+
+Neighborhood\index{particle swarm optimization!neighborhood} or also called topology specifies connection between particles and how the particles communicate their best positions in the swarm. It directly controls information flow in the swarm and therefore speed of convergence. For big neighborhood, the particles soon receive best position in the swarm and will attempt to reach it without much exploring. If is the neighborhood too short, particles may focus too much on the exploration as the global information would be missing.
+
+Some of the popular neighborhood topologies are ring (figure \ref{fig:topologyring}), dense ring (figure \ref{fig:topologydensering}), and star (figure \ref{fig:topologystar}). Moreover, particles can be organized in the grid and allow communication only within this grid. Some popular grid topologies are linear (figure \ref{fig:topologygridlinear}), diamond (figure \ref{fig:topologygriddiamond}), and compact (figure \ref{fig:topologygridcompact}) \citep{PSOtopologies}.
+
+Notice that all these topologies are static and does not change during run of the algorithm. Dynamic topologies were proposed, such as random topology and closest neighbors topology. In the random topology, each particle inform $k$ random particles from the swarm. The $k$ is usually kept small, for example $k=3$ \citep{SPSObenchmark}. Note that different neighborhood is generated after each step. In the closest neighbors topology each particle informs $k$ closest particles -- except that this topology is very computation intensive, it usually lead to premature convergence, because particles begin to create clusters and keep informing themselves only within this cluster.
+
+\begin{figure}[t]
+    \begin{subfigure}[t]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{img/master_neigh_ring.pdf}
+        \caption{Ring topology}
+        \label{fig:topologyring}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{img/master_neigh_densering.pdf}
+        \caption{Dense ring topology}
+        \label{fig:topologydensering}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{img/master_neigh_star.pdf}
+        \caption{Star topology}
+        \label{fig:topologystar}
+    \end{subfigure}
+    \caption{\acrshort*{acc:pso} neighborhood topologies}
+\end{figure}
+
+\begin{figure}[b]
+    \begin{subfigure}[t]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{img/master_neigh_linear.pdf}
+        \caption{Linear grid topology}
+        \label{fig:topologygridlinear}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{img/master_neigh_diamond.pdf}
+        \caption{Diamond grid topology}
+        \label{fig:topologygriddiamond}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{img/master_neigh_compact.pdf}
+        \caption{Compact grid topology}
+        \label{fig:topologygridcompact}
+    \end{subfigure}
+    \caption[\acrshort*{acc:pso} grid topologies]{\acrshort*{acc:pso} grid topologies. Population is colored blue, active particle orange and it's neighborhood by green.s}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%
+%%%%  VELOCITY  %%%%
+%%%%%%%%%%%%%%%%%%%%
+\subsection{Velocity update}
