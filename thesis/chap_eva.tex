@@ -288,7 +288,7 @@ Crossover operators from \acrshort{acc:ga} may fulfil this requirements, however
 \begin{itemize}
     \item $\left(\mu+\lambda\right)$ evolution strategy, also known as \emph{plus schema}.
     \item  $\left(\mu,\lambda\right)$ evolution strategy, also known as \emph{comma schema},
-    \item steady--state evolution strategy.
+    \item\label{enum:steadystate} steady--state evolution strategy.
 \end{itemize}
 Here, the $\mu$ represents number of parents and $\lambda$ number of offsprings. In the first two cases, $\abs{\mu}$ individuals are selected to the next generation, but in the plus schema these individuals are taken from both parents and offsprings. For the comma schema, $\abs{\mu}$ individuals are drawn only from the offsprings and parents are discarded. Obviously, to have at least $\abs{\mu}$ distinct individuals in the next generation, it must hold $\lambda\geq\mu$. For stochastic selection operators, where is possibility to draw same individual multiple times, it may be beneficial to have more offsprings than parents.
 
@@ -423,13 +423,13 @@ where $n$ user--defined parameter and function domain is interval $\left[-1,1\ri
 \begin{figure}
     \begin{subfigure}[t]{0.45\textwidth}
         \includegraphics[width=\textwidth]{img/render_distributions_normalcauchy.pdf}
-        \caption{Normal and Cauchy distributions.}
+        \caption{Normal and Cauchy distributions}
         \label{fig:mutationdistributionnormalcacuchy}
     \end{subfigure}
     \hfill
     \begin{subfigure}[t]{0.45\textwidth}
         \includegraphics[width=\textwidth]{img/render_distributions_polynomial.pdf}
-        \caption{Polynomial distributions.}
+        \caption{Polynomial distributions}
         \label{fig:mutationdistributionpolynomial}
     \end{subfigure}
     \caption{Mutation distributions}
@@ -462,9 +462,19 @@ where $s$ is starting value and $p$ is adjustable parameter. Examples of decays 
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.5\textwidth]{img/render_decayrate.pdf}
-    \caption{Decay rates}
-    \label{fig:decayrates}
+    \begin{minipage}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/render_decayrate.pdf}
+        \caption{Decay rates}
+        \label{fig:decayrates}
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/render_differential.pdf}
+        \caption[Differential evolution crossover]{Differential evolution crossover with $F=0.7$}
+        \label{fig:differentialevolution}
+    \end{minipage}
 \end{figure}
 
 Another popular approach to adaptive operators is the \emph{one--fifth rule}\index{adaptive operators!one--fifth rule} \citep{onefifthrule}. The main idea behind is to increase mutation deviation (usually called step--size) after successful mutation and decrease it otherwise. The reasoning behind is that if too many individuals are better, than the search is probably too local and by increasing the step size, we increase the search domain. Consequently, a little success individuals indicate that the step is too big and should be decreased.
@@ -476,4 +486,30 @@ However, the proof of this rule by \citeauthor*{onefifthruleoriginal} were done 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%  DIFFERENTIAL EVOLUTION  %%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Differential evolution}
+\subsection{\texorpdfstring{\acrlong*{acc:de}}{Differential evolution}}
+
+\acrfull{acc:de}\index{differential evolution} is a kind of \acrshort{acc:es}, suggested by \citet*{differentialevolutionoriginal}. \acrshort{acc:de} apply special operation to the population, that combines crossover, mutation, and selection. \acrshort{acc:de} is sometimes considered as a directional--based search technique, because it takes into account distribution of the individuals in the population. It can therefore manage non--separable functions better in comparison to traditional \acrshort{acc:es} algorithms.
+
+\acrshort{acc:de} uses four distinct parents $\mathbf{p_1}, \mathbf{p_2}, \mathbf{p_3}, \mathbf{p_4}$. It first construct trial vector $v$ such that
+$$
+\mathbf{v} = \mathbf{p_1} + F\left( \mathbf{p_2} - \mathbf{p_3} \right)
+$$
+where $F$ is user--defined positive parameter controlling the strength of the direction. The vector $\mathbf{p_2} - \mathbf{p_3}$ is the direction from parent $\mathbf{p_3}$ to parent $\mathbf{p_2}$ and reflects the correlation within the population. One example is in the figure \ref{fig:differentialevolution}. Notice how newly created individual is much closer to the optimum compared to it's parents.
+
+There is possibility to use more parents and combine them. Moreover, there are possibilities not to sample parents uniformly, but substitute the best individual in the population as either $\mathbf{p_1}$ or $\mathbf{p_2}$. Alternatively, it is possible to use same individual as the source of the direction as well as the starting position, that is $\mathbf{p_1} = \mathbf{p_3}$. Formula for crossover with five parents is
+$$
+\mathbf{v} = \mathbf{p_1} + F_1\left( \mathbf{p_2} - \mathbf{p_3} \right) + F_2\left( \mathbf{p_4} - \mathbf{p_5} \right)
+$$
+
+Last but not least, this crossover operator can be easily used within traditional \acrshort{acc:es} algorithms as well.
+
+After the crossover, \acrshort{acc:de} performs uniform crossover between the trial vector $\mathbf{v}$ and parent $\mathbf{p_4}$ to finally create offspring $\mathbf{o}$. The mutation rate is controlled by a parameter $C\in\left[0,1\right]$ that represent a probability of offspring $\mathbf{o}$ inherits gene from trial vector $\mathbf{v}$. Finally, the offspring $\mathbf{o}$ is compared to the original parent $\mathbf{p_4}$ and replace it, if is better. This step is equivalent of selection and \acrshort{acc:de} is kind of steady--state evolution strategy, as defined on page \pageref{enum:steadystate}.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                               %%
+%%  Particle swarm optimisation  %%
+%%                               %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{\texorpdfstring{\acrlong*{acc:pso}}{Particle swarm optimization}}

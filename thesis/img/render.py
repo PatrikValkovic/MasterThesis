@@ -9,6 +9,36 @@ import scipy.stats as stats
 os.chdir(os.path.dirname(sys.argv[0]))
 FIGSIZE=8,6
 
+# differential evolution example
+gen = np.random.default_rng(42)
+fn = lambda x,y: x**2+3*y**2+2*x*y
+x = np.linspace(-3,3,1000)
+y = np.linspace(-3,3,1000)
+X, Y = np.meshgrid(x,y)
+Z = fn(X,Y)
+contours = plt.contour(X,Y,Z, levels=[0.1, 0.2, 0.4, 0.8, 1.5, 3.0, 6.0, 12.0], colors='black', alpha=0.2)
+pop = gen.multivariate_normal([0,0],[[0.7, -0.5],[-0.5, 0.7]], size=16)
+plt.scatter(pop[:,0],pop[:,1], c='tab:blue', marker='x', alpha=0.5, label='population', s=32)
+p1, p2, p3, F = 5, 11, 15, 0.7
+plt.arrow(pop[p3,0], pop[p3,1], pop[p2,0] - pop[p3,0], pop[p2,1] - pop[p3,1], color='black', width=0.01, length_includes_head=True, head_width=0.1)
+plt.text(-1.4,1.35,'$p_2 - p_3$', fontsize=14)
+vect = F*(pop[p2] - pop[p3])
+plt.arrow(pop[p1,0], pop[p1,1], vect[0], vect[1] , color='black', width=0.01, length_includes_head=True, head_width=0.1)
+plt.text(-0.1,0.8,'$p_1 + F(p_2 - p_3)$', fontsize=14)
+new_inv = pop[p1] + vect
+plt.scatter(pop[p1,0], pop[p1,1], c='tab:green', marker='x', label='parents', zorder=5, s=80, linewidth=3)
+plt.scatter(pop[p2,0], pop[p2,1], c='tab:green', marker='x', zorder=5, s=80, linewidth=3)
+plt.scatter(pop[p3,0], pop[p3,1], c='tab:green', marker='x', zorder=5, s=80, linewidth=3)
+plt.scatter(new_inv[0],new_inv[1], c='tab:orange', marker='x', label='new individual', zorder=5, s=80, linewidth=3)
+plt.xlabel('x')
+plt.ylabel('y')
+plt.xlim(-2,2)
+plt.ylim(-1,2)
+plt.legend()
+plt.savefig('render_differential.pdf')
+plt.close()
+exit()
+
 # decays
 STEPS = 400
 x = np.arange(0.0, STEPS + 1)
@@ -20,7 +50,7 @@ plt.plot(x, 5 * (1 - x/STEPS)**2, c='tab:red', label='Polynomial $p=2$')
 plt.plot(x, 5 * (1 - x/STEPS)**7, c='tab:purple', label='Polynomial $p=7$')
 plt.legend()
 plt.savefig('render_decayrate.pdf')
-exit()
+
 
 # normal, cauchy distributions
 x = np.linspace(-3,3,1000)
