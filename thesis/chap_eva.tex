@@ -353,7 +353,6 @@ $$
 \boldsymbol{\alpha}_k\cdot\mathbf{p_k}
 $$
 where $\sum_{i=1}^{k}\boldsymbol{\alpha}_i=\boldsymbol{1}$.
-% TODO make sure the implementation checks
 
 Arithmetic crossover is just a linear combination of it's parent, it does not satisfy condition on page \pageref{enum:espopulationvariance} to \enquote{\snipescondition}. Authors \citeauthor*{BlendCrossoverOriginal} address this issue in \emph{blend crossover}\index{crossover \acrshort*{acc:es}!blend} operator. For parents $\mathbf{x}$ and $\mathbf{y}$, the genes of offspring $\mathbf{o}$ is generated randomly from uniform distribution specified by it's parents.
 $$
@@ -363,7 +362,6 @@ o_i = U\left(
 \right)
 $$
 Here, the $\alpha$ is user specified parameter and algorithms is sometimes called \acrshort{acc:blx}--$\alpha$ crossover. Example of \acrshort{acc:blx} is in the figure \ref{fig:blendcrossoverexample}.
-% TODO not implemented
 
 \begin{figure}
     \begin{subfigure}[t]{0.45\textwidth}
@@ -401,7 +399,6 @@ I would argue that the hypersphere sample space can be used as well, as is shown
 \subsection{\texorpdfstring{\acrshort*{acc:es} mutation operators}{Mutation operators}}
 
 Equivalent of bit--flip mutation in \acrshort{acc:ga} is \emph{uniform mutation}\index{mutation \acrshort*{acc:es}!uniform}. It replaces gene by random value sampled from $U(l,u)$ with small probability $p_m$, where interval $\left[l,u\right]$ is the scalar's domain. This operator basically tries random numbers and can rarely lead to a good solution. Moreover, it does not exploit the distribution of the population.
-% TODO check whether is implemented
 
 More successful and frequently used is \emph{normal mutation}\index{mutation \acrshort*{acc:es}!normal}. It performs a little change of the individual by adding sample from a normal distribution with zero mean to each gene.
 $$
@@ -420,7 +417,6 @@ $$
 p(x)=0.5 \left(n + 1\right)\left( 1 - \abs{x} \right)^n
 $$ 
 where $n$ user--defined parameter and function domain is interval $\left[-1,1\right]$. Example of polynomial distribution is in figure \ref{fig:mutationdistributionpolynomial}.
-% TODO make sure is implemented
 
 \begin{figure}
     \begin{subfigure}[t]{0.45\textwidth}
