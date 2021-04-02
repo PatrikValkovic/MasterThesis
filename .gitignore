@@ -18,4 +18,6 @@ thesis/**/*.glg
 thesis/**/*.glo
 thesis/**/*.gls
 thesis/**/*.ist
-
+__pycache__
+.idea
+wandb
