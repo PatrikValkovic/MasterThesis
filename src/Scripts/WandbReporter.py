@@ -5,6 +5,8 @@
 #
 ###############################
 import wandb
+import time
+
 
 class WandbReporter:
     def __init__(self, wandbinit = None):
@@ -24,3 +26,27 @@ class WandbReporter:
     def __call__(self, *args, **kwargs):
         wandb.log(kwargs, step=kwargs['iteration'])
         return args, kwargs
+
+
+class WandbExecutionTime(WandbReporter):
+    def __enter__(self):
+        super().__enter__()
+        self._start_proc = time.process_time()
+        self._last_iter_proc = self._start_proc
+        self._start_perf = time.perf_counter()
+        self._last_iter_perf = self._start_perf
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        super().__exit__(exc_type, exc_val, exc_tb)
+
+    def __call__(self, *args, **kwargs):
+        now_proc, now_perf = time.process_time(), time.perf_counter()
+        wandb.log({
+            'iteration_proc_time': now_proc - self._last_iter_proc,
+            'total_proc_time': now_proc - self._start_proc,
+            'iteration_perf_time': now_perf - self._last_iter_perf,
+            'total_perf_time': now_perf - self._start_perf
+        }, step=kwargs['iteration'])
+        self._last_iter_proc, self._last_iter_perf = now_proc, now_perf
+        return super().__call__(*args, **kwargs)
