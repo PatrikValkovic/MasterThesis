@@ -4,10 +4,8 @@
 # 02.04.21
 #
 ###############################
-import ffeat.measure as M
 import ffeat.strategies as ES
-from MaxTimeMinItersTerminate import MaxTimeMinItersTerminate as TimeTerminate
-from WandbReporter import WandbReporter, WandbExecutionTime
+from utils import MaxTimeMinItersTerminate as TimeTerminate, WandbExecutionTime
 import bbobtorch
 
 REPEAT = 10
