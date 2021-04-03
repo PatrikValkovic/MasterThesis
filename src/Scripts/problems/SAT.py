@@ -47,9 +47,11 @@ class SAT:
         assert len(clauses) == nclauses
         return SAT(vars, clauses, device, dtype)
 
-    def unoptimized(self, population, *args, **kwargs):
+    def fitness_count_satisfied(self, population, *args, **kwargs):
         variables = t.cat([population, t.logical_not(population)], dim=1)
-        satisfied = t.any(variables[:,self._indices], dim=2)
+        satisfied = t.any(variables[:, self._indices], dim=2)
         num_satisfied = t.count_nonzero(satisfied, dim=1)
-        fitness = self._nclauses - num_satisfied
-        return fitness.to(t.float32)
+        return num_satisfied.to(t.float32)
+
+    def fitness_count_unsatisfied(self, *args, **kwargs):
+        return self._nclauses - self.fitness_count_satisfied(*args, **kwargs)
