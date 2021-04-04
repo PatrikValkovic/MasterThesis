@@ -1,0 +1,18 @@
+program: demo_sweep.py
+method: grid
+project: "thesis"
+command:
+  - ${env}
+  - D:\UsersFolders\patrik\Documents\diplomka_env\Scripts\python.exe
+  - ${program}
+  - ${args}
+
+parameters:
+  first:
+    values: [1,2,3]
+  second_arg:
+    values: [0.1, 0.5, 1.0, 2.0]
+  repeat:
+    values: [1,2,3,4,5]
+  iterations:
+    value: 100

@@ -24,7 +24,9 @@ class WandbReporter:
         return self._run
 
     def __call__(self, *args, **kwargs):
-        wandb.log(kwargs, step=kwargs['iteration'])
+        d = dict(kwargs)
+        del d['orig_fitness']
+        wandb.log(d, step=kwargs['iteration'])
         return args, kwargs
 
 

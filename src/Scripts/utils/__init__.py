@@ -7,3 +7,4 @@
 
 from .MaxTimeMinItersTerminate import MaxTimeMinItersTerminate
 from .WandbReporter import WandbReporter, WandbExecutionTime
+from .SpecialPipes import *
