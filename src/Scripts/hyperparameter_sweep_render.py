@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.colors as mcolors
 
-SWEEP_ID = "i7d0d5pr"
+SWEEP_ID = "yguxpp6l"
 SPLIT_BY = "neigh_size"
 
 api = wandb.Api()

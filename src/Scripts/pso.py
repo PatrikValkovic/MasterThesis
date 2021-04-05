@@ -19,7 +19,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 DIM = 80
 POP_SIZE = 1000
 ITERS = 2000
-d = t.device('cpu')
+d = t.device('cuda')
 
 
 logs = []
@@ -34,8 +34,8 @@ alg = PSO.PSO(
     PSO.initialization.Uniform(POP_SIZE, -5, 5, DIM, device=d),
     PSO.initialization.Uniform(POP_SIZE, -1, 1, DIM, device=d),
     PSO.evaluation.Evaluation(fn),
-    PSO.neighborhood.Random(4),
-    PSO.update.PSO2006(0.7, 1.2, 1.2),
+    PSO.neighborhood.Random(0.05),
+    PSO.update.PSO2011(0.8, 1.5, 1.5),
     measurements_termination=[
         SidewayPipe(
             FSubtractPipe(fn.f_opt),
