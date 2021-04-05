@@ -22,8 +22,8 @@ parameters:
   velocity_clip:
     values: [2.0]
   neigh_size:
-    values: [1, 2, 5, 7, 10, 13]
+    values: [5, 3, 5]
   grid_size:
     value: "32,32"
   grid_type:
-    value: "diamond"
+    values: ["linear", "compact", "diamond"]
