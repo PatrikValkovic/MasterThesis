@@ -8,7 +8,7 @@ import torch as t
 import numpy as np
 import time
 
-REPEATS = 1000
+REPEATS = 10
 PARENTS = 1000
 TO_PICK = 16
 CHILDREN = 1000

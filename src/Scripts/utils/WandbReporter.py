@@ -13,7 +13,7 @@ class WandbReporter:
         self._wandbinit = wandbinit or {}
 
     def __enter__(self):
-        self._run = wandb.init(project='thesis', **self._wandbinit)
+        self._run = wandb.init(project='thesis', allow_val_change=True, **self._wandbinit)
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
