@@ -10,7 +10,6 @@ import bbobtorch
 import ffeat.pso as PSO
 import ffeat.measure as M
 from utils import WandbReporter, SidewayPipe, FSubtractPipe
-import ffeat
 
 
 os.environ['WANDB_SILENT'] = 'true'
