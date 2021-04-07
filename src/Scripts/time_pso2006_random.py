@@ -5,6 +5,7 @@
 #
 ###############################
 import os
+import sys
 import argparse
 import ffeat.pso as PSO
 import bbobtorch
@@ -44,7 +45,7 @@ for fni, d, psize in itertools.product(args.function, args.dim, args.popsize):
     fn = getattr(bbobtorch, f"create_f{fni:02d}")(d, dev=dev)
     for i in range(args.repeat):
         with WandbExecutionTime({'config': {
-            'run_type': 'test',
+            'run_type': 'time',
             'run_failed': False,
             'cputype': cpuinfo.get_cpu_info()['brand_raw'],
             'gputype': t.cuda.get_device_name(0) if t.cuda.is_available() else None,
@@ -78,6 +79,6 @@ for fni, d, psize in itertools.product(args.function, args.dim, args.popsize):
                 )
                 alg()
             except:
+                print("Unexpected error:", sys.exc_info()[0])
                 reporter.run.config.update({'run_failed': True}, allow_val_change=True)
-                raise
 
