@@ -45,12 +45,14 @@ for fni, d, psize in itertools.product(args.function, args.dim, args.popsize):
     fn = getattr(bbobtorch, f"create_f{fni:02d}")(d, dev=dev)
     for i in range(args.repeat):
         with WandbExecutionTime({'config': {
+            **vars(args),
             'run_type': 'time',
             'run_failed': False,
             'cputype': cpuinfo.get_cpu_info()['brand_raw'],
             'gputype': t.cuda.get_device_name(0) if t.cuda.is_available() else None,
             'device': args.device,
             'repeat': i,
+            'pop_size': psize,
             'problem_group': 'bbob',
             'bbob_fn': fni,
             'bbob_dim': d,
