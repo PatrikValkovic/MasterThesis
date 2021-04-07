@@ -25,6 +25,7 @@ p.add_argument("--inertia", type=float, default=0.8, help="Weight inertia")
 p.add_argument("--local_c", type=float, default=1.5)
 p.add_argument("--global_c", type=float, default=1.5)
 p.add_argument("--neigh_size", type=float, default=0.2, help="Neighborhood size")
+p.add_argument("--cpu_count", type=int, default=None, help="Number of GPU to use")
 
 p.add_argument("--function", type=str, help="BBOB function index")
 p.add_argument("--dim", type=str, help="Size of the problem comma separated")
@@ -36,6 +37,8 @@ args.popsize = list(map(int, args.popsize.split(',')))
 
 dev = t.device(args.device)
 print(f'GONNA USE {dev}')
+if args.cpu_count is not None:
+    t.set_num_threads(args.cpu_count)
 
 for fni, d, psize in itertools.product(args.function, args.dim, args.popsize):
     fn = getattr(bbobtorch, f"create_f{fni:02d}")(d, dev=dev)
