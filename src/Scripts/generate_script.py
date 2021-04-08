@@ -16,7 +16,7 @@ for job_id, (fn, fdim) in enumerate(itertools.product(
     [1, 7, 15, 19, 22, 24],
     [6, 32, 128, 384]
 )):
-    with open(f'{args.output}/_job.{int(time.time())}.{job_id}.sh') as f:
+    with open(f'{args.output}/_job.{int(time.time())}.{job_id}.sh', "w") as f:
         print("#!/bin/bash")
         print("#PBS -N PSO_GPU")
         print("#PBS -q gpu")
