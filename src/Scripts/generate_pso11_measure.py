@@ -46,6 +46,6 @@ for job_id, (fn, fdim) in enumerate(itertools.product(
         print(file=f)
         print("cp -r \"/storage/praha1/home/kowalsky/MasterThesis/src/Scripts\" \"$SCRATCHDIR\"", file=f)
         print("cd \"$SCRATCHDIR/Scripts\"", file=f)
-        print(f"python timefitness_pso2011_random.py --function {fn} --dim {fdim} --popsize \"32,512,10240,32768\" --device \"cuda\" --repeat 100 --cpu_count $(($PBS_NCPUS / 2))", file=f)
+        print(f"python timefitness_pso2011_random.py --function {fn} --dim {fdim} --popsize \"32,128,200,512,1024,2048,5000,10240,16384,32768\" --device \"cuda\" --repeat 100 --cpu_count $(($PBS_NCPUS / 2))", file=f)
         print(file=f)
         print("rm -rf \"$SCRATCHDIR\"", file=f)
