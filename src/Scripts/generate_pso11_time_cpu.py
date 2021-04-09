@@ -51,8 +51,7 @@ for job_id, (fdim, fn) in combinations:
         print(file=f)
         print("cp -r \"/storage/praha1/home/kowalsky/MasterThesis/src/Scripts\" \"$SCRATCHDIR\"", file=f)
         print("cd \"$SCRATCHDIR/Scripts\"", file=f)
-        print(f"python time_pso2011_random.py --function {fn} --dim {fdim} --popsize \"32,128,200,512,1024,2048,5000,10240,16384,32768\" --device \"cpu\" --repeat 100 --cpu_count {args.cores_per_job} &", file=f)
-        print("wait", file=f)
+        print(f"python time_pso2011_random.py --function {fn} --dim {fdim} --popsize \"32,128,200,512,1024,2048,5000,10240,16384,32768\" --device \"cpu\" --repeat 100 --cpu_count {args.cores_per_job}", file=f)
         print(file=f)
         print("rm -rf \"$SCRATCHDIR\"", file=f)
         combinations = combinations[jobs_per_machine:]
