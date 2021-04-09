@@ -22,7 +22,7 @@ combinations = list(enumerate(itertools.product(
 )))
 
 for job_id, (fdim, fn) in combinations:
-    with open(f'{args.output}/_job.{int(time.time())}.{combinations[0][0]}.sh', "w") as f:
+    with open(f'{args.output}/_job.{int(time.time())}.{job_id}.sh', "w") as f:
         print("#!/bin/bash", file=f)
         print("#PBS -N PSO_CPU_time", file=f)
         print("#PBS -l select=1:ncpus:16:mem=32gb:scratch_local=50gb:cluster=pcr", file=f)
