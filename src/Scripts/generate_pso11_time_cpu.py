@@ -13,6 +13,7 @@ parser.add_argument('--output', type=str, required=True, help='Output directory'
 parser.add_argument('--cluster', type=str, default='pcr', help="Cluster where to run script")
 parser.add_argument("--cores", type=int, default=32, help="Number of real cores per machine")
 parser.add_argument('--cores_per_job', default=8, help="Number of real cores per job")
+parser.add_argument('--take_cores_per_job', type=int, default=16, help="Number of cores to ask per job")
 args, _ = parser.parse_known_args()
 
 jobs_per_machine = args.cores // args.cores_per_job
@@ -20,13 +21,14 @@ combinations = list(enumerate(itertools.product(
     [6, 32, 128, 384],
     [1, 7, 15, 19, 22, 24],
 )))
+ctime = int(time.time())
 
 for job_id, (fdim, fn) in combinations:
-    with open(f'{args.output}/_job.{int(time.time())}.{job_id}.sh', "w") as f:
-        print("#!/bin/bash", file=f)
-        print("#PBS -N PSO_CPU_time", file=f)
-        print("#PBS -l select=1:ncpus=16:mem=32gb:scratch_local=50gb:cluster=pcr", file=f)
-        print("#PBS -l walltime=24:00:00", file=f)
+    with open(f'{args.output}/_job.{ctime}.{job_id}.sh', "w") as f:
+        print(f"#!/bin/bash", file=f)
+        print(f"#PBS -N PSO_CPU_time", file=f)
+        print(f"#PBS -l select=1:ncpus={args.take_cores_per_job}:mem=32gb:scratch_local=50gb:cluster=pcr", file=f)
+        print(f"#PBS -l walltime=24:00:00", file=f)
         print(file=f)
         print("cp -r /storage/praha1/home/kowalsky/PYTHON \"$SCRATCHDIR\"", file=f)
         print("cp -r /storage/praha1/home/kowalsky/PIP \"$SCRATCHDIR\"", file=f)

@@ -9,24 +9,19 @@ import itertools
 import time
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--output', type=str, required=True, help='Output directory')
-parser.add_argument('--cluster', type=str, default='pcr', help="Cluster where to run script")
-parser.add_argument("--cores", type=int, default=32, help="Number of real cores per machine")
-parser.add_argument('--cores_per_job', default=8, help="Number of real cores per job")
+parser.add_argument('--output', type=str, help='Output directory')
 args, _ = parser.parse_known_args()
+ctime = int(time.time())
 
-jobs_per_machine = args.cores // args.cores_per_job
-combinations = list(enumerate(itertools.product(
-    [6, 32, 128, 384],
+for job_id, (fn, fdim) in enumerate(itertools.product(
     [1, 7, 15, 19, 22, 24],
-)))
-
-while len(combinations) > 0:
-    with open(f'{args.output}/_job.{int(time.time())}.{combinations[0][0]}.sh', "w") as f:
+    [6, 32, 128, 384]
+)):
+    with open(f'{args.output}/_job.{ctime}.{job_id}.sh', "w") as f:
         print("#!/bin/bash", file=f)
-        print("#PBS -N PSO_CPU_time", file=f)
-        print("#PBS -l place=exclhost", file=f)
-        print("#PBS -l select=1:scratch_local=100gb:cluster=pcr", file=f)
+        print("#PBS -N PSO06_GPU", file=f)
+        print("#PBS -q gpu", file=f)
+        print("#PBS -l select=1:ncpus=4:mem=8gb:scratch_local=50gb:cluster=adan:ngpus=1", file=f)
         print("#PBS -l walltime=24:00:00", file=f)
         print(file=f)
         print("cp -r /storage/praha1/home/kowalsky/PYTHON \"$SCRATCHDIR\"", file=f)
@@ -52,9 +47,6 @@ while len(combinations) > 0:
         print(file=f)
         print("cp -r \"/storage/praha1/home/kowalsky/MasterThesis/src/Scripts\" \"$SCRATCHDIR\"", file=f)
         print("cd \"$SCRATCHDIR/Scripts\"", file=f)
-        for job_id, (fdim, fn) in combinations[:jobs_per_machine]:
-            print(f"python time_pso2006_random.py --function {fn} --dim {fdim} --popsize \"32,128,200,512,1024,2048,5000,10240,16384,32768\" --device \"cpu\" --repeat 100 --cpu_count {args.cores_per_job} &", file=f)
-        print("wait", file=f)
+        print(f"python timefitness_pso2006_random.py --function {fn} --dim {fdim} --popsize \"32,128,200,512,1024,2048,5000,10240,16384,32768\" --device \"cuda\" --repeat 100 --cpu_count $(($PBS_NCPUS / 2))", file=f)
         print(file=f)
         print("rm -rf \"$SCRATCHDIR\"", file=f)
-        combinations = combinations[jobs_per_machine:]

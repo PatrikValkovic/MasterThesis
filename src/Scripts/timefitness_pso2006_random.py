@@ -11,7 +11,7 @@ import ffeat.pso as PSO
 import ffeat.measure as M
 import bbobtorch
 import torch as t
-from utils import WandbReporter, SidewayPipe, FSubtractPipe
+from utils import WandbExecutionTime, SidewayPipe, FSubtractPipe
 import cpuinfo
 import itertools
 
@@ -26,7 +26,7 @@ p.add_argument("--velocity_clip", type=float, default=2, help="Velocity clip")
 p.add_argument("--inertia", type=float, default=0.8, help="Weight inertia")
 p.add_argument("--local_c", type=float, default=1.5)
 p.add_argument("--global_c", type=float, default=1.5)
-p.add_argument("--neigh_size", type=float, default=0.2, help="Neighborhood size")
+p.add_argument("--neigh_size", type=float, default=0.05, help="Neighborhood size")
 p.add_argument("--cpu_count", type=int, default=None, help="Number of GPU to use")
 
 p.add_argument("--function", type=str, help="BBOB function index")
@@ -45,9 +45,9 @@ if args.cpu_count is not None:
 for fni, d, psize in itertools.product(args.function, args.dim, args.popsize):
     fn = getattr(bbobtorch, f"create_f{fni:02d}")(d, dev=dev)
     for i in range(args.repeat):
-        with WandbReporter({'config': {
+        with WandbExecutionTime({'config': {
             **vars(args),
-            'run_type': 'fitness',
+            'run_type': 'time,fitness',
             'run_failed': False,
             'cputype': cpuinfo.get_cpu_info()['brand_raw'],
             'gputype': t.cuda.get_device_name(0) if t.cuda.is_available() else None,
@@ -75,12 +75,12 @@ for fni, d, psize in itertools.product(args.function, args.dim, args.popsize):
                     measurements_termination=[
                         SidewayPipe(
                             FSubtractPipe(fn.f_opt),
-                            M.FitnessMedian(),
                             M.FitnessMean(),
                             M.FitnessStd(),
                             M.FitnessLowest(),
                             M.Fitness01Quantile(),
                             M.Fitness05Quantile(),
+                            M.FitnessMedian(),
                             reporter,
                         )
                     ],

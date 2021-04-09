@@ -11,12 +11,13 @@ import time
 parser = argparse.ArgumentParser()
 parser.add_argument('--output', type=str, help='Output directory')
 args, _ = parser.parse_known_args()
+ctime = int(time.time())
 
 for job_id, (fn, fdim) in enumerate(itertools.product(
     [1, 7, 15, 19, 22, 24],
     [6, 32, 128, 384]
 )):
-    with open(f'{args.output}/_job.{int(time.time())}.{job_id}.sh', "w") as f:
+    with open(f'{args.output}/_job.{ctime}.{job_id}.sh', "w") as f:
         print("#!/bin/bash", file=f)
         print("#PBS -N PSO11_GPU", file=f)
         print("#PBS -q gpu", file=f)
