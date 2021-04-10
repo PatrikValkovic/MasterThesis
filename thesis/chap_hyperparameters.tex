@@ -1,0 +1,28 @@
+\chapter{Hyperparameters}
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|l r|c|}
+        \hline
+        \multicolumn{2}{|c|}{\textbf{Parameter}} & \thead{Value} \\
+        \hline
+        cognitive acceleration coefficient & $c_l$ & 1.5 \\
+        social acceleration coefficient  & $c_g$ & 1.5 \\
+        inertia weight & $\omega$ & 0.8 \\
+        velocity clip value & & 2 \\
+        \hline \hline
+        \textbf{Neighborhood} & & \makecell[c]{Size in\\ percent} \\
+        \hline
+        Circle & & 0.26 \\
+        Grid & & \\
+        \quad linear & & 0.02 \\
+        \quad compact & & 0.05 \\
+        \quad diamond & & 0.06 \\
+        Nearest neighbors & & 0.13 \\
+        Random & & \\
+        \quad PSO2006 & & 0.13 \\
+        \quad PSO2011 & & 0.2 \\ 
+        \hline
+    \end{tabular}
+    \caption{\acrlong*{acc:pso} hyperparameters}
+\end{table}
