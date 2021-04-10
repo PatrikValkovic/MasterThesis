@@ -1,10 +1,10 @@
-\chapter{\texorpdfstring{\acrlong*{acc:ea}}{Evolution algorithms}}
+\chapter{\texorpdfstring{\acrlong*{acc:ea}}{Evolutionary algorithms}}
 
 Optimization. What better word would describe the ultimate goal of all the people, our civilization, and maybe even the Universe. With a bit of exaggeration, optimization is the cause of all the ramifications we can see around. What else are physics laws than minimization processes, our pursuit of knowledge and self--improvement rather than maximization of self-worth, industrial revolutions than minimization of human labor, maximization of goods production, and standard of living at the same time. In my opinion, optimization is the reason what drives us forward, makes us better, and guides our decisions.
 
 One of the most extraordinary optimization processes is, without a doubt, evolution. Evolution is nothing less than Nature's way of improving species to better adapt to their environment. The father of evolution is undoubtedly Charles, who first come up with an idea of evolution in his work \enquote{On the origin of species: A facsimile of the first edition} \citep{darwin1964origin}. According to him, the individuals better adapted to the environment have a higher potential to reproduce and pass their genetic material --- including the predisposition to survive in the environment --- to their offsprings. Sometimes referred to as \enquote{Survival of the fittest}.
 
-This exact ideas inspired scientists and formed the field of \acrfull{acc:ea}\index{evolutionary algorithm}\footnote{I will refer to all the population-based algorithms in this work as \acrlong*{acc:ea}. These includes, among others, \acrlong*{acc:ga}, \acrlong*{acc:ea}, and \acrlong*{acc:pso}.}.
+This exact ideas inspired scientists and formed the field of \acrfull{acc:ea}\index{evolutionary algorithm}\footnote{I will refer to all the population-based algorithms in this work as \acrlong*{acc:ea}. These includes, among others, \acrlong*{acc:ga}, \acrlong*{acc:es}, and \acrlong*{acc:pso}.}.
 \acrshort{acc:ea} are stochastic, population-based optimization algorithms inspired by biological evolution. In general, a set of individuals called the population compete with each other for a place in the next generation. Each individual represents one possible solution to the problem at hand. The quality of the individual is proportional to the quality of solution it represents. This quality is usually expressed using the fitness (or sometimes called objective) function. As with natural evolution, the probability of survival is proportional to the solution quality -- the better the solution is, the higher the probability of survival \citep{IntroductionToEA}. In the \acrshort{acc:ea}, the process producing new generation is usually called selection.
 
 Evolution is not only about survival but also about reproduction. \acrlong*{acc:ea} took inspiration here as well and uses specials operators for each generation -- usually called evolution operators or variation operators\index{variation operator}. As the name suggests, these operators make sure the population explores new solutions. The two most common operators are crossover and mutation. During crossover\index{crossover}, individuals from the current population (usually called parents) produce new individuals (usually called offsprings) by combining their genetic information. In some way, crossover mimics reproduction in Nature, during which the \acrshort{acc:dna} of offspring is by majority determined by its parents \acrshort{acc:dna}. Mutation\index{mutation}, on the other hand, causes random minor alteration of the individual genetic material and is able to introduce novel patterns that did not previously occur in the population \citep{HowToSolveItModernHeuristics}.
@@ -221,7 +221,7 @@ Alternatively, logarithmic respectively exponential scale is possible as well, s
 
 Special example of fitness scaling is \emph{rank selection}\index{selection!rank}. To eliminate dependency on the fitness function's absolute values, rank selection assigns artificial fitness values to the individuals based on their order in the sorted sequence. One common rank evaluation function is linear -- it assigns new fitness values in the interval $\left[l,u\right]$ such that the best individual has new fitness value $l$, the worst one $u$, and the rest of the population is uniformly distributed in this interval \citep{razali2011genetic} (I expect minimization problem). Different scaling schemas are possible as well.
 
-The advantage of rank selection is steady selection pressure, and unlike roulette wheel selection, it can handle fitness functions with negative values. Moreover, it is easy to control selection pressure using interval width, as shown in table \ref{tab:rankselection}. It also does not suffer from outliers -- individuals with very high or low fitness in comparison to the rest of the population. Rank selection can avoid premature convergence, but computation costs can be very costly because the population needs to be sorted, fitness values reevaluated, and another proportional--based selection operator needs to follow.
+The advantage of rank selection is steady selection pressure, and unlike mentioned roulette wheel selection, it can handle fitness functions with negative values. Moreover, it is easy to control selection pressure using interval width, as shown in table \ref{tab:rankselection}. It also does not suffer from outliers -- individuals with very high or low fitness in comparison to the rest of the population. Rank selection can avoid premature convergence, but computation costs can be very costly because the population needs to be sorted, fitness values reevaluated, and another proportional--based selection operator needs to follow.
 
 \begin{table}
     \centering
@@ -260,24 +260,24 @@ The elitism mechanism is operator, which makes sure the best individuals endure 
 
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%                        %%
-%%  EVOLUTION STRATEGIES  %%
-%%                        %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{\texorpdfstring{\acrlong*{acc:es}}{Evolution strategies}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                         %%
+%%  REAL CODED ALGORITHMS  %%
+%%                         %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Real--Coded Evolutionary Algorithms}
 
-\acrfull{acc:es} are natural extension of \acrshort{acc:ga} by extension of genotype into real numbers.
+Real--coded evolutionary algorithms are natural extension of \acrshort{acc:ga} by extension of genotype into real numbers.
 $$
 \individual \in \mathbb{R}^{n}
 $$
 Alternatively, the relaxed definition allows genotype of an arbitrary number of dimensions. That may be helpful for problems, which expect a particular structure of the solution -- for example image processing filters \citep{WVDF}. Note that using the different genotype structure disallows direct use of some operators, like one and two--point crossovers, because the split point may be ambitious. On the other hand, some operators, like the uniform crossover, can easily handle multidimensional genotypes without much change.
 
-Origin of \acrlong{acc:es} dates to 1970s at Technical University in Technische Universität Berlin, where \citeauthor*{ES-original} presented \acrshort{acc:es} \citep{ES-original}. Originally, \acrshort{acc:ea} has not been used as an optimization algorithm for real function, but \enquote{rather as a set of rules for the automatic design and analysis of consecutive experiments with stepwise variable adjustement driving a suitable object/system into the optimal state in spite of environmental noise} \citep{EScomprehensiveintroduction}. It turned out that this simple stochastic search technique outperformed traditional--based methods. Although there is no guarantee \acrshort{acc:es} will find the optimal solution, they are in most cases able to find near--optimal and sufficiently good enough solution.
+Origin of real--coded evolutionary algorithms, more precisely \acrfull{acc:es}, dates back to 1970s at Technical University in Technische Universität Berlin, where \citeauthor*{ES-original} presented \acrshort{acc:es} \citep{ES-original}. Originally, \acrshort{acc:es} has not been used as an optimization algorithm for real function, but \enquote{rather as a set of rules for the automatic design and analysis of consecutive experiments with stepwise variable adjustement driving a suitable object/system into the optimal state in spite of environmental noise} \citep{EScomprehensiveintroduction}. It turned out that this simple stochastic search technique outperformed traditional--based methods. Although there is no guarantee \acrshort{acc:es} will find the optimal solution, they are in most cases able to find near--optimal and sufficiently good enough solution.
 
-This section takes inspiration mainly from the work of \citet*{IntroductionToEA} and \citet*{EScomprehensiveintroduction}.
+This section takes inspiration mainly from the work of \citet*{IntroductionToEA} and \citet*{EScomprehensiveintroduction}. Moreover, some techniques originated in \acrshort{acc:es} are applicable for general real--coded evolutionary algorithms as well. Therefore, I will not make rigorous distinction between real--coded evolutionary algorithms and \acrshort{acc:es} through this section.
 
-\acrshort{acc:es} can use same selection and crossover operators as \acrshort{acc:ga}, although it is not recommended \citet{IntroductionToEA}. In general, good crossover operators should
+Real--coded evolutionary algorithms can use same selection and crossover operators as \acrshort{acc:ga}, although it is not recommended \citet{IntroductionToEA}. In general, good crossover operators should
 \begin{itemize}
     \item preserve population mean because crossover operators do not work with a fitness function and therefore should introduce bias in the search space,
     \item slightly increase the variance of the population, to balance the pressure of selection operators, that usually decrease the variance of the population,
@@ -286,7 +286,7 @@ This section takes inspiration mainly from the work of \citet*{IntroductionToEA}
 \end{itemize}
 Crossover operators from \acrshort{acc:ga} may fulfill these requirements, however, real--coded encoding allows a more diverse set of operators. I will describe them a bit later.
 
-\acrshort{acc:ea} also introduced two different selection schemas\index{selection schema}:
+\acrshort{acc:es} also introduced two different selection schemas\index{selection schema}:
 \begin{itemize}
     \item $\left(\mu+\lambda\right)$ evolution strategy, also known as \emph{plus schema}.
     \item  $\left(\mu,\lambda\right)$ evolution strategy, also known as \emph{comma schema},
@@ -333,9 +333,9 @@ Lets take for example two functions:
 \end{align*}
 These functions are shown in figure \ref{fig:separationfucntions}. Running simple hill climber algorithm \citep{HandbookOfMetaheuristics}, one may get trajectories displayed in the figure by orange color. Notice that the trajectory of the function $f_{nosep}$ is much longer -- it took $200$ steps to achieve global minimum for the function $f_{sep}$, however up to $400$ steps for the function $f_{nosep}$ (the step size was equal for both runs). The cause of this is that the first function is separable -- it can be written in the form $f_{sep}(x,y)=f(x)+f(y)$. Hill climbing algorithm can easily find optimum because $\min f_{sep}=\min f(x)+\min f(y)$, therefore it can search for the optimum for each variable and then aggregate the outcomes. That is not true for the function $f_{nosep}$, because it is not separable, and using the local search technique is not as straightforward. Separable functions are more challenging and harder in some sense, exactly the kind of problems \acrshort{acc:ea} should solve efficiently.
 
-The problem of crossover operators from \acrshort{acc:ga} is precisely the same as I have just shown you. These operators work on the genes independently and do not use knowledge about the correlation of the genotype space within the population. It is necessary to use different crossover operators tailored for the \acrshort{acc:ea}.
+The problem of crossover operators from \acrshort{acc:ga} is precisely the same as I have just shown you. These operators work on the genes independently and do not use knowledge about the correlation of the genotype space within the population. It is necessary to use different crossover operators tailored for the real--coded \acrshort{acc:ea}.
 
-One of the simplest \acrshort{acc:es} crossover is \emph{arithmetic crossover}\index{crossover \acrshort*{acc:es}!arithmetic}. For parents $\mathbf{p_1}$ and $\mathbf{p_2}$, the offspring $o$ is created using following formula.
+One of the simplest real--coded \acrshort{acc:ea} crossover is \emph{arithmetic crossover}\index{crossover real--coded!arithmetic}. For parents $\mathbf{p_1}$ and $\mathbf{p_2}$, the offspring $o$ is created using following formula.
 $$
 \mathbf{o} = \alpha\mathbf{p_1}+\left(1-\alpha\right)\mathbf{p_2}
 $$
@@ -354,7 +354,7 @@ $$
 $$
 where $\sum_{i=1}^{k}\boldsymbol{\alpha}_i=\boldsymbol{1}$.
 
-Arithmetic crossover is just a linear combination of it's parent, it does not satisfy condition on page \pageref{enum:espopulationvariance} to \enquote{\snipescondition}. Authors \citeauthor*{BlendCrossoverOriginal} address this issue in \emph{blend crossover}\index{crossover \acrshort*{acc:es}!blend} operator. For parents $\mathbf{x}$ and $\mathbf{y}$, the genes of offspring $\mathbf{o}$ is generated randomly from uniform distribution specified by it's parents.
+Arithmetic crossover is just a linear combination of it's parent, it does not satisfy condition on page \pageref{enum:espopulationvariance} to \enquote{\snipescondition}. Authors \citeauthor*{BlendCrossoverOriginal} address this issue in \emph{blend crossover}\index{crossover real--coded!blend} operator. For parents $\mathbf{x}$ and $\mathbf{y}$, the genes of offspring $\mathbf{o}$ is generated randomly from uniform distribution specified by it's parents.
 $$
 o_i = U\left( 
     x_i - \alpha \left( y_i - x_i \right),
@@ -375,10 +375,10 @@ Here, the $\alpha$ is user specified parameter and algorithms is sometimes calle
         \caption{Simplex crossover example in two dimensions. Sampling space of simplex (blue) and hypersphere (orange).}
         \label{fig:simplexcrossoverexample}
     \end{subfigure}
-    \caption{\acrshort*{acc:es} crossover operators}
+    \caption{Real--coded crossover operators}
 \end{figure}
 
-Another type of crossover operator is \emph{simplex crossover}\index{crossover \acrshort*{acc:es}!simplex}. It uses simplex to sample sample offsprings. Simplex is a generalization of triangle into more dimensions. It is defined in $n$--dimensional space using $n+1$ points. For two dimensional space is simplex triangle, for three dimensional space is simplex tetrahydron and so on. From the definition, the simplex crossover require $n+1$ parents $\mathbf{p_1}, \mathbf{p_2}, \dots, \mathbf{p_n}, \mathbf{p_{n+1}}$. It calculate their centroid
+Another type of crossover operator is \emph{simplex crossover}\index{crossover real--coded!simplex}. It uses simplex to sample sample offsprings. Simplex is a generalization of triangle into more dimensions. It is defined in $n$--dimensional space using $n+1$ points. For two dimensional space is simplex triangle, for three dimensional space is simplex tetrahydron and so on. From the definition, the simplex crossover require $n+1$ parents $\mathbf{p_1}, \mathbf{p_2}, \dots, \mathbf{p_n}, \mathbf{p_{n+1}}$. It calculate their centroid
 $$
 \mathbf{k}=\frac{\sum_{i=1}^{n+1} \mathbf{p_i}}{n+1}
 $$
@@ -396,11 +396,11 @@ I would argue that the hypersphere sample space can be used as well, as is shown
 %%%%%%%%%%%%%%%%%%%%
 %%%%  MUTATION  %%%%
 %%%%%%%%%%%%%%%%%%%%
-\subsection{\texorpdfstring{\acrshort*{acc:es} mutation operators}{Mutation operators}}
+\subsection{Real--coded mutation operators}
 
-Equivalent of bit--flip mutation in \acrshort{acc:ga} is \emph{uniform mutation}\index{mutation \acrshort*{acc:es}!uniform}. It replaces gene by random value sampled from $U(l,u)$ with small probability $p_m$, where interval $\left[l,u\right]$ is the scalar's domain. This operator basically tries random numbers and can rarely lead to a good solution. Moreover, it does not exploit the distribution of the population.
+Equivalent of bit--flip mutation in \acrshort{acc:ga} is \emph{uniform mutation}\index{mutation real--coded!uniform}. It replaces gene by random value sampled from $U(l,u)$ with small probability $p_m$, where interval $\left[l,u\right]$ is the scalar's domain. This operator basically tries random numbers and can rarely lead to a good solution. Moreover, it does not exploit the distribution of the population.
 
-More successful and frequently used is \emph{normal mutation}\index{mutation \acrshort*{acc:es}!normal}. It performs a little change of the individual by adding sample from a normal distribution with zero mean to each gene.
+More successful and frequently used is \emph{normal mutation}\index{mutation real--coded!normal}. It performs a little change of the individual by adding sample from a normal distribution with zero mean to each gene.
 $$
 p_i = p_i + N(0,\sigma)
 $$
@@ -464,7 +464,7 @@ where $s$ is starting value and $p$ is adjustable parameter. Examples of decays 
         \includegraphics[width=\textwidth]{img/render_decayrate.pdf}
         \caption{Decay rates}
         \label{fig:decayrates}
-    \end{minipage}%
+    \end{minipage}
     \hfill
     \begin{minipage}[t]{0.48\textwidth}
         \centering
@@ -485,7 +485,7 @@ However, the proof of this rule by \citeauthor*{onefifthruleoriginal} was done o
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\texorpdfstring{\acrlong*{acc:de}}{Differential evolution}}
 
-\acrfull{acc:de}\index{differential evolution} is a kind of \acrshort{acc:es}, suggested by \citet*{differentialevolutionoriginal}. \acrshort{acc:de} apply special operation to the population, that combines crossover, mutation, and selection. \acrshort{acc:de} is sometimes considered as a directional--based search technique, because it takes into account distribution of the individuals in the population. It can therefore manage non--separable functions better in comparison to traditional \acrshort{acc:es} algorithms.
+\acrfull{acc:de}\index{differential evolution} is a kind of real--coded evolutionary algorithm, suggested by \citet*{differentialevolutionoriginal}. \acrshort{acc:de} apply special operation to the population, that combines crossover, mutation, and selection. \acrshort{acc:de} is sometimes considered as a directional--based search technique, because it takes into account distribution of the individuals in the population. It can therefore manage non--separable functions better in comparison to traditional real--coded evolutionary algorithms.
 
 \acrshort{acc:de} uses four distinct parents $\mathbf{p_1}, \mathbf{p_2}, \mathbf{p_3}, \mathbf{p_4}$. It first construct trial vector $v$ such that
 $$
@@ -498,7 +498,7 @@ $$
 \mathbf{v} = \mathbf{p_1} + F_1\left( \mathbf{p_2} - \mathbf{p_3} \right) + F_2\left( \mathbf{p_4} - \mathbf{p_5} \right)
 $$
 
-Last but not least, this crossover operator can be easily used within traditional \acrshort{acc:es} algorithms as well.
+Last but not least, this crossover operator can be easily used within traditional real--coded evolutionary algorithms as well.
 
 After the crossover, \acrshort{acc:de} performs uniform crossover between the trial vector $\mathbf{v}$ and parent $\mathbf{p_4}$ to finally create offspring $\mathbf{o}$. The mutation rate is controlled by a parameter $C\in\left[0,1\right]$ that represent a probability of offspring $\mathbf{o}$ inherits gene from trial vector $\mathbf{v}$. Finally, the offspring $\mathbf{o}$ is compared to the original parent $\mathbf{p_4}$ and replace it, if is better. This step is equivalent of selection and \acrshort{acc:de} is kind of steady--state evolution strategy, as defined on page \pageref{enum:steadystate}.
 
@@ -512,11 +512,11 @@ After the crossover, \acrshort{acc:de} performs uniform crossover between the tr
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\texorpdfstring{\acrlong*{acc:pso}}{Particle swarm optimization}}
 
-\acrfull{acc:pso}\index{particle swarm optimization} is another population--based stochastic optimization technique inspired by a flocking of birds and schooling of fish in Nature. It was introduced by \citet*{PSOOriginal}. The \acrshort{acc:pso} is somehow similar to the \acrshort{acc:es} in the sense that the individual is a vector of real numbers. In the \acrshort{acc:pso} terminology, the individuals are called \emph{particles}.
+\acrfull{acc:pso}\index{particle swarm optimization} is another population--based stochastic optimization technique inspired by a flocking of birds and schooling of fish in Nature. It was introduced by \citet*{PSOOriginal}. The \acrshort{acc:pso} is somehow similar to the real--coded evolutionary algorithms and \acrshort{acc:es} in the sense that the individual is a vector of real numbers. In the \acrshort{acc:pso} terminology, the individuals are called \emph{particles}.
 
 Thorough the time, the \acrshort{acc:pso} went through plenty of improvements. Two major versions, namely \acrfull{acc:spso2006} and \acrfull{acc:spso2011}, were released as a baseline for further improvements. I will focus on these versions as specified by \citet{SPSO}.
 
-Except for the position, each particle $\mathbf{p_i}$ has velocity vector $\mathbf{v_i}$, which defines the particle's direction and speed. The velocity vector is then used for a position update. Unlike \acrshort{acc:es}, modifications to the particles are not made directly but by manipulating with the velocity vector. These two components are the cause why the \acrshort{acc:pso} get its name.
+Except for the position, each particle $\mathbf{p_i}$ has velocity vector $\mathbf{v_i}$, which defines the particle's direction and speed. The velocity vector is then used for a position update. Unlike real--coded evolutionary algorithms, modifications to the particles are not made directly but by manipulating with the velocity vector. These two components are the cause why the \acrshort{acc:pso} get its name.
 
 Additionally to velocity, each particle $\mathbf{p_i}$ remember it's own best position, usually called \emph{local best}\index{particle swarm optimization!local best} and denoted by $\mathbf{L_i}$. This variable is updated after every step if the particle's fitness value is better than the fitness value of $\mathbf{L_i}$.
 

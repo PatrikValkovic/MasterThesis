@@ -22,4 +22,4 @@ thesis/**/*.idx
 thesis/**/*.ilg
 thesis/**/*.ind
 thesis/**/*.loa
-
+.idea
