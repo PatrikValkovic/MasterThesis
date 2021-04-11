@@ -25,7 +25,7 @@ p.add_argument("--velocity_clip", type=float, default=2, help="Velocity clip")
 p.add_argument("--inertia", type=float, default=0.8, help="Weight inertia")
 p.add_argument("--local_c", type=float, default=1.5)
 p.add_argument("--global_c", type=float, default=1.5)
-p.add_argument("--neigh_size", type=float, default=0.2, help="Neighborhood size")
+p.add_argument("--neigh_size", type=float, default=0.05, help="Neighborhood size")
 p.add_argument("--cpu_count", type=int, default=None, help="Number of GPU to use")
 
 p.add_argument("--function", type=str, help="BBOB function index")

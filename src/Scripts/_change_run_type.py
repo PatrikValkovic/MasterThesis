@@ -5,6 +5,7 @@
 #
 ###############################
 import wandb
+import progressbar
 
 
 api = wandb.Api()
@@ -14,7 +15,9 @@ runs = api.runs(f'kowalsky/thesis', filters={
         {"config.run_type": None},
     ]
 })
+print(f"Going to change {len(runs)} runs")
 
-for run in runs:
+for run in progressbar.progressbar(runs):
     run.config['run_type'] = 'test'
     run.update()
+
