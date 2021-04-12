@@ -1,0 +1,57 @@
+\chapter{GPU Programming}
+
+Increase of processors performance has been for a long time driven by Moore's law -- \enquote{The complexity for minimum component costs has increased at a rate of roughly a factor of two per year. Certainly over the short term this rate can be expected to continue, if not to increase. Over the longer term, the rate of increase is a bit more uncertain, although there is no reason to believe it will not remain constant for at least 10 years} \citep{MooresLaw}. This \enquote{law}, if we may call it that way, is unfortunately limited by physical properties of components used within modern processors. These limits are both on the side of possible processing speed, as well as on the side of size and number of transistors in the processor core. Over the last years, scientists are predicting end of Moore's law \citep{MooresLawEnd}, and their voices are louder, since the size of transistors in the \acrfull{acc:cpu} reached $7nm$ in 2018 \citep{SamsungSevenNm}. 
+
+Processors manufactures are well aware of the physical complications arising from the small size of the transistors, and invest more effort into multi--core processors. These processors have number of independent cores, that can be utilized in parallel and can possibly increase the performance of the processor linearly in respect to the number of cores. To name a few, last server processors by Intel\textsuperscript{\textregistered} Xeon\textsuperscript{\textregistered} Platinum 8380 Processor with 40 cores and 80 threads \citep{IntelXeonPlatinum}, as well as AMD EPYC\texttrademark\ 7763 with 64 cores and 128 threads \citep{AMDEpyc}, are great example.
+
+\acrfullpl{acc:gpu} takes this idea of multi--cores processors further. Rather than increasing single--thread performance, the \acrshort{acc:gpu} manufactures are focusing on massive parallelism using great number of cores working in highly parallel and distributed manner \citep{GPUComputingOwens}. Using this approach, the \acrshort{acc:gpu} programming offer promising performance. Common consumer \acrshortpl{acc:gpu} can easily outperform current high--end \acrshortpl{acc:cpu} in the instruction throughput and memory bandwidth. These demands originally came from the game industry, which place great emphasis on parallel processing and reasonably real--time latency. 
+
+Decision about the architecture however influence the way \acrshort{acc:gpu} are programmed. Unlike \acrshort{acc:cpu}, which is can run generic code, \acrshort{acc:gpu} is suited for specific kind of algorithms, that can fully use the underlying hardware. The program needs to have following mandatory properties to make it possible to run on \acrshort{acc:gpu} \citep{GPUComputingOwens}:
+\begin{itemize}
+    \item \textit{Large computation demands} -- \acrshort{acc:gpu} can deliver enormous performance, but has weak performance for short tasks without a lot of data. The overhead of allocating memory on \acrshort{acc:gpu} and moving it between can easily outweigh the advantage of using it. On the other hand, the real--time rendering require hundreds of operations per pixel, and \acrshort{acc:gpu} can easily meet these demands.
+    \item \textit{Significant parallelism} -- the algorithm needs to be easy to parallelize and ideally scale to as much cores as possible. Whereas \acrshort{acc:cpu} provides tens of cores (up to 64 today), the \acrshort{acc:gpu} have hundreds or thousands of them (current cutting-edge \acrshort{acc:gpu} designed especially for \acrshort{acc:ai}, NVIDIA V100, has 5120 CUDA cores \citep{nvidiav100spec}), although with smaller per--core performance. If can algorithm utilize only a few of the them, it may be slower than on multi--core \acrshort{acc:cpu}. Once again, real--time rendering can render each pixel independently, which makes it perfect candidate for \acrshort{acc:gpu} computing.
+    \item \textit{Throughput over latency} -- because the \acrshort{acc:gpu} is highly parallel, the throughput is more important than the absolute latency of individual operations. From the point of rendering, human eye can perceive pictures in order of milliseconds. Operations in modern processors take in order of nanoseconds. Therefore, the absolute time to render a single pixel is not important as long as all the pixels are rendered in the same order of time. The algorithms cannot make assumptions about the running time of individual parts, but rather on the running time of the task as a whole.
+\end{itemize}
+
+\acrlong{acc:ea} fits well into these categories, as the individuals fitness evaluation may be processed in parallel and independently. The crossover and mutation operators may be parallelized as well, as they operate and individuals or small set of individuals. We may parallelize the algorithm even more by processing each gene separately, as presented by \citet{CHENG2019514}.
+
+
+%%%%%%%%%%%%%%%
+%%           %%
+%%  HISTORY  %%
+%%           %%
+%%%%%%%%%%%%%%%
+\section{History}
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%
+%%                %%
+%%  ARCHITECTURE  %%
+%%                %%
+%%%%%%%%%%%%%%%%%%%%
+\section{Architecture}
+
+
+
+
+%%%%%%%%%%%%%%%
+%%           %%
+%%  PYTORCH  %%
+%%           %%
+%%%%%%%%%%%%%%%
+\section{PyTorch}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                       %%
+%%  EVA PARALLELIZATION  %%
+%%                       %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Evolutionary Algorithms parallelization}
