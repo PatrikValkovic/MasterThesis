@@ -10,18 +10,12 @@ from progressbar import progressbar
 api = wandb.Api()
 runs = api.runs(f'kowalsky/thesis', filters={
     "$and": [
-        {'config.run_type.value': 'time'},
-        {'config.device.value': 'cpu'},
-        {'config.alg_group.value': 'pso'},
-        {'config.pso.update.value': 'PSO2006'},
-        {'config.pso.neigh.value': 'Random'},
-        {'config.pop_size.value': {'$ne': None}},
-        {'createdAt': {'$lt': '2021-04-09T22:04:00'}}
+        {'createdAt': {'$gt': '2021-04-12T09:20:59Z'}}
     ]
 })
 runs = list(runs)
 print(f"Going to change {len(runs)} runs")
 
 for run in progressbar(runs):
-    run.config['run_type'] = 'test'
+    run.config['run_failed'] = True
     run.update()

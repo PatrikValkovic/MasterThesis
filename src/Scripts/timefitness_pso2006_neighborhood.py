@@ -84,6 +84,7 @@ for fni, d, psize, neigh_type in itertools.product(
             'bbob_dim': d,
             'alg_group': 'pso',
             'pso.neigh': neighborhood.__class__.__name__,
+            'pso.neigh.subtype': None if not isinstance(neighborhood, PSO.neighborhood.Grid2D) else neighborhood._neighborhood._type,
             'pso.neigh.size': args.neigh_size,
             'pso.update': PSO.update.PSO2006.__name__,
             'pso.inertia': args.inertia,
