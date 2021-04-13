@@ -36,9 +36,9 @@ The stages \acrshort{acc:gpu} performs is usually referred as \emph{rendering pi
 
 Soon, scientists and engineers identified many more problems suitable for processing on \acrshort{acc:gpu}. Although some parts of the rendering pipeline were fully programmable, the pipeline still inherently graphical and some stages are not possible to skip. To run general--purpose programs on \acrshort{acc:gpu} required encoding the problem in the domain of geometric primitives and use available programmable and special--purpose hardware to implement the algorithm. Moreover, the programmers need to decide which part of the hardware will execute which part of the calculation and how the pipeline's fixed stages will affect the data structure. As shader programs do not have access to shared memory, the data passing were realized using textures, vertices, and fragment properties \citep{GPUComputingOwens}. These complications discouraged general use of \acrshort{acc:gpu} for general--purpose programs, although some efforts have been made to hide underlying rendering pipeline from the programmer point of view \citep{BrookGPU}.
 
-Lack of support for general--purpose program on \acrshort{acc:gpu} inspired companies to develop new approach, that would give programmers better control over the underlying hardware. In 2007, NVIDIA introduced first version of \acrfull{acc:cuda} \citep{CUDAwiki}. Open source implementation of general--purpose programming came in 2008 as Open Computing Language (OpenCL) by Khronos Group \citep{OpenCLRelease}. These are higher level interfaces with C--like syntax exposing \acrshort{acc:gpu} resources without any connection to the graphical pipeline. Programmer is given control of execution and parallelization of the program, as well as memory access. Over the years, these technologies undergo a number of improvements (current version is CUDA 11.2, respectively OpenCL 3.0) adding support for data types, language constructs and hardware.
+Lack of support for general--purpose program on \acrshort{acc:gpu} inspired companies to develop new approach, that would give programmers better control over the underlying hardware. In 2006, NVIDIA introduced first version of \acrfull{acc:cuda} \citep{CUDAwiki}. Open source implementation of general--purpose programming came in 2008 as Open Computing Language (OpenCL) by Khronos Group \citep{OpenCLRelease}. These are higher level interfaces with C--like syntax exposing \acrshort{acc:gpu} resources without any connection to the graphical pipeline. Programmer is given control of execution and parallelization of the program, as well as memory access. Over the years, these technologies undergo a number of improvements (current version is CUDA 11.2, respectively OpenCL 3.0) adding support for data types, language constructs and hardware.
 
-CUDA become de facto standard in the field of general--purpose computing on \acrshort{acc:gpu} and I will focus primarily on it. Fortunately, other technologies like OpenCL have similar underlying architecture and approach to the \acrshort{acc:gpu} programming. Following section should therefore generalize for them as well.
+\acrshort{acc:cuda} become de facto standard in the field of general--purpose computing on \acrshort{acc:gpu} and I will focus primarily on it. Fortunately, other technologies like OpenCL have similar underlying architecture and approach to the \acrshort{acc:gpu} programming. Following section should therefore generalize for them as well.
 
 
 
@@ -50,6 +50,43 @@ CUDA become de facto standard in the field of general--purpose computing on \acr
 %%%%%%%%%%%%%%%%%%%%
 \section{Architecture}
 
+Design goals of \acrshort{acc:gpu} is to provide in order of magnitude higher instruction throughput and memory bandwidth in comparison to \acrshort{acc:cpu}. The overall architecture of \acrshort{acc:gpu} is therefore significantly different. In this section, I will focus on \acrshort{acc:gpu} architecture from the point of \acrshort{acc:cuda} platform, taking inspiration mainly from the CUDA Programming Guide \citep{CUDAguide}.
+
+\begin{figure}
+    \begin{subfigure}[t]{0.47\textwidth}
+        \includegraphics[width=\textwidth]{img/master_cpu_arch.pdf}
+        \caption{Architecture of \acrshort*{acc:cpu}. Each core has L1 cache and own control circuit. Cores can therefore work independently.}
+        \label{fig:cpuarch}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.47\textwidth}
+        \includegraphics[width=\textwidth]{img/master_gpu_arch.pdf}
+        \caption{Architecture of \acrshort*{acc:gpu}. One control circuit controls number of cores. One row of cores is called \acrlong{acc:sm} (\acrshort{acc:sm}, bounded by gray borders). L2 cache is shared between the cores.}
+        \label{fig:gpuarch}
+    \end{subfigure}
+    \caption{Difference between \acrshort*{acc:cpu} and \acrshort*{acc:gpu} architecture}
+\end{figure}
+
+Computation power of \acrshort{acc:gpu} comes from the fact, that it devotes in order of magnitudes more transistors on the chip to the data processing, rather than to the control circuits. The architecture of the \acrshort{acc:cpu} is shown in figure \ref{fig:cpuarch}. Each core has its own control circuit and therefore each cores can execute instructions independently. Moreover, each thread has its own L1 cache.
+
+The \acrshort{acc:gpu}\index{GPU!architecture} architecture is depicted in figure \ref{fig:gpuarch}. A set of cores share the same control circuit and L1 cache. One row of these cores is called \acrfull{acc:sm}. Number of cores per \acrshort{acc:sm} differ between architectures, more information can be found in the article by \citet{NVIDIAhistory} or on NVIDIA official websites. Using one control circuit to manage multiple cores brings some implications -- all the cores needs to execute the same instruction at once. In this sense, the instruction throughput is achieved using \acrfull{acc:simd} approach -- one instruction can at one tick modify multiple data. This is faster than executing the same instruction sequentially on \acrshort{acc:cpu}.
+
+Each \acrshort{acc:gpu} come with different set of hardware features or available instructions. Compute capability\index{GPU!compute capability} specify, which features are available at the target hardware. For example half--precision float--point operations are available from compute capability 5.3. Number of arithmetic CUDA cores per \acrshort{acc:sm} is 8 for compute capability 1.x, 32 resp. 48 for compute capability 2.0 resp. 2.1, 64 for compute capability 6.0, 7.x, and 8.0, 128 for compute capability 6.1, 6.2, and 8.6, and finally 192 for compute capability 3.x. I will therefore not discuss specific numbers in the following text. In order to use newer compute capabilities, the \acrshort{acc:gpu}, driver and the software need to support them.
+
+\acrlong{acc:cuda} allows almost direct translation of code from C onto the \acrshort{acc:gpu}. It uses C++ language with a few extensions. It is therefore straightforward to write program for \acrshort{acc:gpu} as long as we are familiar with C syntax. To distinguish code running on \acrshort{acc:cpu} and \acrshort{acc:gpu}, \acrshort{acc:cuda} differentiate between host (the code running on \acrshort{acc:cpu}) and device (the code running on the \acrshort{acc:gpu}) functions. There is special type of functions, called \emph{kernels}\index{CUDA!kernel}, that is called by the host, but executed on the device.
+
+The \acrshort{acc:cuda} defines following terminology:
+\begin{itemize}
+    \item CUDA thread\index{CUDA!thread} is execution of single kernel. To process $K$ blocks of data, the runtime creates at least $K$ threads and run the same kernel function on each of them.
+    \item CUDA thread block\index{CUDA!block} is a set of threads grouped into grid. Programmer may specify size of the grid during call of the kernel function as a three--dimensional vector. The number of threads in the thread block is limited by the compute capability of the hardware. Moreover, all the threads in the thread block needs to be executed on one \acrshort{acc:sm} (with some exceptions) and can be synchronized using \textit{\_\_syncthreads} call. Each kernel receives \textit{threadIdx} variable, which allows to identify individuals threads in the block.
+    \item CUDA kernel grid\index{CUDA!grid} is grid of thread blocks. Similarly to thread block, its size may be specified during  kernel call and each thread receives \textit{blockIdx} resp. \textit{blockDim} variables defining block in which the thread is running, resp. size of the blocks. More blocks from the same grid may run in parallel on different or same \acrshort{acc:sm}, but the threads cannot be synchronized between the blocks.
+    \item Warp\index{CUDA!warp} is set of 32 threads (for all compute capabilities so far), that execute the same instruction. The thread block is split into warps and executed by the \acrshort{acc:sm}. The warp is the minimal unit executable on the \acrshort{acc:gpu}. The device plan warps the same way \acrshort{acc:os} plans processes and may switch context to other warp while the current one is waiting for the data. By executing different warp, the latency of for example memory access is \enquote{hidden} behind execution of different warp. Although \acrshort{acc:gpu} cannot execute anything smaller than warp, it may mask some threads from the execution. It is therefore possible to have block size of $50$ threads, however $2\cdot32 - 50=14$ cores in the second warp will still execute (although this fact is hidden from the programmer).
+\end{itemize}
+
+
+%TODO moving memory
+%TODO memory hierarchy and shared memory banks
+%TODO trans warp functions
 
 
 
