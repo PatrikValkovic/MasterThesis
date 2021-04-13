@@ -1,0 +1,3 @@
+{"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\QHistorically, acc:gpu come from needs of game industry for real–time rendering.\\E$"}
+{"rule":"POSSESSIVE_APOSTROPHE","sentence":"^\\QThe stages acc:gpu performs is usually referred as rendering pipeline\\E$"}
+{"rule":"POSSESSIVE_APOSTROPHE","sentence":"^\\QThe stages acc:gpu performs is usually referred as rendering pipeline and may slightly differ.\\E$"}

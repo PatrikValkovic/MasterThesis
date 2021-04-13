@@ -432,3 +432,88 @@ doi = {10.1007/s10732-014-9245-2}
   author={{NVIDIA Corporation}},
   year={2020},
 }
+
+@book{GameGraphicProgramming,
+  title={Game Graphic Programming},
+  author={Sherrod, A.},
+  isbn={9781584506157},
+  lccn={2007935957},
+  series={Course Technology PTR game development series},
+  url={https://books.google.cz/books?id=gasLAAAAQBAJ},
+  year={2008},
+  publisher={Course Technology/Charles River Media/Cengage Learning}
+}
+
+@article{DirectX10,
+author = {Blythe, David},
+title = {The Direct3D 10 System},
+year = {2006},
+issue_date = {July 2006},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {25},
+number = {3},
+issn = {0730-0301},
+url = {https://doi.org/10.1145/1141911.1141947},
+doi = {10.1145/1141911.1141947},
+abstract = {We present a system architecture for the 4th generation of PC-class programmable graphics processing units (GPUs). The new pipeline features significant additions and changes to the prior generation pipeline including a new programmable stage capable of generating additional primitives and streaming primitive data to memory, an expanded, common feature set for all of the programmable stages, generalizations to vertex and image memory resources, and new storage formats. We also describe structural modifications to the API, runtime, and shading language to complement the new pipeline. We motivate the design with descriptions of frequently encountered obstacles in current systems. Throughout the paper we present rationale behind prominent design choices and alternatives that were ultimately rejected, drawing on insights collected during a multi-year collaboration with application developers and hardware designers.},
+journal = {ACM Trans. Graph.},
+month = jul,
+pages = {724–734},
+numpages = {11},
+keywords = {programmable graphics hardware, programmable shading, graphics systems}
+}
+
+@inproceedings{SoftwareRasterization,
+author = {Laine, Samuli and Karras, Tero},
+title = {High-Performance Software Rasterization on GPUs},
+year = {2011},
+isbn = {9781450308960},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/2018323.2018337},
+doi = {10.1145/2018323.2018337},
+abstract = {In this paper, we implement an efficient, completely software-based graphics pipeline on a GPU. Unlike previous approaches, we obey ordering constraints imposed by current graphics APIs, guarantee hole-free rasterization, and support multisample antialiasing. Our goal is to examine the performance implications of not exploiting the fixed-function graphics pipeline, and to discern which additional hardware support would benefit software-based graphics the most.We present significant improvements over previous work in terms of scalability, performance, and capabilities. Our pipeline is malleable and easy to extend, and we demonstrate that in a wide variety of test cases its performance is within a factor of 2--8x compared to the hardware graphics pipeline on a top of the line GPU.Our implementation is open sourced and available at http://code.google.com/p/cudaraster/},
+booktitle = {Proceedings of the ACM SIGGRAPH Symposium on High Performance Graphics},
+pages = {79–88},
+numpages = {10},
+location = {Vancouver, British Columbia, Canada},
+series = {HPG '11}
+}
+
+@article{BrookGPU,
+author = {Buck, Ian and Foley, Tim and Horn, Daniel and Sugerman, Jeremy and Fatahalian, Kayvon and Houston, Mike and Hanrahan, Pat},
+title = {Brook for {GPU}s: Stream Computing on Graphics Hardware},
+year = {2004},
+issue_date = {August 2004},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {23},
+number = {3},
+issn = {0730-0301},
+url = {https://doi.org/10.1145/1015706.1015800},
+doi = {10.1145/1015706.1015800},
+abstract = {In this paper, we present Brook for GPUs, a system for general-purpose computation on programmable graphics hardware. Brook extends C to include simple data-parallel constructs, enabling the use of the GPU as a streaming co-processor. We present a compiler and runtime system that abstracts and virtualizes many aspects of graphics hardware. In addition, we present an analysis of the effectiveness of the GPU as a compute engine compared to the CPU, to determine when the GPU can outperform the CPU for a particular algorithm. We evaluate our system with five applications, the SAXPY and SGEMV BLAS operators, image segmentation, FFT, and ray tracing. For these applications, we demonstrate that our Brook implementations perform comparably to hand-written GPU code and up to seven times faster than their CPU counterparts.},
+journal = {ACM Trans. Graph.},
+month = aug,
+pages = {777–786},
+numpages = {10},
+keywords = {GPU Computing, Stream Computing, Brook, Programmable Graphics Hardware, Data Parallel Computing}
+}
+
+@misc{ CUDAwiki,
+author = "{Wikipedia contributors}",
+title = "CUDA --- {Wikipedia}{,} The Free Encyclopedia",
+year = "2021",
+howpublished = "\url{https://en.wikipedia.org/w/index.php?title=CUDA&oldid=1017440526}",
+  note = {Accessed: 2021-04-12},
+}
+
+@misc{ OpenCLRelease,
+author = {The Khronos\texttrademark\ Group},
+title = {The {K}hronos {G}roup Releases {OpenCL }1.0 Specification},
+year = {2008},
+month        = {12},
+howpublished = "\url{https://khr.io/e9}",
+  note = {Accessed: 2021-04-12},
+}
