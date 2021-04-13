@@ -30,7 +30,7 @@ robotics \citep{EvolutionaryRobotics}\allowbreak\citep{RoboticsInPhysX}\allowbre
 design of neural networks \citep{NEAT}\allowbreak\citep{Floreano2008NeuroevolutionFA},
 and many more.
 
-There has been attempts to implement and run evolutionary algorithms on \acrshort{acc:gpu} \citep{CHENG2019514} and use the computation power available. However, most of these methods focus on \acrfull{acc:cuda} or similar technology. \acrshort{acc:cuda} and alike technologies have drawbacks -- they use low-end languages like C or C\texttt{++}, require deep knowledge of the underlying hardware and algorithms are harder to modify.
+There has been attempts to implement and run evolutionary algorithms on \acrshort{acc:gpu} \citep{CHENG2019514} and use the computation power available. However, most of these methods focus on \acrfull{acc:cuda} or similar technology. \acrshort{acc:cuda} and alike technologies have drawbacks -- they use low-end languages like C or \cpp, require deep knowledge of the underlying hardware and algorithms are harder to modify.
 
 Goal of this work is therefore to analyze existing implementations of evolutionary algorithms and propose their implementations on \acrshort{acc:gpu}. The implementation needs to be easy to understand, extendable, and easily to modify. In order to meet given criteria, implementation should reuse existing frameworks available for neural networks if possible.
 
