@@ -12,14 +12,13 @@ import copy
 import pickle
 import gzip
 import traceback
+import math
 
 CACHE_DIR = 'D:\\runscache'
 api = wandb.Api()
 FIGSIZE=(6, 4)
-POP_RENDER = [32, 128, 512, 2048, 10240, 32768]
-pop_list = [32, 128, 200, 512, 1024, 2048, 5000, 10240, 16384, 32768]
-linestyles = [':','-.','--','-']
 
+#region support
 class MyRun:
     def __init__(self, wandbrun, keep_history):
         self.name = wandbrun.name
@@ -27,9 +26,9 @@ class MyRun:
         self.sweep = None if wandbrun.sweep is None else {'id': wandbrun.sweep.id, 'name': wandbrun.sweep.config['name']}
         self.config = copy.deepcopy(dict(wandbrun.config))
         self.summary = copy.deepcopy(dict(wandbrun.summary))
-        self._history = None if not keep_history else copy.deepcopy(wandbrun.history())
+        self._history = None if not keep_history else copy.deepcopy(list(wandbrun.scan_history()))
 
-    def history(self):
+    def scan_history(self):
         return self._history
 
     def __str__(self) -> str:
@@ -47,9 +46,161 @@ class MyRun:
             with gzip.open(f'{CACHE_DIR}/{h.hexdigest()}.run', 'rb') as f:
                 runs = pickle.load(f)
         return runs
+def new_group(name):
+    exit()
+def round_plotup(val):
+    base = math.floor(math.log10(val))
+    round_to = 10 ** base
+    return (int(val / round_to)+1) * round_to
+def round_plotdown(val):
+    base = math.floor(math.log10(val))
+    round_to = 10 ** base
+    return int(val / round_to) * round_to
+def plot_generatelogticks(minval, maxval, ticks):
+    diff = math.log(maxval) - math.log(minval)
+    points = [math.exp(math.log(minval) + diff * s / ticks) for s in range(ticks+1)]
+    points[0] = minval
+    points[ticks] = maxval
+    for i in range(1, ticks):
+        base = math.floor(math.log10(points[i])) - 1
+        round_to = 10 ** base
+        points[i] = (int(points[i] / round_to)+1) * round_to
+    return points
+#endregion
 
 
-# render PSO2006 run times
+#region PSO2011 performance
+new_group('PSO2011 run times')
+COLORS = ['tab:blue', 'tab:orange', 'tab:green', 'tab:red']
+STYLES = ['-','--',':']
+NUM_Y_TICKS = 7
+for fn, in progressbar(list(itertools.product(
+        [1, 7, 15, 19, 22, 24],
+))):
+    plt.figure(figsize=FIGSIZE)
+    minval = math.inf
+    maxval = -math.inf
+    for ips, popsize in enumerate([32, 512, 10240, 32768]):
+        runs = MyRun.load_and_cache({
+            "$and": [
+                {'config.run_type.value': 'time,fitness'},
+                {'config.device.value': 'cuda'},
+                {'config.bbob_fn.value': fn},
+                {'config.bbob_dim.value': 128},
+                {'config.alg_group.value': 'pso'},
+                {'config.pso.update.value': 'PSO2011'},
+                {'config.pso.neigh.value': 'Random'},
+                {'config.pop_size.value': popsize},
+                {'config.run_failed.value': False},
+            ]
+        }, keep_history=True)
+        medians = np.array(list(map(lambda r: list(map(lambda h: h['fitness_median'], r.scan_history())), runs)))
+        medians = np.mean(medians, axis=0)
+        q05 = np.array(list(map(lambda r: list(map(lambda h: h['fitness_q05'], r.scan_history())), runs)))
+        q05 = np.mean(q05, axis=0)
+        best = np.array(list(map(lambda r: list(map(lambda h: h['fitness_lowest'], r.scan_history())), runs)))
+        best = np.mean(best, axis=0)
+        minval = min(minval, best.min())
+        maxval = max(maxval, medians.max())
+        plt.plot(range(len(medians)), medians, c=COLORS[ips], linestyle=STYLES[0])
+        plt.plot(range(len(q05)), q05, c=COLORS[ips], linestyle=STYLES[1])
+        plt.plot(range(len(best)), best, c=COLORS[ips], linestyle=STYLES[2])
+    plt.yscale('log')
+    plt.gca().get_yaxis().clear()
+    plt.xlim(0, 1000)
+    plt.xlabel('Generation')
+    minval = round_plotdown(minval)
+    maxval = round_plotup(maxval)
+    plt.ylim(minval, maxval)
+    plt.yticks(plot_generatelogticks(minval, maxval, NUM_Y_TICKS))
+    plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter(useOffset=False))
+    plt.minorticks_off()
+    plt.ylabel('Objective function')
+    plt.title(f"BBOB function $f_{{{fn}}}$")
+    plt.savefig(f'runs/fitness_pso2011_f{fn}.pdf')
+    plt.close()
+
+fig2 = plt.figure()
+ax2 = fig2.add_subplot()
+ax2.axis('off')
+legend = ax2.legend([
+    mlines.Line2D([0],[0], linestyle='-', c='black'),
+    mlines.Line2D([0], [0], linestyle='--', c='black'),
+    mlines.Line2D([0], [0], linestyle=':', c='black'),
+    mlines.Line2D([0], [0], c='tab:blue'),
+    mlines.Line2D([0], [0], c='tab:orange'),
+    mlines.Line2D([0], [0], c='tab:green'),
+    mlines.Line2D([0], [0], c='tab:red'),
+], [
+    'Fitness median', 'Fitness 0.05 quantile', 'Best fitness',
+    '32 particles', '512 particles',
+    '10240 particles', '32768 particles',
+], frameon=False, loc='lower center', ncol=10, )
+fig2 = legend.figure
+fig2.canvas.draw()
+bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+fig2.savefig(
+    f"runs/fitness_pso2011_legend.pdf",
+    dpi="figure",
+    bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+)
+plt.close(fig2)
+#endregion
+
+#region PSO2006 performance
+new_group('PSO2006 performance')
+for fn, in progressbar(list(itertools.product(
+        [1, 7, 15, 19, 22, 24],
+))):
+    plt.figure(figsize=FIGSIZE)
+    minval = math.inf
+    maxval = -math.inf
+    for ips, popsize in enumerate([32, 512, 10240, 32768]):
+        runs = MyRun.load_and_cache({
+            "$and": [
+                {'config.run_type.value': 'fitness'},
+                {'config.device.value': 'cuda'},
+                {'config.bbob_fn.value': fn},
+                {'config.bbob_dim.value': 128},
+                {'config.alg_group.value': 'pso'},
+                {'config.pso.update.value': 'PSO2006'},
+                {'config.pso.neigh.value': 'Random'},
+                {'config.pop_size.value': popsize},
+                {'config.run_failed.value': False},
+            ]
+        }, keep_history=True)
+        medians = np.array(list(map(lambda r: list(map(lambda h: h['fitness_median'], r.scan_history())), runs)))
+        medians = np.mean(medians, axis=0)
+        q05 = np.array(list(map(lambda r: list(map(lambda h: h['fitness_q05'], r.scan_history())), runs)))
+        q05 = np.mean(q05, axis=0)
+        best = np.array(list(map(lambda r: list(map(lambda h: h['fitness_lowest'], r.scan_history())), runs)))
+        best = np.mean(best, axis=0)
+        minval = min(minval, best.min())
+        maxval = max(maxval, medians.max())
+        plt.plot(range(len(medians)), medians, c=COLORS[ips], linestyle=STYLES[0])
+        plt.plot(range(len(q05)), q05, c=COLORS[ips], linestyle=STYLES[1])
+        plt.plot(range(len(best)), best, c=COLORS[ips], linestyle=STYLES[2])
+    plt.yscale('log')
+    plt.gca().get_yaxis().clear()
+    plt.xlim(0, 1000)
+    plt.xlabel('Generation')
+    minval = round_plotdown(minval)
+    maxval = round_plotup(maxval)
+    plt.ylim(minval, maxval)
+    plt.yticks(plot_generatelogticks(minval, maxval, NUM_Y_TICKS))
+    plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter(useOffset=False))
+    plt.minorticks_off()
+    plt.ylabel('Objective function')
+    plt.title(f"BBOB function $f_{{{fn}}}$")
+    plt.savefig(f'runs/fitness_pso2006_f{fn}.pdf')
+    plt.close()
+#endregion
+
+#region PSO2006 run times
+new_group('PSO2006 run times')
+POP_RENDER = [32, 128, 512, 2048, 10240, 32768]
+pop_list = [32, 128, 200, 512, 1024, 2048, 5000, 10240, 16384, 32768]
+linestyles = [':','-.','--','-']
 for fn, in progressbar(list(itertools.product(
         [1, 7, 15, 19, 22, 24],
 ))):
@@ -149,10 +300,10 @@ fig2.savefig(
     dpi="figure",
     bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
 )
+#endregion
 
-
-
-# render PSO2011 run times
+# region PSO2011 run times
+new_group('PSO2011 run times')
 for fn, in progressbar(list(itertools.product(
         [1, 7, 15, 19, 22, 24],
 ))):
@@ -252,3 +403,4 @@ fig2.savefig(
     dpi="figure",
     bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
 )
+#endregion
