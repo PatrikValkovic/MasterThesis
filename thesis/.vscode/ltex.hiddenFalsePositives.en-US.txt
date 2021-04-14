@@ -3,3 +3,4 @@
 {"rule":"POSSESSIVE_APOSTROPHE","sentence":"^\\QThe stages acc:gpu performs is usually referred as rendering pipeline and may slightly differ.\\E$"}
 {"rule":"ALLOW_TO","sentence":"^\\QEach kernel receives threadIdx variable, which allows to identify individuals threads in the block.\\E$"}
 {"rule":"A_INFINITIVE","sentence":"^\\QAll the compute capabilities up today have 32 banks for shared memory.\\E$"}
+{"rule":"ALLOW_TO","sentence":"^\\QWhen necessary, PyTorch allows to implement part of the algorithm in\\E$"}
