@@ -89,10 +89,12 @@ To minimize access latency to global device memory, \cuda provides a set of tool
 
 Special kind of memory, residing on--chip, is \emph{shared memory}\index{CUDA!shared memory}. The latency of shared memory is roughly 100x times lower than for global device memory and the global memory is shared in the thread block. Simple operation like matrix multiplication can be speed up by order of magnitude using shared memory \citep{MatrixMultiplicationGPU}. However, shared memory operates in equally--sized memory modules called banks, which complicates concurrent access to the shared memory. All the compute capabilities up today have 32 banks for shared memory organized into 32--bit words. Access to distinct memory addresses belonging to the same bank (bank conflict) by multiple threads within the same warp is serialized and therefore significantly increase the running time of the kernel. This is common for data types with the size of 64--bits, such as double precision floats. It may be beneficial to pad each value with one byte to eliminate conflicting access to the same banks.
 
-%TODO trans warp functions
-%TODO cuda pittfalls
-%TODO typical operations
-%TODO cuda libraries
+As I mentioned earlier, all threads in the warp needs to execute the exact same instruction. However, the programming language supports conditional jumps, loops and other constructs known from the modern programming languages. It may easily happen, that some threads within the warp may execute different execution path -- situation known as \emph{warp divergence}\index{CUDA!warp divergence}. There are more reasons, why may threads in the warp diverge, but the branching is the most common one. In order for \gpu to evaluate each execution path, it runs them sequentially and mask out threads not participating in the current path. Masked threads will still execute the program, however, their results are ignored from the programmer point of view. This mean the same code will be executed twice (note that this increase exponentially for nested conditions) and significantly increase the time to finish the program. In general, warp divergence is undesirable and should be avoided when possible.
+Warm divergence can only occur within a warp, different warps in the same thread block may execute different execution paths without any impact on the performance of the program.
+
+Parallel nature of \cuda allows number of algorithms, that have by order of magnitudes better performance on \gpu than on \cpuns. Typical example would be element--wise linear operations or matrix multiplication \citep{GPUMatrixMultiplication}. Reduction operations such as summation of the array can be implemented effectively on \gpu \citep{harris2007optimizing}, as well as different kind of sorting algorithms \citep{GPUsorting}.
+
+These operations are so common, NVIDIA released a set of libraries with implementation of these algorithms. The most relevant for this work are \textit{cuBLAS} (GPU--accelerated basic linear algebra library), CUDA Math Library implementing most common mathematical functions, and \textit{cuRAND} (GPU--accelerated random number generation). These implementations are optimized for the latest hardware and maintained by NVIDIA.
 
 
 
