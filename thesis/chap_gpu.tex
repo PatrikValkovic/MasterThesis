@@ -135,3 +135,7 @@ Because of PyTorch properties mentioned above, I decided to implement the evolut
 %%                       %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Evolutionary Algorithms parallelization}
+
+Evolutionary algorithms in general manage a population of individuals and by repeated application of evolutionary operators search search for optimal solution of the problem in hand. As the individuals within the population are independent, there is great potential of speeding up the whole process by paralelization of evolutionary operators. Although some of the operators need more than one particle for their execution (the crossover operators are the typical example), the operator is usually applied multiple times on different sets of individuals. Moreover, these set are usually small and therefore the coupling between individuals remains small, and the operator may be executed in parallel for all the sets. The typical crossover operator for example needs only two individuals and is applied for half of the population.
+
+Scientists and engineers were well aware of this potential and first attempts to parallelize evolutionary algorithms came long before \cuda was introduced by NVIDIA \citep{PGAPack} in 2006. These projects were either using single machine with multiple processor cores, or system of machines sharing sharing the population over the network.
