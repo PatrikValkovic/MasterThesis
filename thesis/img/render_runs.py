@@ -47,7 +47,8 @@ class MyRun:
                 runs = pickle.load(f)
         return runs
 def new_group(name):
-    exit()
+    print(f"RUNNING {name}")
+    #exit()
 def round_plotup(val):
     base = math.floor(math.log10(val))
     round_to = 10 ** base
@@ -70,7 +71,7 @@ def plot_generatelogticks(minval, maxval, ticks):
 
 
 #region PSO2011 performance
-new_group('PSO2011 run times')
+new_group('PSO2011 performance')
 COLORS = ['tab:blue', 'tab:orange', 'tab:green', 'tab:red']
 STYLES = ['-','--',':']
 NUM_Y_TICKS = 7
@@ -215,7 +216,7 @@ for fn, in progressbar(list(itertools.product(
                 {'config.alg_group.value': 'pso'},
                 {'config.pso.update.value': 'PSO2006'},
                 {'config.pso.neigh.value': 'Random'},
-                {'config.pop_size.value': {'$ne': None}},
+                {'config.pop_size.value': {'$in': pop_list}},
                 {'createdAt': {'$gte': '2021-04-09T22:04:00'}}
             ]
         })
@@ -243,7 +244,7 @@ for fn, in progressbar(list(itertools.product(
                 {'config.alg_group.value': 'pso'},
                 {'config.pso.update.value': 'PSO2006'},
                 {'config.pso.neigh.value': 'Random'},
-                {'config.pop_size.value': {'$ne': None}},
+                {'config.pop_size.value': {'$in': pop_list}},
             ]
         })
         measure = np.zeros(len(pop_list))
@@ -256,7 +257,7 @@ for fn, in progressbar(list(itertools.product(
                 progress = s['iteration'] / s['max_iteration']
                 psize = c['pop_size']
                 i = pop_list.index(c['pop_size'])
-                measure[i] += s['total_proc_time'] / progress
+                measure[i] += s['total_perf_time'] / progress
                 run_count[i] += 1
             except:
                 traceback.print_exc()
@@ -319,7 +320,7 @@ for fn, in progressbar(list(itertools.product(
                 {'config.pso.update.value': 'PSO2011'},
                 {'config.pso.neigh.value': 'Random'},
                 {'config.pop_size': {'$neq': None}},
-                {'config.pop_size.value': {'$ne': None}},
+                {'config.pop_size.value': {'$in': pop_list}},
             ]
         })
         measure = np.zeros(len(pop_list))
@@ -346,7 +347,7 @@ for fn, in progressbar(list(itertools.product(
                 {'config.alg_group.value': 'pso'},
                 {'config.pso.update.value': 'PSO2011'},
                 {'config.pso.neigh.value': 'Random'},
-                {'config.pop_size.value': {'$ne': None}},
+                {'config.pop_size.value': {'$in': pop_list}},
             ]
         })
         measure = np.zeros(len(pop_list))
@@ -359,7 +360,7 @@ for fn, in progressbar(list(itertools.product(
                 progress = s['iteration'] / s['max_iteration']
                 psize = c['pop_size']
                 i = pop_list.index(c['pop_size'])
-                measure[i] += s['total_proc_time'] / progress
+                measure[i] += s['total_perf_time'] / progress
                 run_count[i] += 1
             except:
                 traceback.print_exc()
