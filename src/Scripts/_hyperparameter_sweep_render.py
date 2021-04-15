@@ -8,9 +8,11 @@ import wandb
 import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.colors as mcolors
+import matplotlib.ticker as mticker
 
-SWEEP_ID = "yguxpp6l"
-SPLIT_BY = "neigh_size"
+
+SWEEP_ID = "1y495e7b"
+SPLIT_BY = "es.mutation.params.mutation_rate"
 
 api = wandb.Api()
 sweep = api.sweep(f'kowalsky/thesis/{SWEEP_ID}')
@@ -36,7 +38,7 @@ for ki, k in enumerate(split.keys()):
     q05 = np.zeros((len(split[k]), max_iters), dtype=float)
     q00 = np.zeros((len(split[k]), max_iters), dtype=float)
     for runi, run in enumerate(split[k]):
-        hist = run.history(pandas=False)
+        hist = list(run.scan_history())
         for step in range(max_iters):
             mean[runi, step] = hist[min(step, len(hist)-1)]['fitness_mean']
             q05[runi, step]  = hist[min(step, len(hist)-1)]['fitness_q05']
@@ -48,5 +50,6 @@ for ki, k in enumerate(split.keys()):
     plt.plot(range(max_iters), mean, c=c, linestyle='-', label=k)
     plt.plot(range(max_iters), q05, c=c, linestyle='--')
     plt.plot(range(max_iters), q00, c=c, linestyle=':')
+plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter(useOffset=False))
 plt.legend()
 plt.show()
