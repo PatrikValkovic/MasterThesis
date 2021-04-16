@@ -1,5 +1,7 @@
 \chapter{Results}
 
+All the algorithms were run with hyperparameters from chpater \ref{chap:hyperparameters}. Each configuration run hundred times and the plotted values are mean of specified matric from each run.
+
 
 
 %%%%%%%%%%%%%%%%%
@@ -45,7 +47,7 @@
         \includegraphics[width=\textwidth]{img/runs/time_pso2006_alldim_legend.pdf}
     \end{minipage}
 
-    \caption[PSO2006 running times]{Running times of \acrlong{acc:spso2006} algorithm using problem of dimension $6$, $32$, $128$, and $384$. The algorithm run for $1000$ generations. Populations with over $1000$ particles takes advantage of \gpu.}
+    \caption[PSO2006 running times]{Running times of \acrlong{acc:spso2006} algorithm using problems of dimension $6$, $32$, $128$, and $384$. The algorithm run for $1000$ generations. Populations with over $1000$ particles takes advantage of \gpu and are clearly faster to evaluate.}
 \end{figure}
 
 \begin{figure}[ht!]
@@ -86,7 +88,7 @@
         \includegraphics[width=\textwidth]{img/runs/fitness_pso2011_legend.pdf}
     \end{minipage}
 
-    \caption[PSO2006 fitness over generations]{Median, $0.05$ quantile, and best fitness of \acrlong{acc:spso2006} algorithm using random neighborhood on problem of $128$ dimensions. I measured populations consisting of $32$, $512$, $10240$, and $32768$ particles. All the problem functions take advantage of more particles, except of function $f_7$. Given hyperparameters in table \ref{tab:psohyperparameters}, \acrshort{acc:spso2006} seems to have better convergence properties in comparison to \acrshort{acc:spso2011}.}
+    \caption[PSO2006 fitness over generations]{Median, $0.05$ quantile, and best fitness of \acrlong{acc:spso2006} algorithm using random neighborhood on problem with $128$ dimensions. I measured populations consisting of $32$, $512$, $10240$, and $32768$ particles. All the problem functions take advantage of more particles, except of function $f_7$. Given hyperparameters in table \ref{tab:psohyperparameters}, \acrshort{acc:spso2006} seems to have better convergence properties in comparison to \acrshort{acc:spso2011}.}
 \end{figure}
 
 
@@ -134,7 +136,7 @@
         \includegraphics[width=\textwidth]{img/runs/time_pso2011_alldim_legend.pdf}
     \end{minipage}
 
-    \caption[PSO2011 running times]{Running times of \acrlong{acc:spso2011} algorithm using problem of dimension $6$, $3$2, $128$, and $384$. The algorithm run for $1000$ generations. Populations with over $1000$ particles takes advantage of \gpu.}
+    \caption[PSO2011 running times]{Running times of \acrlong{acc:spso2011} algorithm using problems of dimension $6$, $32$, $128$, and $384$. The algorithm run for $1000$ generations. Populations with over $1000$ particles takes clear advantage of \gpu.}
 \end{figure}
 
 \begin{figure}[ht!]
@@ -175,5 +177,5 @@
         \includegraphics[width=\textwidth]{img/runs/fitness_pso2011_legend.pdf}
     \end{minipage}
 
-    \caption[PSO2011 fitness over generations]{Median, $0.05$ quantile, and best fitness of \acrlong{acc:spso2011} algorithm using random neighborhood on problem of $128$ dimensions. I measured populations consisting of $32$, $512$, $10240$, and $32768$ particles. All the problem functions take advantage of more particles.}
+    \caption[PSO2011 fitness over generations]{Median, $0.05$ quantile, and best fitness of \acrlong{acc:spso2011} algorithm using random neighborhood on problem with $128$ dimensions. I measured populations consisting of $32$, $512$, $10240$, and $32768$ particles. All the problem functions take advantage of more particles.}
 \end{figure}
