@@ -148,7 +148,7 @@ These models are historically more suited for multi--processor systems rather th
 \begin{figure}[hb!]
     \centering
     \includegraphics[width=0.8\textwidth]{img/KnapsackKernelDesign.png}
-    \caption{Design of the knapsack fitness function kernel in \citet{GpuIsland}. It is gene--level model, where each thread aggregate informations from one individual and $CHR\_PER\_BLOCK$ items.}
+    \caption[Knapsack problem CUDA evaluation kernel]{Design of the knapsack fitness function kernel in \citet{GpuIsland}. It is gene--level model, where each thread aggregate informations from one individual and $CHR\_PER\_BLOCK$ items.}
     \label{fig:knapsackkernel}
 \end{figure}
 
@@ -158,4 +158,4 @@ In parallel computing, the granularity\index{granularity} is a masure of the com
     \item Warp--level granularity evaluate one individual using warp of threads. Advantage of warp is that threads within may communicate and for some problems this may be necessary to do so.
     \item Gene--level granularity evaluate each gene of the individual using one thread -- or more generally set of threads (then warp--level granularity is just a special case of gene--level granularity).     
 \end{itemize}
-The gene--level granularity is ideal for the \gpu computing, as it expose enough parallelism. Earlier attempts with chromosome--level or more coarse level granularity could not fully utilize the \gpuns. One example of gene--level granularity is in the work of \citet*{GpuIsland} for knapsack problem. His design of the \cuda kernel is in the figure \ref{fig:knapsackkernel}. Other author implemented simple genetic algorithm \citep{SimpleGACUDA}, differential evolution \citep{DifferentialEvaCUDA}, and particle swarm optimisation \citep{PSOCUDA}, all of them showed in order of magnitude speed up and proof that implementing \acrlong{acc:ea} on \gpu has its advantages.
+The gene--level granularity is ideal for the \gpu computing, as it expose enough parallelism. Earlier attempts with chromosome--level or more coarse level granularity could not fully utilize the \gpuns. One example of gene--level granularity is in the work of \citet*{GpuIsland} for knapsack problem. His design of the \cuda kernel is in the figure \ref{fig:knapsackkernel}. Other author implemented simple genetic algorithm \citep{SimpleGACUDA}, differential evolution \citep{veronese2010differential}, and particle swarm optimisation \citep{PSOCUDA}, all of them showed in order of magnitude speed up and proof that implementing \acrlong{acc:ea} on \gpu has its advantages.
