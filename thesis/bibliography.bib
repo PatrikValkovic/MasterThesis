@@ -49,18 +49,14 @@ journal = {Mathematical Problems in Engineering},
 doi = {10.1155/2014/593684}
 }
 
-@article{CHENG2019514,
-title = {Accelerating genetic algorithms with {GPU} computing: A selective overview},
-journal = {Computers \& Industrial Engineering},
-volume = {128},
-pages = {514-525},
-year = {2019},
-issn = {0360-8352},
-doi = {https://doi.org/10.1016/j.cie.2018.12.067},
-url = {https://www.sciencedirect.com/science/article/pii/S036083521830665X},
-author = {John Runwei Cheng and Mitsuo Gen},
-keywords = {Parallel genetic algorithms, GPU computing, Parallelism},
-abstract = {The emergence of GPU-CPU heterogeneous architectures has led to a fundamental paradigm shift in parallel programming. Accelerating Genetic Algorithms (GAs) on these architectures has received significant attention from both practitioners and researchers ever since GPUs emerged. In the past decade we have witnessed many progresses on migrating parallel GAs from CPU to GPU (Graphical Processing Unit) architecture, which makes this research field truly enter into the world of High Performance Computing (HPC), and demonstrates a great potential to many research disciplines and industrial worlds that can benefit from the power of GPU accelerated stochastic global search to explore large and complex search spaces for better solutions. Designing a parallel algorithm on GPU is quite different from designing one on CPU. On CPU architecture, we typically consider how to distribute data across tens of CPU threads, while on GPU architecture, we have more than hundreds of thousands of GPU threads running simultaneously. Therefore, we should rethink the design approaches and implementation strategies of parallel algorithms to fully utilize the computing power of GPUs to accelerate the computation of GAs. The intention of this paper is to give an overview on selective works of parallel GAs designed for GPU architecture. In this survey paper, we first reexamine the concept of granularity of parallelism for GAs on GPU architecture, discuss how the aspect of data layout affect the kernel design to maximize memory bandwidth, and explain how to organize threads in grid and blocks to expose sufficient parallelism to GPU. The comprehensive overview on selective works since 2010 then follows. The focus is mainly on the perspective of GPU architecture: how to accelerate GAs with GPU computing. Performance issues are not touched in this review, because most of these works are conducted on very early GPU cards, which are out of date already. We finally discuss some future research suggestions in the last section, especially about how to build up an efficient implementation of parallel GAs for hyper-scale computing. Many industrial and academic disciplines will be benefited from the GPU accelerated parallel GAs, one of the promising area is to evolve better deep neural networks.}
+@inbook{CHENG2019514,
+author = {Cheng, John and Gen, Mitsuo},
+year = {2020},
+month = {02},
+pages = {},
+title = {Parallel Genetic Algorithms with GPU Computing},
+isbn = {978-953-51-6996-3},
+doi = {10.5772/intechopen.89152}
 }
 
 @book{darwin1964origin,
@@ -608,4 +604,18 @@ month = {03},
 pages = {},
 title = {Users Guide to the PGAPack Parallel Genetic Algorithm Library},
 doi = {10.2172/366458}
+}
+
+@article{IslandModel,
+title = {An effective new island model genetic algorithm for job shop scheduling problem},
+journal = {Computers \& Operations Research},
+volume = {67},
+pages = {132-142},
+year = {2016},
+issn = {0305-0548},
+doi = {https://doi.org/10.1016/j.cor.2015.10.005},
+url = {https://www.sciencedirect.com/science/article/pii/S0305054815002361},
+author = {Mohamed Kurdi},
+keywords = {Job shop scheduling, Island model, Parallel genetic algorithm, Evolutionary computation},
+abstract = {This paper presents an effective new island model genetic algorithm to solve the well-known job shop scheduling problem with the objective of minimizing the makespan. To improve the effectiveness of the classical island model genetic algorithm, we have proposed a new naturally inspired evolution model and a new naturally inspired migration selection mechanism that are capable of improving the search diversification and delaying the premature convergence. In the proposed evolution model, islands employ different evolution methods during their self-adaptation phases, rather than employing the same methods. In the proposed migration selection mechanism, worst individuals who are least adapted to their environments migrate first, hoping in finding a better chance to live in a more suitable environment that imposes a more suitable self-adaptation method on them. The proposed algorithm is tested on 52 benchmark instances, with the proposed evolution model and migration selection mechanism, and without them using the classical alternatives, and also compared with other algorithms recently reported in the literature. Computational results verify the improvements achieved by the proposed evolution model and migration selection mechanism, and show the superiority of the proposed algorithm over the others in terms of effectiveness.}
 }
