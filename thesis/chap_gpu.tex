@@ -143,7 +143,14 @@ Scientists and engineers were well aware of this potential and first attempts to
     \item Master--worker model execute all the operators on a single machine, but the fitness evaluation is shared among several processors. When the fitness evaluation takes significant amount of time (for example running of physical simulation), and the time to share the individuals among processors is negligible, master--worker model is the best way to accelerate the algorithm.
     \item Island model maintain a list of populations running in parallel. Each of this population may run on separate processor and therefore in paralell. The individual populations are usually called \emph{islands}. The islands do not interact between each other, except special operator called \emph{migration operator}\index{migration operator}. This operator periodically in a predefined way exchanges a small portion of population amidst islands. By copying few individuals into new island, we hope to bring new generitc material into it. There has been shown, that island model on its own may improve the solution quality and running time of the algorithm \citep{IslandModel}.
 \end{itemize}
-These models are historically more suited for multi--processor systems rather than for \gpuns, as it would be hard to scale them up to thousands of cores, that are currently available in modern \gpuns.
+These models are historically more suited for multi--processor systems rather than for \gpuns, as it would be hard to scale them up to thousands of cores, that are currently available in modern \gpuns. Nevertheless, these approaches can still be combined with proposed implementation, one may for example use island model and run each population on different \gpuns--enabled machine.
+
+\begin{figure}[hb!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{img/KnapsackKernelDesign.png}
+    \caption{Design of the knapsack fitness function kernel in \citet{GpuIsland}. It is gene--level model, where each thread aggregate informations from one individual and $CHR\_PER\_BLOCK$ items.}
+    \label{fig:knapsackkernel}
+\end{figure}
 
 In parallel computing, the granularity\index{granularity} is a masure of the computation amount conducted by the task. Typically there is coarse--grained parallelism, which splits the problem in hand into several large tasks. Fine--grained parallelism in constrast splits the problem into large number of small task. Both corase--grained and fine--grained algorithms has been proposed for \cpu architecture. For \gpu programming however, more delicate levels of granularity are needed:
 \begin{itemize}
@@ -151,4 +158,4 @@ In parallel computing, the granularity\index{granularity} is a masure of the com
     \item Warp--level granularity evaluate one individual using warp of threads. Advantage of warp is that threads within may communicate and for some problems this may be necessary to do so.
     \item Gene--level granularity evaluate each gene of the individual using one thread -- or more generally set of threads (then warp--level granularity is just a special case of gene--level granularity).     
 \end{itemize}
-The gene--level granularity is ideal for the \gpu computing, as it expose enough parallelism. Earlier attempts with chromosome--level or more coarse level granularity could not fully utilize the \gpuns.
+The gene--level granularity is ideal for the \gpu computing, as it expose enough parallelism. Earlier attempts with chromosome--level or more coarse level granularity could not fully utilize the \gpuns. One example of gene--level granularity is in the work of \citet*{GpuIsland} for knapsack problem. His design of the \cuda kernel is in the figure \ref{fig:knapsackkernel}. Other author implemented simple genetic algorithm \citep{SimpleGACUDA}, differential evolution \citep{DifferentialEvaCUDA}, and particle swarm optimisation \citep{PSOCUDA}, all of them showed in order of magnitude speed up and proof that implementing \acrlong{acc:ea} on \gpu has its advantages.
