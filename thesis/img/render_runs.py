@@ -69,6 +69,129 @@ def plot_generatelogticks(minval, maxval, ticks):
     return points
 #endregion
 
+#region PSO neighborhood times
+#new_group('PSO neighborhood times')
+NUM_Y_TICKS = 7
+POP_RENDER = [36,121,225,529,1225,2500,4900,10000,16900,22500]
+NEIGHBORHOODS = [
+    {'label': 'Random', 'selection': [
+        {'config.pso.neigh.value': 'Random'},
+    ], 'color': 'tab:blue'},
+    {'label': 'Circle', 'selection': [
+        {'config.pso.neigh.value': 'Circle'},
+    ], 'color': 'tab:orange'},
+    {'label': 'Nearest', 'selection': [
+        {'config.pso.neigh.value': 'Nearest'},
+    ], 'color': 'tab:green'},
+    {'label': 'Lienar Grid', 'selection': [
+        {'config.pso.neigh.value': 'Grid2D'},
+        {'config.pso.neigh.subtype.value': 'linear'},
+    ], 'color': 'tab:red'},
+    {'label': 'Compact Grid', 'selection': [
+        {'config.pso.neigh.value': 'compact'},
+    ], 'color': 'tab:purple'},
+    {'label': 'Diamond Grid', 'selection': [
+        {'config.pso.neigh.value': 'diamond'},
+    ], 'color': 'tab:gray'},
+]
+for fn, in progressbar(list(itertools.product(
+    [1, 7, 15, 19, 22, 24],
+))):
+    plt.figure(figsize=FIGSIZE)
+    maxval = -math.inf
+    minval = math.inf
+    for neig in NEIGHBORHOODS:
+        runs = MyRun.load_and_cache({
+            "$and": [
+                {'state': 'finished'},
+                {'config.run_type.value': 'time'},
+                {'config.device.value': 'cpu'},
+                {'config.bbob_fn.value': fn},
+                {'config.bbob_dim.value': 128},
+                {'config.alg_group.value': 'pso'},
+                {'config.pso.update.value': 'PSO2006'},
+                {'config.pop_size.value': {'$in': POP_RENDER}},
+                {'createdAt': {'$gte': '2021-04-09T22:04:00'}},
+                {'config.run_failed.value': False},
+                *neig['selection'],
+            ]
+        })
+        measure = np.zeros(len(POP_RENDER))
+        run_count = np.zeros(len(POP_RENDER))
+        for run in runs:
+            try:
+                s, c = run.summary, run.config
+                if 'iteration' not in s:
+                    continue
+                progress = s['iteration'] / s['max_iteration']
+                i = POP_RENDER.index(c['pop_size'])
+                measure[i] += s['total_perf_time'] / progress
+                run_count[i] += 1
+            except:
+                traceback.print_exc()
+                print(run)
+        measure = measure[run_count > 0] / run_count[run_count > 0]
+        minval, maxval = min(measure.min(), minval), max(measure.max(), maxval)
+        plt.plot(
+            np.array(POP_RENDER)[run_count > 0],
+            measure,
+            c=neig['color'],
+            linestyle='-'
+        )
+        runs = MyRun.load_and_cache({
+            "$and": [
+                {'config.run_type.value': 'time,fitness'},
+                {'config.device.value': 'cuda'},
+                {'config.bbob_fn.value': fn},
+                {'config.bbob_dim.value': 128},
+                {'config.alg_group.value': 'pso'},
+                {'config.pso.update.value': 'PSO2006'},
+                {'config.pop_size.value': {'$in': POP_RENDER}},
+                {'createdAt': {'$gte': '2021-04-09T22:04:00'}},
+                {'config.run_failed.value': False},
+                *neig['selection'],
+            ]
+        })
+        measure = np.zeros(len(POP_RENDER))
+        run_count = np.zeros(len(POP_RENDER))
+        for run in runs:
+            try:
+                s, c = run.summary, run.config
+                if 'iteration' not in s:
+                    continue
+                progress = s['iteration'] / s['max_iteration']
+                psize = c['pop_size']
+                i = POP_RENDER.index(c['pop_size'])
+                measure[i] += s['total_perf_time'] / progress
+                run_count[i] += 1
+            except:
+                traceback.print_exc()
+                print(run)
+        measure = measure[run_count > 0] / run_count[run_count > 0]
+        minval, maxval = min(measure.min(), minval), max(measure.max(), maxval)
+        plt.plot(
+            np.array(POP_RENDER)[run_count > 0],
+            measure,
+            c=neig['color'],
+            linestyle='--'
+        )
+    plt.title(f"BBOB function $f_{{{fn}}}$")
+    plt.xscale('log')
+    plt.yscale('log')
+    plt.xticks([36, 121, 529, 2500, 10000, 22500])
+    plt.gca().get_xaxis().set_major_formatter(mticker.ScalarFormatter())
+    plt.gca().get_xaxis().set_tick_params(which='minor', size=0)
+    plt.xlim(36, 22500)
+    plt.xlabel('Population size')
+    minval = round_plotdown(minval)
+    maxval = round_plotup(maxval)
+    plt.ylim(minval, maxval)
+    plt.yticks(plot_generatelogticks(minval, maxval, NUM_Y_TICKS))
+    plt.ylabel('Running time [s]')
+    plt.savefig(f"runs/time_pso2006_fn{fn}_neigh.pdf")
+    plt.close()
+    exit()
+#endregion
 
 #region PSO2011 performance
 new_group('PSO2011 performance')
