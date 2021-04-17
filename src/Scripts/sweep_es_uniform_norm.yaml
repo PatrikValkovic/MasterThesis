@@ -28,12 +28,7 @@ parameters:
     value: false
   crossover_params:
     values:
-    - "change_prob-0.5"
     - "change_prob-0.4"
-    - "change_prob-0.3"
-    - "change_prob-0.2"
-    - "change_prob-0.1"
-    - "change_prob-0.01"
   mutation:
     value: AddFromNormal
   mutation_params:

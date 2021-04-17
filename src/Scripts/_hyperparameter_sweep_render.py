@@ -11,8 +11,8 @@ import matplotlib.colors as mcolors
 import matplotlib.ticker as mticker
 
 
-SWEEP_ID = "390qgkf4"
-SPLIT_BY = "es.crossover.params.change_prob"
+SWEEP_ID = "tptdagw1"
+SPLIT_BY = "es.mutation.params.mutation_rate"
 
 api = wandb.Api()
 sweep = api.sweep(f'kowalsky/thesis/{SWEEP_ID}')
