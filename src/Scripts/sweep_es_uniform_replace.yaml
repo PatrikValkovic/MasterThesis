@@ -1,5 +1,5 @@
 program: sweep_es.py
-name: ES_UniformCrossover_CauchyMut
+name: ES_UniformCrossover_ReplaceMut
 method: grid
 project: "thesis"
 
@@ -30,7 +30,19 @@ parameters:
     values:
     - "change_prob-0.4"
   mutation:
-    value: AddFromCauchy
+    value: ReplaceUniform
   mutation_params:
     values:
-    - 'mutation_rate-0.2,scale-0.003'
+    - 'min--5,max-5,mutation_rate-0.01'
+    - 'min--5,max-5,mutation_rate-0.05'
+    - 'min--5,max-5,mutation_rate-0.1'
+    - 'min--5,max-5,mutation_rate-0.2'
+    - 'min--5,max-5,mutation_rate-0.3'
+    - 'min--5,max-5,mutation_rate-0.5'
+    - 'min--5,max-5,mutation_rate-0.6'
+    - 'min--5,max-5,mutation_rate-0.7'
+    - 'min--5,max-5,mutation_rate-0.9'
+    - 'min--5,max-5,mutation_rate-1.1'
+    - 'min--5,max-5,mutation_rate-1.3'
+    - 'min--5,max-5,mutation_rate-1.5'
+

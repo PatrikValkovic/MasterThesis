@@ -11,7 +11,7 @@ import matplotlib.colors as mcolors
 import matplotlib.ticker as mticker
 
 
-SWEEP_ID = "sicscplv"
+SWEEP_ID = "w6nfq7ko"
 SPLIT_BY = "es.mutation.params.scale"
 COLORS = [
     *mcolors.TABLEAU_COLORS.values(),
