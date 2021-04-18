@@ -11,8 +11,8 @@ import matplotlib.colors as mcolors
 import matplotlib.ticker as mticker
 
 
-SWEEP_ID = "w6nfq7ko"
-SPLIT_BY = "es.mutation.params.scale"
+SWEEP_ID = "lno6gxqa"
+SPLIT_BY = "es.mutation.params.mutation_rate"
 COLORS = [
     *mcolors.TABLEAU_COLORS.values(),
     'k','b','r','m','r','lime','navy','aqua','yellow','orangered'

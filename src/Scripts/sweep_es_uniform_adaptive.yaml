@@ -1,5 +1,5 @@
-program: sweep_es.py
-name: ES_UniformCrossover_ReplaceMut
+program: sweep_es_adaptive.py
+name: ES_UniformCrossover_AdaptiveMut
 method: grid
 project: "thesis"
 
@@ -29,9 +29,7 @@ parameters:
   crossover_params:
     values:
     - "change_prob-0.4"
-  mutation:
-    value: ReplaceUniform
   mutation_params:
     values:
-    - 'min--5,max-5,mutation_rate-0.2'
+    - 'init_std-0.01,std_increase-0.1,std_decrease-0.1,mutate_members-1.0,better_to_increase-0.2,minimum_std-0.001,maximum_std-0.1'
 
