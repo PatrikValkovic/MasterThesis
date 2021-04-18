@@ -8,10 +8,10 @@ import torch as t
 import numpy as np
 import time
 
-REPEATS = 10
-PARENTS = 1000
-TO_PICK = 16
-CHILDREN = 1000
+REPEATS = 1000
+PARENTS = 10000
+TO_PICK = 1
+CHILDREN = 5000
 
 # init
 t.set_num_threads(4)
@@ -35,6 +35,22 @@ for _ in range(REPEATS):
 e = time.time()
 ##############################
 print(f"randint               p:{np.mean(bufferp):.6f} f:{np.mean(bufferf):.6f} in reality {e-s:.6f}")
+
+# rand permutation
+bufferp, bufferf = [], []
+s = time.time()
+for _ in range(REPEATS):
+    startp = time.process_time()
+    startf = time.perf_counter()
+    x = t.randperm(PARENTS, dtype=t.long)[:CHILDREN]
+    float(x.max())
+    endp = time.process_time()
+    endf = time.perf_counter()
+    bufferp.append(endp - startp)
+    bufferf.append(endf - startf)
+e = time.time()
+##############################
+print(f"randperm              p:{np.mean(bufferp):.6f} f:{np.mean(bufferf):.6f} in reality {e-s:.6f}")
 
 # uniform
 bufferp, bufferf = [], []
@@ -107,6 +123,22 @@ for _ in range(REPEATS):
 e = time.time()
 ##############################
 print(f"randint               p:{np.mean(bufferp):.6f} f:{np.mean(bufferf):.6f} in reality {e-s:.6f}")
+
+# rand permutation
+bufferp, bufferf = [], []
+s = time.time()
+for _ in range(REPEATS):
+    startp = time.process_time()
+    startf = time.perf_counter()
+    x = t.randperm(PARENTS, dtype=t.long, device=d)[:CHILDREN]
+    float(x.max())
+    endp = time.process_time()
+    endf = time.perf_counter()
+    bufferp.append(endp - startp)
+    bufferf.append(endf - startf)
+e = time.time()
+##############################
+print(f"randperm              p:{np.mean(bufferp):.6f} f:{np.mean(bufferf):.6f} in reality {e-s:.6f}")
 
 # uniform
 bufferp, bufferf = [], []

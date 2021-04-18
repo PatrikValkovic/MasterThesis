@@ -11,8 +11,12 @@ import matplotlib.colors as mcolors
 import matplotlib.ticker as mticker
 
 
-SWEEP_ID = "tptdagw1"
-SPLIT_BY = "es.mutation.params.mutation_rate"
+SWEEP_ID = "sicscplv"
+SPLIT_BY = "es.mutation.params.scale"
+COLORS = [
+    *mcolors.TABLEAU_COLORS.values(),
+    'k','b','r','m','r','lime','navy','aqua','yellow','orangered'
+]
 
 api = wandb.Api()
 sweep = api.sweep(f'kowalsky/thesis/{SWEEP_ID}')
@@ -32,7 +36,7 @@ split = split_by(SPLIT_BY)(runs)
 plt.figure(figsize=(12,8))
 plt.title(f'Hyperparameters {SPLIT_BY}')
 plt.yscale('log')
-for ki, k in enumerate(split.keys()):
+for ki, k in enumerate(sorted(split.keys(), key=float)):
     max_iters = max(map(lambda x: x.summary['iteration'], split[k]))
     mean = np.zeros((len(split[k]), max_iters), dtype=float)
     q05 = np.zeros((len(split[k]), max_iters), dtype=float)
@@ -46,7 +50,7 @@ for ki, k in enumerate(split.keys()):
     mean = np.median(mean, axis=0)
     q05 = np.median(q05, axis=0)
     q00 = np.median(q00, axis=0)
-    c = list(mcolors.TABLEAU_COLORS.values())[ki]
+    c = COLORS[ki]
     plt.plot(range(max_iters), mean, c=c, linestyle='-', label=k)
     plt.plot(range(max_iters), q05, c=c, linestyle='--')
     plt.plot(range(max_iters), q00, c=c, linestyle=':')

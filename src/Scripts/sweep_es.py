@@ -6,6 +6,7 @@
 ###############################
 import os
 import argparse
+import ffeat
 import ffeat.strategies as ES
 import ffeat.measure as M
 import bbobtorch
@@ -95,6 +96,7 @@ with WandbExecutionTime({'config': {
             selection,
             crossover,
             mutation,
+            ffeat.pso.clip.Position(-5,5),
             iterations=args.iterations
         )
         alg(),
