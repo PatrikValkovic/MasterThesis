@@ -24,10 +24,10 @@ MUTATIONS = [
     },
 ]
 SCHEMA = {
-    # replace parent, #discard parent
-    'normal': ('true', 'false'),
-    'comma': ('true', 'true'),
-    'plus': ('false', 'false'),
+    # replace parent, discard parent, num offsprings
+    'normal': ('true', 'false', 0.8),
+    'comma':  ('true', 'true' , 2.0000001),
+    'plus':   ('false','false', 1.5),
 }
 combinations = list(enumerate(itertools.product(
     [24, 128, 384],  # fdim
@@ -36,12 +36,12 @@ combinations = list(enumerate(itertools.product(
     SCHEMA.values(),
 )))
 ctime = int(time.time())
-devices = ['pcr12', 'pcr13']
+devices = ['pcr12', 'pcr13', 'pcr14', 'pcr11']
 
-for job_id, (fdim, fn, mut, (replaceparent, discardparent)) in combinations:
+for job_id, (fdim, fn, mut, (replaceparent, discardparent, offsprings)) in combinations:
     with open(f'{args.output}/_job.{ctime}.{job_id}.sh', "w") as f:
         print(f"#!/bin/bash", file=f)
-        print(f"#PBS -N ES_MUTATION", file=f)
+        print(f"#PBS -N ES_SCHEMA", file=f)
         print(f"#PBS -l select=1:ncpus={args.take_cores_per_job}:mem=32gb:scratch_local=50gb:vnode={devices[job_id % len(devices)]}", file=f)
         print(f"#PBS -l walltime=24:00:00", file=f)
         print(file=f)
@@ -68,7 +68,7 @@ for job_id, (fdim, fn, mut, (replaceparent, discardparent)) in combinations:
         print(file=f)
         print("cp -r \"/storage/praha1/home/kowalsky/MasterThesis/src/Scripts\" \"$SCRATCHDIR\"", file=f)
         print("cd \"$SCRATCHDIR/Scripts\"", file=f)
-        print(f"python ./{mut['script']} --mutation \"{mut['mutation']}\" --mutation_params \"{mut['mutation_params']}\" --function {fn} --dim {fdim} --repeat 100 --iterations 1000 --device cpu --cpu_count {args.cores_per_job} --selection Tournament --crossover Uniform --crossover_offsprings 0.8 --replace_parents {replaceparent} --discard_parents {discardparent} --crossover_params \"change_prob-0.4\" --popsize \"2048,32,128,200,512,1024,5000,10240,16384,32768\"", file=f)
+        print(f"python ./{mut['script']} --mutation \"{mut['mutation']}\" --mutation_params \"{mut['mutation_params']}\" --function {fn} --dim {fdim} --repeat 100 --iterations 1000 --device cpu --cpu_count {args.cores_per_job} --selection Tournament --crossover Uniform --crossover_offsprings {offsprings} --replace_parents {replaceparent} --discard_parents {discardparent} --crossover_params \"change_prob-0.4\" --popsize \"2048,32,128,200,512,1024,5000,10240,16384,32768\"", file=f)
         print(file=f)
         print("rm -rf \"$SCRATCHDIR\"", file=f)
         print("echo \"DONE\"", file=f)
