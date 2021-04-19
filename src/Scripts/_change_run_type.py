@@ -13,6 +13,7 @@ runs = api.runs(f'kowalsky/thesis', filters={
         {'config.run_type.value': 'test'},
         {'config.device.value': 'cpu'},
         {'config.alg_group.value': 'es_mutation'},
+        {'createdAt': {'$gt': '2021-04-19T18:00:00Z'}}
     ]
 })
 runs = list(runs)
