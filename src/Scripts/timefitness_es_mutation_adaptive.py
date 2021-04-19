@@ -9,7 +9,8 @@ import sys
 import argparse
 import bbobtorch
 import torch as t
-from utils import WandbExecutionTime, MaxTimeMinItersTerminate
+from utils import WandbExecutionTime, SidewayPipe, FSubtractPipe
+import ffeat.measure as M
 import cpuinfo
 import itertools
 import ffeat.strategies as ES
@@ -31,13 +32,12 @@ p.add_argument('--crossover_offsprings', type=float, help="Number of offsprings 
 p.add_argument('--replace_parents', type=str, default='true', help="Whether should offsprings replace parents")
 p.add_argument('--discard_parents', type=str, default='false', help="Whether should be parents discard after crossover")
 p.add_argument('--crossover_params', type=str, help="Additional parameters for crossover")
-p.add_argument('--mutation', type=str, help="Mutation to use")
-p.add_argument('--mutation_params', type=str, help="Additional parameters for mutation")
 
 p.add_argument("--function", type=str, help="BBOB function index")
 p.add_argument("--dim", type=str, help="Size of the problem comma separated")
 p.add_argument("--popsize", type=str, help="Size of the population comma separated")
 args, _ = p.parse_known_args()
+args.mutation_params = 'init_std-0.01,std_increase-1.3,std_decrease-0.2,mutate_members-1.0,better_to_increase-0.3,minimum_std-0.00001,maximum_std-1'
 
 args.function = list(map(int, args.function.split(',')))
 args.dim = list(map(int, args.dim.split(',')))
@@ -59,18 +59,16 @@ crossover = getattr(ES.crossover, args.crossover)(
         replace_parents=args.replace_parents,
         **args.crossover_params
     )
-mutation = getattr(ES.mutation, args.mutation)(
-    **args.mutation_params
-)
 
 for fni, d, psize in itertools.product(args.function, args.dim, args.popsize):
     fn = getattr(bbobtorch, f"create_f{fni:02d}")(d, dev=dev)
     selection = getattr(ES.selection, args.selection)(psize)
+    mutation = ES.mutation.AdaptiveStep(evaluation=ES.evaluation.Evaluation(fn), **args.mutation_params)
 
     for i in range(args.repeat):
         with WandbExecutionTime({'config': {
             **vars(args),
-            'run_type': 'time',
+            'run_type': 'time,fitness',
             'run_failed': False,
             'cputype': cpuinfo.get_cpu_info()['brand_raw'],
             'gputype': t.cuda.get_device_name(0) if t.cuda.is_available() else None,
@@ -87,7 +85,7 @@ for fni, d, psize in itertools.product(args.function, args.dim, args.popsize):
             'es.crossover.replace_parents': args.replace_parents,
             'es.crossover.discard_parents': args.discard_parents,
             **{f'es.crossover.params.{k}': v for k,v in args.crossover_params.items()},
-            'es.mutation': args.mutation,
+            'es.mutation': ES.mutation.AdaptiveStep.__name__,
             **{f'es.mutation.params.{k}': v for k,v in args.mutation_params.items()},
             'es.elitism': False,
         }}) as reporter:
@@ -95,11 +93,19 @@ for fni, d, psize in itertools.product(args.function, args.dim, args.popsize):
                 alg = ES.EvolutionStrategy(
                     ES.initialization.Uniform(psize, -5, 5, d, device=dev),
                     ES.evaluation.Evaluation(fn),
-                    reporter,
-                    MaxTimeMinItersTerminate(1*60*1000,80),
+                    SidewayPipe(
+                        FSubtractPipe(fn.f_opt),
+                        M.FitnessMean(),
+                        M.FitnessStd(),
+                        M.FitnessLowest(),
+                        M.Fitness01Quantile(),
+                        M.Fitness05Quantile(),
+                        M.FitnessMedian(),
+                        reporter,
+                    ),
+                    mutation,
                     selection,
                     crossover,
-                    mutation,
                     ffeat.pso.clip.Position(-5, 5),
                     iterations=args.iterations
                 )

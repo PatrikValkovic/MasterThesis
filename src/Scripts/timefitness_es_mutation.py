@@ -9,7 +9,8 @@ import sys
 import argparse
 import bbobtorch
 import torch as t
-from utils import WandbExecutionTime, MaxTimeMinItersTerminate
+from utils import WandbExecutionTime, SidewayPipe, FSubtractPipe
+import ffeat.measure as M
 import cpuinfo
 import itertools
 import ffeat.strategies as ES
@@ -70,7 +71,7 @@ for fni, d, psize in itertools.product(args.function, args.dim, args.popsize):
     for i in range(args.repeat):
         with WandbExecutionTime({'config': {
             **vars(args),
-            'run_type': 'time',
+            'run_type': 'time,fitness',
             'run_failed': False,
             'cputype': cpuinfo.get_cpu_info()['brand_raw'],
             'gputype': t.cuda.get_device_name(0) if t.cuda.is_available() else None,
@@ -95,8 +96,16 @@ for fni, d, psize in itertools.product(args.function, args.dim, args.popsize):
                 alg = ES.EvolutionStrategy(
                     ES.initialization.Uniform(psize, -5, 5, d, device=dev),
                     ES.evaluation.Evaluation(fn),
-                    reporter,
-                    MaxTimeMinItersTerminate(1*60*1000,80),
+                    SidewayPipe(
+                        FSubtractPipe(fn.f_opt),
+                        M.FitnessMean(),
+                        M.FitnessStd(),
+                        M.FitnessLowest(),
+                        M.Fitness01Quantile(),
+                        M.Fitness05Quantile(),
+                        M.FitnessMedian(),
+                        reporter,
+                    ),
                     selection,
                     crossover,
                     mutation,
