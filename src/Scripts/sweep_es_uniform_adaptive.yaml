@@ -15,13 +15,13 @@ parameters:
   popsize:
     value: 1000
   function:
-    value: 17
+    values: [1, 7, 15, 19, 22, 24]
   selection:
     value: Tournament
   crossover:
     value: Uniform
   crossover_offsprings:
-    values: [0.8]
+    value: 0.8
   replace_parents:
     value: true
   discard_parents:

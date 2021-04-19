@@ -99,7 +99,7 @@ with WandbExecutionTime({'config': {
             ffeat.pso.clip.Position(-5,5),
             iterations=args.iterations
         )
-        alg(),
+        alg()
     except:
         traceback.print_exc()
         reporter.run.config.update({'run_failed': True}, allow_val_change=True)
