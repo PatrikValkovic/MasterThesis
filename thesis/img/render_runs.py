@@ -47,8 +47,8 @@ class MyRun:
                 runs = pickle.load(f)
         return runs
 def new_group(name):
+    exit()
     print(f"RUNNING {name}")
-    #exit()
 def round_plotup(val):
     base = math.floor(math.log10(val))
     round_to = 10 ** base
@@ -69,30 +69,154 @@ def plot_generatelogticks(minval, maxval, ticks):
     return points
 #endregion
 
+#region PSO neighborhood fitness
+new_group('PSO neighborhood fitness')
+NUM_Y_TICKS = 7
+POP_SIZES=[121, 529, 4900, 22500]
+PSIZE_C = {
+    '121': 'tab:blue',
+    '529': 'tab:orange',
+    '4900': 'tab:green',
+    '22500': 'tab:red',
+}
+NEIGHBORHOODS = [
+    {'label': 'Random', 'selection': [
+        {'config.pso.neigh.value': 'Random'},
+    ], 'pop_sizes': POP_SIZES},
+    {'label': 'Nearest', 'selection': [
+        {'config.pso.neigh.value': 'Nearest'},
+    ], 'pop_sizes': POP_SIZES[:3]},
+    {'label': 'Circle', 'selection': [
+        {'config.pso.neigh.value': 'Circle'},
+    ], 'pop_sizes': POP_SIZES},
+    {'label': 'Linear Grid', 'selection': [
+        {'config.pso.neigh.value': 'Grid2D'},
+        {'config.pso.neigh.subtype.value': 'linear'},
+    ], 'pop_sizes': POP_SIZES[1:]},
+    {'label': 'Compact Grid', 'selection': [
+        {'config.pso.neigh.value': 'Grid2D'},
+        {'config.pso.neigh.subtype.value': 'compact'},
+    ], 'pop_sizes': POP_SIZES[1:]},
+    {'label': 'Diamond Grid', 'selection': [
+        {'config.pso.neigh.value': 'Grid2D'},
+        {'config.pso.neigh.subtype.value': 'diamond'},
+    ], 'pop_sizes': POP_SIZES[1:]},
+]
+STYLES=['-','--',':']
+for fn, neig in progressbar(list(itertools.product(
+    [1, 7, 15, 19, 22, 24],
+    NEIGHBORHOODS
+))):
+    plt.figure(figsize=FIGSIZE)
+    maxval = -math.inf
+    minval = math.inf
+    for psize in neig['pop_sizes']:
+        runs = MyRun.load_and_cache({
+            "$and": [
+                {'state': 'finished'},
+                {'config.run_type.value': 'time,fitness'},
+                {'config.device.value': 'cuda'},
+                {'config.bbob_fn.value': fn},
+                {'config.pop_size.value': psize},
+                {'config.bbob_dim.value': 128},
+                {'config.alg_group.value': 'pso'},
+                {'config.pso.update.value': 'PSO2006'},
+                {'createdAt': {'$gte': '2021-04-09T22:04:00'}},
+                {'config.run_failed.value': False},
+                *neig['selection'],
+            ]
+        }, keep_history=True)
+        runs = list(filter(lambda r: 'iteration' in r.summary, runs))
+        print()
+        print(neig)
+        print(f"psize {psize}, {fn}fn, runs: {len(runs)}")
+        print()
+        max_iter = max(map(lambda r: r.summary['iteration'], runs))
+        medians, q05, best = [], [], []
+        for step in range(max_iter+1):
+            cmedians, cq05, cbest = [], [], []
+            for r in runs:
+                h = r.scan_history()
+                if len(h) <= step:
+                    continue
+                h = h[step]
+                cmedians.append(h['fitness_median'])
+                cq05.append(h['fitness_q05'])
+                cbest.append(h['fitness_lowest'])
+            if len(cmedians) <= 20:
+                break
+            medians.append(np.mean(cmedians))
+            q05.append(np.mean(cq05))
+            best.append(np.mean(cbest))
+        minval = min(minval, np.min(best))
+        maxval = max(maxval, np.max(medians))
+        plt.plot(range(len(medians)), medians, c=PSIZE_C[str(psize)], linestyle=STYLES[0])
+        plt.plot(range(len(q05)), q05,         c=PSIZE_C[str(psize)], linestyle=STYLES[1])
+        plt.plot(range(len(best)), best,       c=PSIZE_C[str(psize)], linestyle=STYLES[2])
+    plt.yscale('log')
+    plt.gca().get_yaxis().clear()
+    plt.xlim(0, 1000)
+    plt.xlabel('Generation')
+    minval = round_plotdown(minval)
+    maxval = round_plotup(maxval)
+    plt.ylim(minval, maxval)
+    plt.yticks(plot_generatelogticks(minval, maxval, NUM_Y_TICKS))
+    plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter(useOffset=False))
+    plt.minorticks_off()
+    plt.ylabel('Objective function')
+    plt.title(f"{neig['label']} neighborhood BBOB $f_{{{fn}}}$")
+    plt.savefig(f'runs/fitness_pso_f{fn}_neigh{neig["label"].replace(" ","")}.pdf')
+    plt.close()
+
+fig2 = plt.figure()
+ax2 = fig2.add_subplot()
+ax2.axis('off')
+legend = ax2.legend([
+    mlines.Line2D([0],[0], linestyle='-', c='black'),
+    mlines.Line2D([0],[0], linestyle='--', c='black'),
+    mlines.Line2D([0],[0], linestyle=':', c='black'),
+    *list(map(lambda x: mlines.Line2D([0],[0],c=x), PSIZE_C.values())),
+], [
+    'Fitness median', 'Fitness 0.05 quantile', 'Best fitness',
+    *list(map(lambda x: f"{x} particles", PSIZE_C.keys()))
+], frameon=False, loc='lower center', ncol=10, )
+fig2 = legend.figure
+fig2.canvas.draw()
+bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+fig2.savefig(
+    f"runs/fitness_pso_neigh_legend.pdf",
+    dpi="figure",
+    bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+)
+plt.close(fig2)
+#endregion
+
 #region PSO neighborhood times
-#new_group('PSO neighborhood times')
+new_group('PSO neighborhood times')
 NUM_Y_TICKS = 7
 POP_RENDER = [36,121,225,529,1225,2500,4900,10000,16900,22500]
 NEIGHBORHOODS = [
     {'label': 'Random', 'selection': [
         {'config.pso.neigh.value': 'Random'},
     ], 'color': 'tab:blue'},
-    {'label': 'Circle', 'selection': [
-        {'config.pso.neigh.value': 'Circle'},
-    ], 'color': 'tab:orange'},
     {'label': 'Nearest', 'selection': [
         {'config.pso.neigh.value': 'Nearest'},
     ], 'color': 'tab:green'},
-    {'label': 'Lienar Grid', 'selection': [
-        {'config.pso.neigh.value': 'Grid2D'},
-        {'config.pso.neigh.subtype.value': 'linear'},
-    ], 'color': 'tab:red'},
-    {'label': 'Compact Grid', 'selection': [
-        {'config.pso.neigh.value': 'compact'},
-    ], 'color': 'tab:purple'},
+    {'label': 'Circle', 'selection': [
+        {'config.pso.neigh.value': 'Circle'},
+    ], 'color': 'tab:orange'},
+    #{'label': 'Linear Grid', 'selection': [
+    #    {'config.pso.neigh.value': 'Grid2D'},
+    #    {'config.pso.neigh.subtype.value': 'linear'},
+    #], 'color': 'tab:red'},
+    #{'label': 'Compact Grid', 'selection': [
+    #    {'config.pso.neigh.value': 'Grid2D'},
+    #    {'config.pso.neigh.subtype.value': 'compact'},
+    #], 'color': 'tab:purple'},
     {'label': 'Diamond Grid', 'selection': [
-        {'config.pso.neigh.value': 'diamond'},
-    ], 'color': 'tab:gray'},
+        {'config.pso.neigh.value': 'Grid2D'},
+        {'config.pso.neigh.subtype.value': 'diamond'},
+    ], 'color': 'tab:red'},
 ]
 for fn, in progressbar(list(itertools.product(
     [1, 7, 15, 19, 22, 24],
@@ -136,7 +260,7 @@ for fn, in progressbar(list(itertools.product(
             np.array(POP_RENDER)[run_count > 0],
             measure,
             c=neig['color'],
-            linestyle='-'
+            linestyle='-',
         )
         runs = MyRun.load_and_cache({
             "$and": [
@@ -173,7 +297,7 @@ for fn, in progressbar(list(itertools.product(
             np.array(POP_RENDER)[run_count > 0],
             measure,
             c=neig['color'],
-            linestyle='--'
+            linestyle='--',
         )
     plt.title(f"BBOB function $f_{{{fn}}}$")
     plt.xscale('log')
@@ -187,10 +311,31 @@ for fn, in progressbar(list(itertools.product(
     maxval = round_plotup(maxval)
     plt.ylim(minval, maxval)
     plt.yticks(plot_generatelogticks(minval, maxval, NUM_Y_TICKS))
+    plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter(useOffset=False))
+    plt.minorticks_off()
     plt.ylabel('Running time [s]')
     plt.savefig(f"runs/time_pso2006_fn{fn}_neigh.pdf")
-    plt.close()
-    exit()
+
+fig2 = plt.figure()
+ax2 = fig2.add_subplot()
+ax2.axis('off')
+legend = ax2.legend([
+    mlines.Line2D([0],[0], linestyle='-', c='black'),
+    mlines.Line2D([0], [0], linestyle='--', c='black'),
+    *list(map(lambda x: mlines.Line2D([0],[0],c=x['color']), NEIGHBORHOODS)),
+], [
+    'CPU', 'CUDA',
+    *list(map(lambda x: x['label'], NEIGHBORHOODS))
+], frameon=False, loc='lower center', ncol=10, )
+fig2 = legend.figure
+fig2.canvas.draw()
+bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+fig2.savefig(
+    f"runs/time_pso_neigh_legend.pdf",
+    dpi="figure",
+    bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+)
+plt.close(fig2)
 #endregion
 
 #region PSO2011 performance

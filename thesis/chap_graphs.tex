@@ -93,6 +93,101 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
 
 
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                      %%
+%%   PSO NEIGHBORHOOD   %%
+%%                      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure}[ht!]
+    \centering
+    \begin{minipage}[t]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/runs/time_pso2006_fn1_neigh.pdf}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/runs/time_pso2006_fn7_neigh.pdf}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/runs/time_pso2006_fn15_neigh.pdf}
+    \end{minipage}
+
+    \centering
+    \begin{minipage}[t]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/runs/time_pso2006_fn19_neigh.pdf}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/runs/time_pso2006_fn22_neigh.pdf}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/runs/time_pso2006_fn24_neigh.pdf}
+    \end{minipage}
+
+    \begin{minipage}{\textwidth}
+        \centering
+        \includegraphics[width=0.5\textwidth]{img/runs/time_pso_neigh_legend.pdf}
+    \end{minipage}
+
+    \caption[PSO2006 neighborhood running times]{Running times of \acrlong{acc:spso2011} algorithm with different neighborhood types. The algorithm run for 1000 generations on problem with 128 dimensions. Neighborhood sizes are at table \ref{tab:psohyperparameters}. The nearest neighborhood topology was run only to population of size 4900, as it compares all pairs of individuals and the device does not have enough memory. The minimum population size for grid topologies were 225, because topologies size were specified as a fraction of population size and for smaller populations neighborhood could not be constructed. The grid topologies were always assembled into square. Running times of circle, linear grid, compact grid, and diamond grid were almost identical (depending only on the size of neighborhood, see chapter \ref{chap:impl}), so I plot only measurements for circle and diamond grid.}
+\end{figure}
+
+
+
+\begin{figure}[ht!]
+    \centering
+    \begin{minipage}[t]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/runs/fitness_pso_f24_neighRandom.pdf}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/runs/fitness_pso_f24_neighNearest.pdf}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/runs/fitness_pso_f24_neighCircle.pdf}
+    \end{minipage}
+
+    \centering
+    \begin{minipage}[t]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/runs/fitness_pso_f24_neighLinearGrid.pdf}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/runs/fitness_pso_f24_neighCompactGrid.pdf}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/runs/fitness_pso_f24_neighDiamondGrid.pdf}
+    \end{minipage}
+
+    \begin{minipage}{\textwidth}
+        \centering
+        \includegraphics[width=0.8\textwidth]{img/runs/fitness_pso_neigh_legend.pdf}
+    \end{minipage}
+
+    \caption[PSO neighborhood fitness]{Fitness of neighborhoods using $121$, $529$, $4900$, and $22500$ particles and \acrshort{acc:spso2006} update algorithm. Nearest neighborhood for $22500$ particles is not present, because of the memory demands. Grid neighborhoods for $121$ particles is not present, because there was not enough particles to build it. 
+    All the neighborhoods clearly benefit from greater number of particles with the exception of compact grid and diamond grid. This is probably caused by premature convergence rather than degredation of the performance.
+    Measurements for \acrshort{acc:bbob} functions $f_1$, $f_7$, $f_{15}$, and $f_{22}$ report similar properties.}
+\end{figure}
+
+
+
+
 %%%%%%%%%%%%%%%%%
 %%             %%
 %%   PSO2011   %%
