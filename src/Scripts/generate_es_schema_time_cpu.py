@@ -41,7 +41,7 @@ devices = ['pcr12', 'pcr13']
 for job_id, (fdim, fn, mut, (replaceparent, discardparent)) in combinations:
     with open(f'{args.output}/_job.{ctime}.{job_id}.sh', "w") as f:
         print(f"#!/bin/bash", file=f)
-        print(f"#PBS -N ES_MUTATION", file=f)
+        print(f"#PBS -N ES_SCHEMA", file=f)
         print(f"#PBS -l select=1:ncpus={args.take_cores_per_job}:mem=32gb:scratch_local=50gb:vnode={devices[job_id % len(devices)]}", file=f)
         print(f"#PBS -l walltime=24:00:00", file=f)
         print(file=f)
