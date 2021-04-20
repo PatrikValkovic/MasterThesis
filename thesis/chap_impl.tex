@@ -53,3 +53,88 @@ The module encompass few more classes allowing to reorder and discard parameters
 %%                      %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Genetic Algorithms}
+
+The \acrlongpl{acc:ga} are in the \incode{ffeat.genetic} module. This module is further divided into following submodules.
+\begin{itemize}
+    \item \incode{ffeat.genetic.initialization} holds classes initializing the population. I considered only random initialization of individuals for the \acrshort{acc:ga} case, and this is implemented by the \incode{Uniform} class.
+    \item \incode{ffeat.genetic.evaluation} submodule contains classes to evaluate the individuals. The \incode{Evaluation} class expect to evaluate the whole population at once (ideal for \gpu implementation), whereas the \incode{RowEval} evaluate individuals one after another. Both classes expect fitness function during their creation.
+    \item \incode{ffeat.genetic.mutation} includes mutation operators. The library only implements simple Flip--Bit mutation operator, allowing to specify number of mutated individuals and probability of gene change.
+    \item \incode{ffeat.genetic.crossover} submodule.
+    \item \incode{ffeat.genetic.selection} submodule.
+\end{itemize}
+
+I implemented uniform, one--point, and two--point crossovers for \acrshort{acc:ga} (classes \incode{Uniform}, \incode{OnePoint1D}, and \incode{TwoPoint1D}). The uniform crossover may handle individual with arbitrary number of dimensions, because it simply generates random mask of genes to inherit from the first parent. For one--, and two--point crossovers would be position of the crossover point ambiguous, they therefore expect individuals to be one--dimensional.
+\todo{Rozhodnout jestli psát o implementaci point crossover operátorů na základě měření.}
+All the crossover operators allows to specify whether to replace parents or concatenate them with the population (plus schema known from the \acrshort{acc:es}), or whether to discard parents (comma schema from \acrshort{acc:es}).
+
+In the \incode{ffeat.genetic.selection} module the library keeps implementations of the 
+tournament (\incode{Tournament} class)
+roulette (\incode{Roulette} class), 
+and \acrlong{acc:sus} (\incode{StochasticUniversalSampling} class)
+selection operators. The tournament selection allows to specify whether is it maximization or minimization problem and a number of parents, as I discussed in chapter \ref{chap:eva}. The rank--based selection operator is in fact roulette or \acrshort{acc:sus} selection with preprocessing of fitness values. I will get to fitness transformation later.
+
+I also implement elitism in the \incode{ffeat.genetic.selection.Elitism} class. It copies the $n$ best individuals from the population and temporary stored them aside from the population. After all the \acrshort{acc:ga} operators are done, it copies them back. The implementation does not follow the exact description found in books \citep{IntroductionToEA}, because it may replace better individual (when the elite improve).
+\todo{Možná zmínit, že je malá pravděpodobnost, že se to stane (zdroj?) a nebo že nám to nevadí (měření?). Popřípadě že to zjednodušuje implementaci.}
+\todo{Na základě měření diskuze o implementaci.}
+
+For convenience, the parameters dealing with population size, typically the number of individuals to sample during selection or number of offsprings in crossovers, can be specified using absolute number or a fraction of population size. Moreover, some operators may change during algorithms, for example mutation probability of Flip--Bit mutation, and these accept callable object evaluated each iteration. Finally, there is no need to use \incode{ffeat.flow} module directly, but the flow is wrap in the \incode{ffeat.genetic.GeneticAlgorithm} class, into which the user just need to plug the operators.)
+
+Example of genetic algorithm defined in the \acrshort{acc:ffeat} library is in the algorithm \ref{alg:gaffeat}.
+
+\begin{algorithm}[hb!]
+\begin{lstlisting}[language=Python, xrightmargin=18pt]
+import ffeat.genetic as GA
+
+fn = create_problem_function()
+
+alg = GA.GeneticAlgorithm(
+    # Randomly initialize 100 individuals 
+    # with gene of length 40
+    GA.initialization.Uniform(100, 40),
+    # Evaluate the population
+    GA.evaluation.Evaluation(fn),
+    # Sample 100 individuals into new generation
+    GA.selection.Tournament(100),
+    # Crossover 40% of them
+    GA.crossover.OnePoint1D(0.4),
+    # Mutate 60 of them with 1% mutation chance
+    GA.mutation.FlipBit(60, mutate_prob=0.01),
+    # repeat for 100 generations
+    iterations=100
+)
+alg() # run the evolution
+\end{lstlisting}
+\caption{Simple \acrshort*{acc:ga} in \acrshort*{acc:ffeat}}
+\label{alg:gaffeat}
+\end{algorithm}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%
+%%                  %%
+%%  REAL--CODED EA  %%
+%%                  %%
+%%%%%%%%%%%%%%%%%%%%%%
+\section{Real--coded evolutionary algorithms}
+
+
+
+
+%%%%%%%%%%%%%%%
+%%           %%
+%%  UTILITY  %%
+%%           %%
+%%%%%%%%%%%%%%%
+\section{Utility functions}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                               %%
+%%  PARTICLE SWARM OPTIMIZATION  %%
+%%                               %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Particle swarm optimization}
+
