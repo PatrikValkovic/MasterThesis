@@ -4,3 +4,5 @@
 {"rule":"ALLOW_TO","sentence":"^\\QEach kernel receives threadIdx variable, which allows to identify individuals threads in the block.\\E$"}
 {"rule":"A_INFINITIVE","sentence":"^\\QAll the compute capabilities up today have 32 banks for shared memory.\\E$"}
 {"rule":"ALLOW_TO","sentence":"^\\QWhen necessary, PyTorch allows to implement part of the algorithm in\\E$"}
+{"rule":"STARS_AND_STEPS","sentence":"^\\Qacc:ea are simple to split, as one step may be one evolutionary operator.\\E$"}
+{"rule":"ALLOW_TO","sentence":"^\\QPython allows to call function with variable number of arguments, and variable number of keyword arguments.\\E$"}
