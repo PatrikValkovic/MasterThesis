@@ -26,16 +26,30 @@ I use this design to implement operators in Pipe and Filter architecture. Operat
 
 The library is split into several modules, each of them focusing into different kind of evolutionary algorithms or solving particular problem.
 \begin{itemize}
-    \item \lstinline|ffeat.flow| module includes basic classes to control flow of the algorithm with the Pipe and Filter architecture in mind.
-    \item \lstinline|ffeat.genetic| implements genetic algorithms operators and assume binary encoding.
-    \item \lstinline|ffeat.strategies| contains all the real--coded operators. Although not all of them are adaptive, therefore cannot be considered as evolution strategies, I decide to put them into shared module for convenience.
-    \item \lstinline|ffeat.pso| handles \acrlong{acc:pso} algorithms, their neighborhood and velocity update algorithms.
-    \item \lstinline|ffeat.measure| implements aggregations functions, primary focusing on fitness metrics.
-    \item \lstinline|ffeat.utils| is support module containing various useful functions like fitness scaling, decay, and early termination implementations.
+    \item \incode{ffeat.flow} module includes basic classes to control flow of the algorithm with the Pipe and Filter architecture in mind.
+    \item \incode{ffeat.genetic} implements genetic algorithms operators and assume binary encoding.
+    \item \incode{ffeat.strategies} contains all the real--coded operators. Although not all of them are adaptive, therefore cannot be considered as evolution strategies, I decide to put them into shared module for convenience.
+    \item \incode{ffeat.pso} handles \acrlong{acc:pso} algorithms, their neighborhood and velocity update algorithms.
+    \item \incode{ffeat.measure} implements aggregations functions, primary focusing on fitness metrics.
+    \item \incode{ffeat.utils} is support module containing various useful functions like fitness scaling, decay, and early termination implementations.
 \end{itemize}
 
+The base class for all the operators is \incode{ffeat.Pipe}. The implementation just accepts all the arguments and return them. The specific logic needs to be provided by the derived class. The method the library invokes is the Python's \incode{__call__} method, that allows to call the object the same as it was a method. That means the library invokes the operators using the same way as functions, which allows to implementation of simple operators by a function rather than a class.
+
+The \incode{ffeat.flow} implements basal classes to use the Pipe and Filter architecture. I will refer to operators to invoke as \enquote{filters} to agree with the architecture naming. The most important filters are:
+\begin{itemize}
+    \item \incode{Sequence} executing filters in sequence and passing output of one to the following filter. The \incode{Sequence} class implements the simplest Pipe and Filter architecture alone.
+    \item \incode{Parallel} executes filters in parallel -- that means all of them receive the same parameters and their results are concatenated together. The execution is parallel from the logic point of view, not using multithreading.
+    \item \incode{Repeat} executes filters in a loop for a given number of iterations (or indefinitely). The implementation allows to break the loop early by passing \enquote{break} parameter as a keyword argument into the inner filters.
+\end{itemize}
+The module encompass few more classes allowing to reorder and discard parameters (\incode{Select} class), replace some of them (\incode{Replace} class), transform each parameter (\incode{EachArg} class), and use Python lambda function (\incode{Lambda} class). I do not want to discuss them here, as the details are no important. Please see the attached source code for more information.
 
 
 
 
-% contribution
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                      %%
+%%  GENETIC ALGORITHMS  %%
+%%                      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Genetic Algorithms}
