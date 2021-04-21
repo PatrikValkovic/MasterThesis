@@ -29,17 +29,17 @@ p.add_argument('--crossover', type=str, help="Crossover to use")
 p.add_argument('--crossover_offsprings', type=float, help="Number of offsprings for selection")
 p.add_argument('--replace_parents', type=str, default='true', help="Whether should offsprings replace parents")
 p.add_argument('--discard_parents', type=str, default='false', help="Whether should be parents discard after crossover")
-p.add_argument('--crossover_additional', type=str, help="Additional parameters for crossover")
+p.add_argument('--crossover_params', type=str, help="Additional parameters for crossover")
 p.add_argument('--mutation', type=str, help="Mutation to use")
 p.add_argument('--mutation_params', type=str, help="Additional parameters for mutation")
-p.add_argument('--num_elites', type=float, help="Number of elites")
+p.add_argument('--num_elites', type=int, help="Number of elites")
 args, unknown_args = p.parse_known_args()
 args.repeat = args.aarepeat
 if int(args.crossover_offsprings) == args.crossover_offsprings:
     args.crossover_offsprings = int(args.crossover_offsprings)
 args.replace_parents = args.replace_parents.upper() == "TRUE"
 args.discard_parents = args.discard_parents.upper() == "TRUE"
-args.crossover_additional = {e.split('-')[0]: float(e.split('-')[1]) for e in args.crossover_additional.split(',')}
+args.crossover_params = {e.split('-')[0]: float(e.split('-')[1]) for e in args.crossover_params.split(',')}
 args.mutation_params = {e.split('-')[0]: float(e.split('-')[1]) for e in args.mutation_params.split(',')}
 d = t.device(args.device)
 
@@ -49,7 +49,7 @@ crossover = getattr(ES.crossover, args.crossover)(
     args.crossover_offsprings,
     discard_parents=args.discard_parents,
     replace_parents=args.replace_parents,
-    **args.crossover_additional
+    **args.crossover_params
 )
 mutation = getattr(ES.crossover, args.mutation)(
     **args.mutation_params
@@ -68,9 +68,9 @@ with WandbExecutionTime({'config': {
     'es.crossover.offsprings': args.crossover_offsprings,
     'es.crossover.replace_parents': args.replace_parents,
     'es.crossover.discard_parents': args.discard_parents,
-    'es.crossover.params': args.crossover_additional,
+    **{f'es.crossover.params.{k}': v for k,v in args.crossover_params.items()},
     'es.mutation': args.mutation,
-    'es.mutation.params': args.mutation_params,
+    **{f'es.mutation.params.{k}': v for k,v in args.mutation_params.items()},
     'es.elitism': True,
     'es.elitism.size': args.num_elites,
 
