@@ -12,7 +12,7 @@ import bbobtorch
 import torch as t
 from utils import WandbExecutionTime, SidewayPipe, FSubtractPipe
 import cpuinfo
-import ffeat
+import traceback
 
 os.environ['WANDB_SILENT'] = 'true'
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
@@ -51,7 +51,7 @@ crossover = getattr(ES.crossover, args.crossover)(
     replace_parents=args.replace_parents,
     **args.crossover_params
 )
-mutation = getattr(ES.crossover, args.mutation)(
+mutation = getattr(ES.mutation, args.mutation)(
     **args.mutation_params
 )
 with WandbExecutionTime({'config': {
@@ -61,10 +61,10 @@ with WandbExecutionTime({'config': {
     'bbob_fn': args.function,
     'bbob_dim': args.dim,
 
-    'alg_group': 'es',
+    'alg_group': 'es_elitism',
     'pop_size': args.popsize,
     'es.selection': args.selection,
-    'es.crossover': args.scrossover,
+    'es.crossover': args.crossover,
     'es.crossover.offsprings': args.crossover_offsprings,
     'es.crossover.replace_parents': args.replace_parents,
     'es.crossover.discard_parents': args.discard_parents,
@@ -79,10 +79,10 @@ with WandbExecutionTime({'config': {
 }}) as reporter:
     try:
         alg = ES.EvolutionStrategy(
-            ES.initialization.Uniform(args.pop_size, -5, 5, args.dim, device=d),
+            ES.initialization.Uniform(args.popsize, -5, 5, args.dim, device=d),
             ES.evaluation.Evaluation(fn),
             SidewayPipe(
-                FSubtractPipe(fn.f_ops),
+                FSubtractPipe(fn.f_opt),
                 M.FitnessMean(),
                 M.FitnessStd(),
                 M.FitnessLowest(),
@@ -103,5 +103,6 @@ with WandbExecutionTime({'config': {
         )
         alg()
     except:
-        reporter.run.config.update({'run_failed': True})
+        traceback.print_exc()
+        reporter.run.config.update({'run_failed': True}, allow_val_change=True)
 
