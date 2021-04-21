@@ -77,9 +77,7 @@ I also implement elitism in the \incode{ffeat.genetic.selection.Elitism} class. 
 \todo{Možná zmínit, že je malá pravděpodobnost, že se to stane (zdroj?) a nebo že nám to nevadí (měření?). Popřípadě že to zjednodušuje implementaci.}
 \todo{Na základě měření diskuze o implementaci.}
 
-For convenience, the parameters dealing with population size, typically the number of individuals to sample during selection or number of offsprings in crossovers, can be specified using absolute number or a fraction of population size. Moreover, some operators may change during algorithms, for example mutation probability of Flip--Bit mutation, and these accept callable object evaluated each iteration. Finally, there is no need to use \incode{ffeat.flow} module directly, but the flow is wrap in the \incode{ffeat.genetic.GeneticAlgorithm} class, into which the user just need to plug the operators.)
-
-Example of genetic algorithm in the \acrshort{acc:ffeat} library is in the algorithm \ref{alg:gaffeat}.
+For convenience, the parameters dealing with population size, typically the number of individuals to sample during selection or number of offsprings in crossovers, can be specified using absolute number or a fraction of population size. Moreover, some operators may change during algorithms, for example mutation probability of Flip--Bit mutation, and these accept callable object evaluated each iteration. Finally, there is no need to use \incode{ffeat.flow} module directly, but the flow is wrap in the \incode{ffeat.genetic.GeneticAlgorithm} class, into which the user just need to plug the operators.
 
 \begin{algorithm}[t!]
 \begin{lstlisting}[language=Python, xrightmargin=18pt]
@@ -109,14 +107,19 @@ alg() # run the evolution
 \label{alg:gaffeat}
 \end{algorithm}
 
+Some operators, for example tournament selection and point crossovers should get distinct parents in order for the operator to do something useful. Unfortunately, this requirements is hard to satisfy, especially for \gpuns, because the parent indices are generated independently. It is nevertheless still possible using PyTorch's \incode{torch.multinomial} function. The problem is, this function takes significantly more time than generating random integer in a provided range. I decide to allow specification of parent sampling strategy for all these algorithms.
+\todo{Pravděpodobně změřit čas a fitness hodnoty pro obě strategie. Předpokládal bych, že s větší populací je pravděpodobnost duplicity menší a nebude to takový problém. Sem dát stručný popis, že to nevadí, a detailnější rozbor udělat v další kapitole.}
+
+Example of genetic algorithm in the \acrshort{acc:ffeat} library is in the algorithm \ref{alg:gaffeat}.
 
 
 
-%%%%%%%%%%%%%%%%%%%%%%
-%%                  %%
-%%  REAL--CODED EA  %%
-%%                  %%
-%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%
+%%                 %%
+%%  REAL-CODED EA  %%
+%%                 %%
+%%%%%%%%%%%%%%%%%%%%%
 \section{Real--Coded Evolutionary Algorithms}
 
 Real--coded evolutionary algorithms are encapsulated in the \incode{ffeat.strategies} module. It has similar structure to \acrshort{acc:ga} module described above. Except for the operators mentioned for \acrshort{acc:ga}, I implement operators specific to real--value encoding.
@@ -141,9 +144,9 @@ fn = create_problem_function()
 alg = ES.EvolutionStrategy(
     # Randomly initialize 100 individuals 
     # in range (-5,5) with gene of length 40
-    ESs.initialization.Uniform(100, -5.0, 5.0, 40),
+    ES.initialization.Uniform(100, -5.0, 5.0, 40),
     # Evaluate the population
-    ES.evaluation.Evaluation(_f),
+    ES.evaluation.Evaluation(fn),
     # Sample 100 individuals into new generation
     ES.selection.Roulette(100),
     # Crossover 40% of them
@@ -200,6 +203,50 @@ Earlier in this work I mentioned, that rank--based selection operators are just 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Particle Swarm Optimization}
 
+The \acrlong{acc:pso} algorithms are implemented in the \incode{ffeat.pso} module. It contains the implementation of both \acrshort{acc:spso2006} and \acrshort{acc:spso2011} algorithms, along the following neighborhoods in the \incode{ffeat.pso.neighborhood} submodule.
+\begin{itemize}
+    \item Random neighborhood.
+    \item Nearest neighbors neighborhood.
+    \item Static neighborhood is a helper class, that cache the neighborhood in the first generation and use it for the rest of the algorithm run. Following neighborhoods use static neighborhood as their base class and therefore the time to build the neighborhood does not affect the running time of the algorithm.
+    \item Circle neighborhood with possibility to specify number of neighboors.
+    \item Grid neighborhood with either linear, compact, or diamond shape, as specified in chapter \ref{chap:psoneig}. The compact and diamond shapes are a bit tricky to build in arbitrary number of dimensions, so these are implemented only for two--dimensional case and encapsulated in the \incode{Grid2D} class.
+\end{itemize}
+
+In the \incode{ffeat.pso.clip} submodule are classes allowing to clip either particles' position or their velocity, both per dimension or the by absolute velocity value.
+
+The whole \acrshort{acc:pso} algorithm is wrap inside the \incode{PSO} class. Because of the more complicated flow of the algorithm, this class does not allow as much freedom as previous \acrshort{acc:ga} or real--coded \acrshort{acc:ea} implementations. The example of \acrshort{acc:pso} algorithm in \acrshort{acc:ffeat} is in algorithm \ref{alg:psoffeat}.
+
+\begin{algorithm}[t!]
+\begin{lstlisting}[language=Python, xrightmargin=18pt]
+import ffeat.pso as pso
 
 
-% TODO parent sampling zmínit někde
+fn = create_problem_function()
+
+alg = pso.PSO(
+    # Randomly initialize position of 100 particles
+    pso.initialization.Uniform(100, -5.0, 5.0, 40),
+    # Randomly initialize velocities
+    pso.initialization.Uniform(100, -1.0, 1.0, 40),
+    # Pass the evaluation function
+    pso.evaluation.Evaluation(fn),
+    # Specify random neighborhood with 3 neighbors
+    pso.neighborhood.Random(3),
+    # Use SPSO2006 velocity update rule
+    pso.update.PSO2006(
+        inertia=0.8, 
+        local_c=1.5, 
+        global_c=1.5
+    ),
+    # Clip particles position into range
+    clip_position=pso.clip.Position(-5,5),
+    # Clip particles velocity
+    clip_velocity=pso.clip.VelocityNorm(2.0),
+    # Specify number of iterations
+    iterations=200
+)
+alg() # run the PSO algorithm
+\end{lstlisting}
+\caption{\acrshort*{acc:pso} algorithm in \acrshort*{acc:ffeat}}
+\label{alg:psoffeat}
+\end{algorithm}
