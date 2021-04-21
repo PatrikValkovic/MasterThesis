@@ -117,7 +117,7 @@ alg() # run the evolution
 %%  REAL--CODED EA  %%
 %%                  %%
 %%%%%%%%%%%%%%%%%%%%%%
-\section{Real--coded evolutionary algorithms}
+\section{Real--Coded Evolutionary Algorithms}
 
 Real--coded evolutionary algorithms are encapsulated in the \incode{ffeat.strategies} module. It has similar structure to \acrshort{acc:ga} module described above. Except for the operators mentioned for \acrshort{acc:ga}, I implement operators specific to real--value encoding.
 
@@ -179,6 +179,17 @@ The \incode{ffeat.strategy.EvolutionStrategy} class wraps together all the steps
 %%%%%%%%%%%%%%%
 \section{Utility functions}
 
+I implement some functionality allowing to control and measure the algorithm progress. First set of these functions are in the \incode{ffeat.measure} module. It allows to measure statistical data, like mean, deviation, and quantiles of the population fitness. It passes measured metrics as keyword arguments to the following operator, so it is possible to stop the algorithm early if specific metric does not improve or certain threshold has been reached. Also, it is possible to log these metrics into standard output or file, if neccesarry.
+
+The \incode{ffeat.utils.termination} submodule responsibility is to terminate the algorithm early. There are various termination criteria, for example if metric does not improve for a specified number of generations (\incode{NoImprovement} class), metric deviation for last $k$ is bellow certain threshold (\incode{StdBellow} class), or metric reached specified threshold (\incode{MetricReached} class).
+
+The decay rates presented in section \ref{chap:adaptiveoperators} are implemented in submodule \incode{ffeat.utils.decay} -- specifically linear, polynomial, and exponential decay rate. This module allows to for example decrease the mutation rate over generations.
+
+Last submodule is \incode{ffeat.utils.scaling}, allowing to rescale the fitness for the purposes of roulette--based selection operators. The fitness may be scaled linearly, exponentially, or using logarithmic scale. Special transformation is in the \incode{MultiplicativeInverse} class, transforming minimization problem into maximization one by changing fitness by the $f(x)=1/x$ function.
+
+Earlier in this work I mentioned, that rank--based selection operators are just roulette-based selection operators with replaced fitness functions. Class \incode{RankScale} conduct that by sorting the population by the old fitness values and giving each individual new fitness value based on its order. The given fitness values are linearly distributed along the population, but may be transformed into different scale using of the classes mentioned above.
+\todo{Diskuze nad efektivitou po provedení měření, možná až v další kapitole.}
+
 
 
 
@@ -187,5 +198,8 @@ The \incode{ffeat.strategy.EvolutionStrategy} class wraps together all the steps
 %%  PARTICLE SWARM OPTIMIZATION  %%
 %%                               %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Particle swarm optimization}
+\section{Particle Swarm Optimization}
 
+
+
+% TODO parent sampling zmínit někde
