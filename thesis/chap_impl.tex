@@ -79,11 +79,12 @@ I also implement elitism in the \incode{ffeat.genetic.selection.Elitism} class. 
 
 For convenience, the parameters dealing with population size, typically the number of individuals to sample during selection or number of offsprings in crossovers, can be specified using absolute number or a fraction of population size. Moreover, some operators may change during algorithms, for example mutation probability of Flip--Bit mutation, and these accept callable object evaluated each iteration. Finally, there is no need to use \incode{ffeat.flow} module directly, but the flow is wrap in the \incode{ffeat.genetic.GeneticAlgorithm} class, into which the user just need to plug the operators.)
 
-Example of genetic algorithm defined in the \acrshort{acc:ffeat} library is in the algorithm \ref{alg:gaffeat}.
+Example of genetic algorithm in the \acrshort{acc:ffeat} library is in the algorithm \ref{alg:gaffeat}.
 
-\begin{algorithm}[hb!]
+\begin{algorithm}[t!]
 \begin{lstlisting}[language=Python, xrightmargin=18pt]
 import ffeat.genetic as GA
+
 
 fn = create_problem_function()
 
@@ -118,6 +119,56 @@ alg() # run the evolution
 %%%%%%%%%%%%%%%%%%%%%%
 \section{Real--coded evolutionary algorithms}
 
+Real--coded evolutionary algorithms are encapsulated in the \incode{ffeat.strategies} module. It has similar structure to \acrshort{acc:ga} module described above. Except for the operators mentioned for \acrshort{acc:ga}, I implement operators specific to real--value encoding.
+
+In the \incode{ffeat.strategies.crossover} submodule are uniform, one--point, and two--point crossovers identical to one for \acrshort{acc:ga}. In addition, it contains:
+\begin{itemize}
+    \item Arithmetic crossover in the \incode{Arithmetic} class. It allows to specify number of parents and their weights. For $k$ parents, the offspring is created by the formula 
+    $$\mathbf{o}_i=\sum_{j=1}^k w_{ji}\mathbf{p_j}_i$$
+    It allows to pass callable object for the weights, so the weights may be randomized and the offspring may be different weighted arithmetic sum each generation (allowing different weights for individuals genes as well).
+    \item Blend crossover in the \incode{Blend} class, as described in the chapter \ref{chap:eva}.
+    \item Differential evolution implemented by the \incode{Differential} class. Although this operator may be used alone, I decide to keep it among the crossover operators. It is possible to alter the $F$ and $C$ constants over generations, and replace the parent only if the offspring is better than its parent. In this case, the operator needs to know the fitness values of the parents.
+\end{itemize}
+\todo{Možná něco o implementaci podle toho, jak dopadne měření.}
+
+\begin{algorithm}[b!]
+\begin{lstlisting}[language=Python, xrightmargin=18pt]
+import ffeat.strategies as ES
+
+
+fn = create_problem_function()
+
+alg = ES.EvolutionStrategy(
+    # Randomly initialize 100 individuals 
+    # in range (-5,5) with gene of length 40
+    ESs.initialization.Uniform(100, -5.0, 5.0, 40),
+    # Evaluate the population
+    ES.evaluation.Evaluation(_f),
+    # Sample 100 individuals into new generation
+    ES.selection.Roulette(100),
+    # Crossover 40% of them
+    ES.crossover.TwoPoint1D(0.4),
+    # Use normal mutation for all of them with 
+    # standard deviation 0.01
+    ES.mutation.AddFromNormal(0.01),
+    # repeat for 200 generations
+    iterations=200
+)
+alg() # run the evolution
+\end{lstlisting}
+\caption{Simple real--coded algorithm in \acrshort*{acc:ffeat}}
+\label{alg:esffeat}
+\end{algorithm}
+
+From the mutation operators, I implement the following operators in the \incode{ffeat.strategies.mutation} submodule.
+\begin{itemize}
+    \item Random replacement of gene by a random value from specified distribution. It supports all the distributions implemented by PyTorch \citep{PyTorchDoc} and may refine the mutation rate over generations. It is implemented in the \incode{Replace} class, along with the \incode{ReplaceUniform} class sampling from specified uniform distribution.
+    \item Small deviation of the individual by adding value sampled from specified distribution. It is encapsulated in the \incode{AddFromDistribution} class with specialized classes \incode{AddFromNormal} and \incode{AddFromCauchy} for normal respectively Cauchy distribution. The \incode{AddFromNormal} is the traditional implementation of normal mutation specified in the first chapter.
+    \item Normal mutation with adaptive step implemented in the \incode{AdaptiveStep} class. It supports only the simplest adaptive algorithm by sharing the same deviation for all the dimensions. It allows to specify initial, maximal, and minimal deviation, as well as step size and number of better offsprings needed to increase the deviation. It may be used to implement the one--fifth rule.
+\end{itemize}
+
+The \incode{ffeat.strategy.EvolutionStrategy} class wraps together all the steps for real--coded evolutionary algorithms. Simple real--coded algorithm is in algorithm \ref{alg:esffeat}.
+    
 
 
 
