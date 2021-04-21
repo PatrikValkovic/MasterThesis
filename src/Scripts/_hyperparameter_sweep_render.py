@@ -11,8 +11,8 @@ import matplotlib.colors as mcolors
 import matplotlib.ticker as mticker
 
 
-SWEEP_ID = "ud3ao4hu"
-SPLIT_BY = "bbob_fn"
+SWEEP_ID = "m2vyoxub"
+SPLIT_BY = "es.elitism.size"
 COLORS = [
     *mcolors.TABLEAU_COLORS.values(),
     'k','b','r','m','r','lime','navy','aqua','yellow','orangered'

@@ -99,7 +99,8 @@ with WandbExecutionTime({'config': {
                 selection,
                 crossover,
                 mutation,
-            )
+            ),
+            iterations=args.iterations
         )
         alg()
     except:
