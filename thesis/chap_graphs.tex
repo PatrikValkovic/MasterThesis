@@ -4,13 +4,60 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
 
 
 
+
+%%%%%%%%%%%%%%%%%%%%%%
+%%                  %%
+%%   ES MUTATIONS   %%
+%%                  %%
+%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure}[ht!]
+    \begin{minipage}[t]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/runs/time_es_mutation_fn19_24d.pdf}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/runs/time_es_mutation_fn19_128d.pdf}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/runs/time_es_mutation_fn19_384d.pdf}
+    \end{minipage}
+
+    \begin{minipage}[t]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/runs/time_es_mutation_fn22_24d.pdf}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/runs/time_es_mutation_fn22_128d.pdf}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/runs/time_es_mutation_fn22_384d.pdf}
+    \end{minipage}
+
+    \begin{minipage}{\textwidth}
+        \centering
+        \includegraphics[width=0.8\textwidth]{img/runs/time_es_mutation_legend.pdf}
+    \end{minipage}
+
+    \caption[Running times of mutation operators]{Running times of various mutation operators for real--coded evolutionary algorithms. I chose to measure only \acrshort{acc:bbob} functions $f_{19}$ and $f_{22}$.}
+\end{figure}
+
+
+
+
 %%%%%%%%%%%%%%%%%
 %%             %%
 %%   PSO2006   %%
 %%             %%
 %%%%%%%%%%%%%%%%%
 \begin{figure}[ht!]
-    \centering
     \begin{minipage}[t]{0.32\textwidth}
         \centering
         \includegraphics[width=\textwidth]{img/runs/time_pso2006_fn1_alldim.pdf}
@@ -26,7 +73,6 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
         \includegraphics[width=\textwidth]{img/runs/time_pso2006_fn15_alldim.pdf}
     \end{minipage}
 
-    \centering
     \begin{minipage}[t]{0.32\textwidth}
         \centering
         \includegraphics[width=\textwidth]{img/runs/time_pso2006_fn19_alldim.pdf}
@@ -51,7 +97,6 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
 \end{figure}
 
 \begin{figure}[ht!]
-    \centering
     \begin{minipage}[t]{0.32\textwidth}
         \centering
         \includegraphics[width=\textwidth]{img/runs/fitness_pso2006_f1.pdf}
@@ -67,7 +112,6 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
         \includegraphics[width=\textwidth]{img/runs/fitness_pso2006_f15.pdf}
     \end{minipage}
 
-    \centering
     \begin{minipage}[t]{0.32\textwidth}
         \centering
         \includegraphics[width=\textwidth]{img/runs/fitness_pso2006_f19.pdf}
@@ -100,7 +144,6 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
 %%                      %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{figure}[ht!]
-    \centering
     \begin{minipage}[t]{0.32\textwidth}
         \centering
         \includegraphics[width=\textwidth]{img/runs/time_pso2006_fn1_neigh.pdf}
@@ -116,7 +159,6 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
         \includegraphics[width=\textwidth]{img/runs/time_pso2006_fn15_neigh.pdf}
     \end{minipage}
 
-    \centering
     \begin{minipage}[t]{0.32\textwidth}
         \centering
         \includegraphics[width=\textwidth]{img/runs/time_pso2006_fn19_neigh.pdf}
@@ -143,7 +185,6 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
 
 
 \begin{figure}[ht!]
-    \centering
     \begin{minipage}[t]{0.32\textwidth}
         \centering
         \includegraphics[width=\textwidth]{img/runs/fitness_pso_f24_neighRandom.pdf}
@@ -159,7 +200,6 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
         \includegraphics[width=\textwidth]{img/runs/fitness_pso_f24_neighCircle.pdf}
     \end{minipage}
 
-    \centering
     \begin{minipage}[t]{0.32\textwidth}
         \centering
         \includegraphics[width=\textwidth]{img/runs/fitness_pso_f24_neighLinearGrid.pdf}
@@ -194,7 +234,6 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
 %%             %%
 %%%%%%%%%%%%%%%%%
 \begin{figure}[ht!]
-    \centering
     \begin{minipage}[t]{0.32\textwidth}
         \centering
         \includegraphics[width=\textwidth]{img/runs/time_pso2011_fn1_alldim.pdf}
@@ -210,7 +249,6 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
         \includegraphics[width=\textwidth]{img/runs/time_pso2011_fn15_alldim.pdf}
     \end{minipage}
 
-    \centering
     \begin{minipage}[t]{0.32\textwidth}
         \centering
         \includegraphics[width=\textwidth]{img/runs/time_pso2011_fn19_alldim.pdf}
@@ -235,7 +273,6 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
 \end{figure}
 
 \begin{figure}[ht!]
-    \centering
     \begin{minipage}[t]{0.32\textwidth}
         \centering
         \includegraphics[width=\textwidth]{img/runs/fitness_pso2011_f1.pdf}
@@ -251,7 +288,6 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
         \includegraphics[width=\textwidth]{img/runs/fitness_pso2011_f15.pdf}
     \end{minipage}
 
-    \centering
     \begin{minipage}[t]{0.32\textwidth}
         \centering
         \includegraphics[width=\textwidth]{img/runs/fitness_pso2011_f19.pdf}

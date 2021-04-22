@@ -69,6 +69,134 @@ def plot_generatelogticks(minval, maxval, ticks):
     return points
 #endregion
 
+#region ES mutation times
+NUM_Y_TICKS = 7
+POP_SIZES = [32,128,200,512,1024,2048,5000,10240,16384,32768]
+FNS= [19, 22]
+DIMS= [24, 128, 384]
+MUTATIONS = ['AddFromNormal', 'AddFromCauchy', 'ReplaceUniform', 'AdaptiveStep']
+MUT_COLORS = {
+    'AddFromNormal': 'tab:blue',
+    'AddFromCauchy': 'tab:orange',
+    'ReplaceUniform': 'tab:green',
+    'AdaptiveStep': 'tab:red',
+}
+TO_MEASURE = 'total_real_time'
+for fn, dim in progressbar(list(itertools.product(
+    FNS,
+    DIMS
+))):
+    plt.figure(figsize=FIGSIZE)
+    maxval, minval = -math.inf, math.inf
+    for mut in MUTATIONS:
+        runs = MyRun.load_and_cache({
+            "$and": [
+                {'state': 'finished'},
+                {'config.run_failed.value': False},
+                {'config.pop_size.value': {'$in': POP_SIZES}},
+                {'config.alg_group.value': 'es_mutation'},
+                {'config.device.value': 'cpu'},
+                {'config.bbob_fn.value': fn},
+                {'config.bbob_dim.value': dim},
+                {'config.es.mutation.value': mut}
+            ]
+        })
+        measure = np.zeros(len(POP_SIZES))
+        run_count = np.zeros(len(POP_SIZES))
+        for run in runs:
+            try:
+                s, c = run.summary, run.config
+                if 'iteration' not in s:
+                    continue
+                progress = s['iteration'] / s['max_iteration']
+                i = POP_SIZES.index(c['pop_size'])
+                measure[i] += s[TO_MEASURE] / progress
+                run_count[i] += 1
+            except:
+                traceback.print_exc()
+                print(run)
+        measure = measure[run_count > 0] / run_count[run_count > 0]
+        minval, maxval = min(measure.min(), minval), max(measure.max(), maxval)
+        plt.plot(
+            np.array(POP_SIZES)[run_count > 0],
+            measure,
+            c=MUT_COLORS[mut],
+            linestyle='-',
+        )
+
+        runs = MyRun.load_and_cache({
+            "$and": [
+                {'state': 'finished'},
+                {'config.run_failed.value': False},
+                {'config.pop_size.value': {'$in': POP_SIZES}},
+                {'config.alg_group.value': 'es_mutation'},
+                {'config.device.value': 'cuda'},
+                {'config.bbob_fn.value': fn},
+                {'config.bbob_dim.value': dim},
+                {'config.es.mutation.value': mut}
+            ]
+        })
+        measure = np.zeros(len(POP_SIZES))
+        run_count = np.zeros(len(POP_SIZES))
+        for run in runs:
+            try:
+                s, c = run.summary, run.config
+                if 'iteration' not in s:
+                    continue
+                progress = s['iteration'] / s['max_iteration']
+                i = POP_SIZES.index(c['pop_size'])
+                measure[i] += s[TO_MEASURE] / progress
+                run_count[i] += 1
+            except:
+                traceback.print_exc()
+                print(run)
+        measure = measure[run_count > 0] / run_count[run_count > 0]
+        minval, maxval = min(measure.min(), minval), max(measure.max(), maxval)
+        plt.plot(
+            np.array(POP_SIZES)[run_count > 0],
+            measure,
+            c=MUT_COLORS[mut],
+            linestyle='--',
+        )
+    plt.title(f"BBOB function $f_{{{fn}}}$ with ${dim}$ dimensions")
+    plt.xscale('log')
+    plt.yscale('log')
+    plt.xticks([32, 128, 512, 2048, 10240, 32768])
+    plt.gca().get_xaxis().set_major_formatter(mticker.ScalarFormatter())
+    plt.gca().get_xaxis().set_tick_params(which='minor', size=0)
+    plt.xlim(32, 32768)
+    plt.xlabel('Population size')
+    minval = round_plotdown(minval)
+    maxval = round_plotup(maxval)
+    plt.ylim(minval, maxval)
+    plt.yticks(plot_generatelogticks(minval, maxval, NUM_Y_TICKS))
+    plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter(useOffset=False))
+    plt.minorticks_off()
+    plt.ylabel('Running time [s]')
+    plt.savefig(f"runs/time_es_mutation_fn{fn}_{dim}d.pdf")
+
+fig2 = plt.figure()
+ax2 = fig2.add_subplot()
+ax2.axis('off')
+legend = ax2.legend([
+    mlines.Line2D([0],[0], linestyle='-', c='black'),
+    mlines.Line2D([0],[0], linestyle='--', c='black'),
+    *list(map(lambda x: mlines.Line2D([0],[0],c=MUT_COLORS[x]), MUTATIONS)),
+], [
+    'CPU', 'CUDA',
+    *MUTATIONS
+], frameon=False, loc='lower center', ncol=10, )
+fig2 = legend.figure
+fig2.canvas.draw()
+bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+fig2.savefig(
+    f"runs/time_es_mutation_legend.pdf",
+    dpi="figure",
+    bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+)
+plt.close(fig2)
+#endregion
+
 #region PSO neighborhood fitness
 new_group('PSO neighborhood fitness')
 NUM_Y_TICKS = 7
