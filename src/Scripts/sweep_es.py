@@ -39,8 +39,8 @@ if int(args.crossover_offsprings) == args.crossover_offsprings:
     args.crossover_offsprings = int(args.crossover_offsprings)
 args.replace_parents = args.replace_parents.upper() == "TRUE"
 args.discard_parents = args.discard_parents.upper() == "TRUE"
-args.crossover_params = {e.split('-')[0]: float(e.split('-', maxsplit=1)[1]) for e in args.crossover_params.split(',')}
-args.mutation_params = {e.split('-')[0]: float(e.split('-', maxsplit=1)[1]) for e in args.mutation_params.split(',')}
+args.crossover_params = {e.split('-')[0]: float(e.split('-', maxsplit=1)[1]) for e in args.crossover_params.split(',')} if args.crossover_params is not None else dict()
+args.mutation_params = {e.split('-')[0]: float(e.split('-', maxsplit=1)[1]) for e in args.mutation_params.split(',')} if args.mutation_params is not None else dict()
 d = t.device(args.device)
 
 fn = getattr(bbobtorch, f'create_f{args.function:02d}')(args.dim, dev=d)
