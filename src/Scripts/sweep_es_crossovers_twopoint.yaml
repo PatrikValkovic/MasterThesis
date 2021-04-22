@@ -1,5 +1,5 @@
 program: sweep_es.py
-name: ES_CROS_onepoint
+name: ES_CROS_twopoint
 method: grid
 project: "thesis"
 
@@ -19,7 +19,7 @@ parameters:
   selection:
     value: Tournament
   crossover:
-    value: OnePoint1D
+    value: TwoPoint1D
   crossover_offsprings:
     values: [0.8]
   replace_parents:

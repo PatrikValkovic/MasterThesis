@@ -1,5 +1,5 @@
 program: sweep_es.py
-name: ES_CROS_onepoint
+name: ES_CROS_blend
 method: grid
 project: "thesis"
 
@@ -19,9 +19,12 @@ parameters:
   selection:
     value: Tournament
   crossover:
-    value: OnePoint1D
+    value: Blend
   crossover_offsprings:
-    values: [0.8]
+    values: [0.7]
+  crossover_params:
+    values:
+      - "alpha-0.5"
   replace_parents:
     value: true
   discard_parents:

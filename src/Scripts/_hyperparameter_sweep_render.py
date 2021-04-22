@@ -11,11 +11,11 @@ import matplotlib.colors as mcolors
 import matplotlib.ticker as mticker
 
 
-SWEEP_ID = "5rtms8p1"
-SPLIT_BY = "es.crossover.params.change_prob"
+SWEEP_ID = "r4pr2j0z"
+SPLIT_BY = "es.crossover.params.alpha"
 COLORS = [
     *mcolors.TABLEAU_COLORS.values(),
-    'k','b','r','m','r','lime','navy','aqua','yellow','orangered'
+    'k','b','m','c','lime','navy','aqua','yellow','orangered'
 ]
 
 api = wandb.Api()
