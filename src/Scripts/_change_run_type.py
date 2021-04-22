@@ -26,7 +26,13 @@ api = wandb.Api()
 
 runs = api.runs(f'kowalsky/thesis', filters={
     "$and": [
-        {'config.alg_group.value': 'es_schema'},
+        {'config.run_failed.value': False},
+        {'config.pop_size.value': {'$lte': 2048}},
+        {'config.alg_group.value': 'es_mutation'},
+        {'config.device.value': 'cuda'},
+        {'config.bbob_fn.value': 19},
+        {'config.bbob_dim.value': 384},
+        {'config.es.mutation.value': {'$in': ['AddFromNormal', 'AddFromCauchy', 'ReplaceUniform']}},
     ]
 })
 runs = list(runs)

@@ -35,12 +35,11 @@ MUTATIONS = [
     },
 ]
 combinations = list(enumerate(itertools.product(
-    [24, 128, 384],  # fdim
-    [19, 22],  # fn
-    MUTATIONS,
+    [384], #[24, 128, 384],  # fdim
+    [19], #[19, 22],  # fn
+    MUTATIONS[:3],
 )))
 ctime = int(time.time())
-devices = ['pcr16', 'pcr15']
 
 for job_id, (fdim, fn, mut) in combinations:
     with open(f'{args.output}/_job.{ctime}.{job_id}.sh', "w") as f:
@@ -48,7 +47,7 @@ for job_id, (fdim, fn, mut) in combinations:
         print(f"#PBS -N GPU_ES_MUTATION", file=f)
         print("#PBS -q gpu", file=f)
         print("#PBS -l select=1:ncpus=4:mem=8gb:scratch_local=50gb:cluster=adan:ngpus=1", file=f)
-        print("#PBS -l walltime=24:00:00", file=f)
+        print("#PBS -l walltime=15:00:00", file=f)
         print(file=f)
         print("cp -r /storage/praha1/home/kowalsky/PYTHON \"$SCRATCHDIR\"", file=f)
         print("cp -r /storage/praha1/home/kowalsky/PIP \"$SCRATCHDIR\"", file=f)
@@ -73,7 +72,8 @@ for job_id, (fdim, fn, mut) in combinations:
         print(file=f)
         print("cp -r \"/storage/praha1/home/kowalsky/MasterThesis/src/Scripts\" \"$SCRATCHDIR\"", file=f)
         print("cd \"$SCRATCHDIR/Scripts\"", file=f)
-        print(f"python ./{mut['script']} --mutation \"{mut['mutation']}\" --mutation_params \"{mut['mutation_params']}\" --function {fn} --dim {fdim} --repeat 100 --iterations 1000 --device cuda --cpu_count $(($PBS_NCPUS / 2)) --selection Tournament --crossover Uniform --crossover_offsprings 0.8 --replace_parents true --discard_parents false --crossover_params \"change_prob-0.4\" --popsize \"2048,32,128,200,512,1024,5000,10240,16384,32768\"", file=f)
+        #print(f"python ./{mut['script']} --mutation \"{mut['mutation']}\" --mutation_params \"{mut['mutation_params']}\" --function {fn} --dim {fdim} --repeat 100 --iterations 1000 --device cuda --cpu_count $(($PBS_NCPUS / 2)) --selection Tournament --crossover Uniform --crossover_offsprings 0.8 --replace_parents true --discard_parents false --crossover_params \"change_prob-0.4\" --popsize \"2048,32,128,200,512,1024,5000,10240,16384,32768\"", file=f)
+        print(f"python ./{mut['script']} --mutation \"{mut['mutation']}\" --mutation_params \"{mut['mutation_params']}\" --function {fn} --dim {fdim} --repeat 100 --iterations 1000 --device cuda --cpu_count $(($PBS_NCPUS / 2)) --selection Tournament --crossover Uniform --crossover_offsprings 0.8 --replace_parents true --discard_parents false --crossover_params \"change_prob-0.4\" --popsize \"2048,1024,512,200,128,32\"", file=f)
         print(file=f)
         print("rm -rf \"$SCRATCHDIR\"", file=f)
         print("echo \"DONE\"", file=f)
