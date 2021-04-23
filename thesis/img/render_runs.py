@@ -70,8 +70,105 @@ def plot_generatelogticks(minval, maxval, ticks):
 #endregion
 
 
+#region ES mutation fitness
+#new_group('ES mutation fitness')
+NUM_Y_TICKS = 7
+POP_SIZES=[32, 512, 10240, 32768]
+MUTATIONS = ['AddFromNormal', 'AddFromCauchy', 'ReplaceUniform', 'AdaptiveStep']
+PSIZE_C = {
+    '32': 'tab:blue',
+    '512': 'tab:orange',
+    '10240': 'tab:green',
+    '32768': 'tab:red',
+}
+STYLES=['-','--',':']
+for fn, dim, mut in progressbar(list(itertools.product(
+    [19, 22],
+    [24, 128, 384],
+    MUTATIONS,
+))):
+    plt.figure(figsize=FIGSIZE)
+    maxval = -math.inf
+    minval = math.inf
+    for psize in POP_SIZES:
+        runs = MyRun.load_and_cache({
+            "$and": [
+                {'state': 'finished'},
+                {'config.run_failed.value': False},
+                {'config.pop_size.value': psize},
+                {'config.alg_group.value': 'es_mutation'},
+                {'config.device.value': 'cuda'},
+                {'config.bbob_fn.value': fn},
+                {'config.bbob_dim.value': dim},
+                {'config.es.mutation.value': mut}
+            ]
+        }, keep_history=True)
+        runs = list(filter(lambda r: 'iteration' in r.summary, runs))
+        print()
+        print(f"fn {fn} with {dim} dim for {mut}, runs: {len(runs)} for pop size {psize}")
+        print()
+        max_iter = max(map(lambda r: r.summary['iteration'], runs))
+        medians, q05, best = [], [], []
+        for step in range(max_iter+1):
+            cmedians, cq05, cbest = [], [], []
+            for r in runs:
+                h = r.scan_history()
+                if len(h) <= step:
+                    continue
+                h = h[step]
+                cmedians.append(h['fitness_median'])
+                cq05.append(h['fitness_q05'])
+                cbest.append(h['fitness_lowest'])
+            if len(cmedians) <= 20:
+                break
+            medians.append(np.mean(cmedians))
+            q05.append(np.mean(cq05))
+            best.append(np.mean(cbest))
+        minval = min(minval, np.min(best))
+        maxval = max(maxval, np.max(medians))
+        plt.plot(range(len(medians)), medians, c=PSIZE_C[str(psize)], linestyle=STYLES[0])
+        plt.plot(range(len(q05)), q05,         c=PSIZE_C[str(psize)], linestyle=STYLES[1])
+        plt.plot(range(len(best)), best,       c=PSIZE_C[str(psize)], linestyle=STYLES[2])
+    plt.yscale('log')
+    plt.gca().get_yaxis().clear()
+    plt.xlim(0, 1000)
+    plt.xlabel('Generation')
+    minval = round_plotdown(minval)
+    maxval = round_plotup(maxval)
+    plt.ylim(minval, maxval)
+    plt.yticks(plot_generatelogticks(minval, maxval, NUM_Y_TICKS))
+    plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter(useOffset=False))
+    plt.minorticks_off()
+    plt.ylabel('Objective function')
+    plt.title(f"{mut} mutation of $f_{{{fn}}}$ with {dim} dimensions")
+    plt.savefig(f'runs/fitness_es_mutation_f{fn}_dim{dim}_{mut}.pdf')
+    plt.close()
+
+fig2 = plt.figure()
+ax2 = fig2.add_subplot()
+ax2.axis('off')
+legend = ax2.legend([
+    mlines.Line2D([0],[0], linestyle='-', c='black'),
+    mlines.Line2D([0],[0], linestyle='--', c='black'),
+    mlines.Line2D([0],[0], linestyle=':', c='black'),
+    *list(map(lambda x: mlines.Line2D([0],[0],c=x), PSIZE_C.values())),
+], [
+    'Fitness median', 'Fitness 0.05 quantile', 'Best fitness',
+    *list(map(lambda x: f"population size {x}", PSIZE_C.keys()))
+], frameon=False, loc='lower center', ncol=10, )
+fig2 = legend.figure
+fig2.canvas.draw()
+bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+fig2.savefig(
+    f"runs/fitness_es_mutation_legend.pdf",
+    dpi="figure",
+    bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+)
+plt.close(fig2)
+#endregion
+
 #region ES schema fitness
-#new_group('ES schema fitness')
+new_group('ES schema fitness')
 NUM_Y_TICKS = 7
 POP_SIZES=[32, 512, 10240, 32768]
 SCHEMAS = [
@@ -173,9 +270,8 @@ fig2.savefig(
 plt.close(fig2)
 #endregion
 
-
 #region ES schemas times
-#new_group('ES mutations schemas time')
+new_group('ES mutations schemas time')
 NUM_Y_TICKS = 7
 POP_SIZES = [32,128,200,512,1024,2048,5000,10240,16384,32768]
 FNS= [19, 22]
@@ -300,103 +396,6 @@ fig2.canvas.draw()
 bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
 fig2.savefig(
     f"runs/time_es_schema_legend.pdf",
-    dpi="figure",
-    bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
-)
-plt.close(fig2)
-#endregion
-
-#region ES mutation fitness
-#new_group('ES mutation fitness')
-NUM_Y_TICKS = 7
-POP_SIZES=[32, 512, 10240, 32768]
-MUTATIONS = ['AddFromNormal', 'AddFromCauchy', 'ReplaceUniform', 'AdaptiveStep']
-PSIZE_C = {
-    '32': 'tab:blue',
-    '512': 'tab:orange',
-    '10240': 'tab:green',
-    '32768': 'tab:red',
-}
-STYLES=['-','--',':']
-for fn, dim, mut in progressbar(list(itertools.product(
-    [19, 22],
-    [24, 128, 384],
-    MUTATIONS,
-))):
-    plt.figure(figsize=FIGSIZE)
-    maxval = -math.inf
-    minval = math.inf
-    for psize in POP_SIZES:
-        runs = MyRun.load_and_cache({
-            "$and": [
-                {'state': 'finished'},
-                {'config.run_failed.value': False},
-                {'config.pop_size.value': psize},
-                {'config.alg_group.value': 'es_mutation'},
-                {'config.device.value': 'cuda'},
-                {'config.bbob_fn.value': fn},
-                {'config.bbob_dim.value': dim},
-                {'config.es.mutation.value': mut}
-            ]
-        }, keep_history=True)
-        runs = list(filter(lambda r: 'iteration' in r.summary, runs))
-        print()
-        print(f"fn {fn} with {dim} dim for {mut}, runs: {len(runs)} for pop size {psize}")
-        print()
-        max_iter = max(map(lambda r: r.summary['iteration'], runs))
-        medians, q05, best = [], [], []
-        for step in range(max_iter+1):
-            cmedians, cq05, cbest = [], [], []
-            for r in runs:
-                h = r.scan_history()
-                if len(h) <= step:
-                    continue
-                h = h[step]
-                cmedians.append(h['fitness_median'])
-                cq05.append(h['fitness_q05'])
-                cbest.append(h['fitness_lowest'])
-            if len(cmedians) <= 20:
-                break
-            medians.append(np.mean(cmedians))
-            q05.append(np.mean(cq05))
-            best.append(np.mean(cbest))
-        minval = min(minval, np.min(best))
-        maxval = max(maxval, np.max(medians))
-        plt.plot(range(len(medians)), medians, c=PSIZE_C[str(psize)], linestyle=STYLES[0])
-        plt.plot(range(len(q05)), q05,         c=PSIZE_C[str(psize)], linestyle=STYLES[1])
-        plt.plot(range(len(best)), best,       c=PSIZE_C[str(psize)], linestyle=STYLES[2])
-    plt.yscale('log')
-    plt.gca().get_yaxis().clear()
-    plt.xlim(0, 1000)
-    plt.xlabel('Generation')
-    minval = round_plotdown(minval)
-    maxval = round_plotup(maxval)
-    plt.ylim(minval, maxval)
-    plt.yticks(plot_generatelogticks(minval, maxval, NUM_Y_TICKS))
-    plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter(useOffset=False))
-    plt.minorticks_off()
-    plt.ylabel('Objective function')
-    plt.title(f"{mut} mutation of $f_{{{fn}}}$ with {dim} dimensions")
-    plt.savefig(f'runs/fitness_es_mutation_f{fn}_dim{dim}_{mut}.pdf')
-    plt.close()
-
-fig2 = plt.figure()
-ax2 = fig2.add_subplot()
-ax2.axis('off')
-legend = ax2.legend([
-    mlines.Line2D([0],[0], linestyle='-', c='black'),
-    mlines.Line2D([0],[0], linestyle='--', c='black'),
-    mlines.Line2D([0],[0], linestyle=':', c='black'),
-    *list(map(lambda x: mlines.Line2D([0],[0],c=x), PSIZE_C.values())),
-], [
-    'Fitness median', 'Fitness 0.05 quantile', 'Best fitness',
-    *list(map(lambda x: f"population size {x}", PSIZE_C.keys()))
-], frameon=False, loc='lower center', ncol=10, )
-fig2 = legend.figure
-fig2.canvas.draw()
-bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
-fig2.savefig(
-    f"runs/fitness_es_mutation_legend.pdf",
     dpi="figure",
     bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
 )
