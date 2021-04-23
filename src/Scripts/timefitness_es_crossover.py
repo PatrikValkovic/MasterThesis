@@ -9,11 +9,11 @@ import sys
 import argparse
 import bbobtorch
 import torch as t
-from utils import WandbExecutionTime, SidewayPipe, FSubtractPipe
-import ffeat.measure as M
+from utils import WandbExecutionTime, MaxTimeMinItersTerminate, SidewayPipe, FSubtractPipe
 import cpuinfo
 import itertools
 import ffeat.strategies as ES
+import ffeat.measure as M
 import ffeat
 import traceback
 
@@ -38,11 +38,13 @@ p.add_argument('--mutation_params', type=str, help="Additional parameters for mu
 p.add_argument("--function", type=str, help="BBOB function index")
 p.add_argument("--dim", type=str, help="Size of the problem comma separated")
 p.add_argument("--popsize", type=str, help="Size of the population comma separated")
+p.add_argument("--measure", type=str, help="Which population size to measure")
 args, _ = p.parse_known_args()
 
 args.function = list(map(int, args.function.split(',')))
 args.dim = list(map(int, args.dim.split(',')))
 args.popsize = list(map(int, args.popsize.split(',')))
+args.measure = list(map(int, args.measure.split(',')))
 args.replace_parents = args.replace_parents.upper() == "TRUE"
 args.discard_parents = args.discard_parents.upper() == "TRUE"
 args.crossover_params = {e.split('-')[0]: float(e.split('-', maxsplit=1)[1]) for e in args.crossover_params.split(',')} if args.crossover_params is not None else {}
@@ -50,6 +52,7 @@ args.mutation_params = {e.split('-')[0]: float(e.split('-', maxsplit=1)[1]) for 
 
 dev = t.device(args.device)
 print(f'GONNA USE {dev}')
+print(f"RUNNING {args.crossover}")
 if args.cpu_count is not None:
     t.set_num_threads(args.cpu_count)
 float(t.rand(10).max())
@@ -69,6 +72,7 @@ for fni, d, psize in itertools.product(args.function, args.dim, args.popsize):
     selection = getattr(ES.selection, args.selection)(psize)
 
     for i in range(args.repeat):
+        print(f"FN {fni}:{d} with population {psize}, running for {i}")
         with WandbExecutionTime({'config': {
             **vars(args),
             'run_type': 'time,fitness',
@@ -104,6 +108,7 @@ for fni, d, psize in itertools.product(args.function, args.dim, args.popsize):
                         M.Fitness01Quantile(),
                         M.Fitness05Quantile(),
                         M.FitnessMedian(),
+                        MaxTimeMinItersTerminate(1 * 60 * 1000, 80 if (psize in args.measure) else args.iterations),
                         reporter,
                     ),
                     selection,

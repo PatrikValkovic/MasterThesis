@@ -27,6 +27,7 @@ POP_SIZES = [
     '"2048,32,128,200,512,1024,5000,10240,16384"',
     '32768'
 ]
+TO_MEASURE = '"32,512,10240,32768"'
 combinations = list(enumerate(itertools.product(
     [24, 128, 384],  # fdim
     [19, 24],  # fn
@@ -34,13 +35,13 @@ combinations = list(enumerate(itertools.product(
     POP_SIZES,
 )))
 ctime = int(time.time())
-devices = ['pcr16', 'pcr15', 'pcr14', 'pcr13']
 
 for job_id, (fdim, fn, cross, popsize) in combinations:
     with open(f'{args.output}/_job.{ctime}.{job_id}.sh', "w") as f:
         print(f"#!/bin/bash", file=f)
-        print(f"#PBS -N ES_CROSSOVER", file=f)
-        print(f"#PBS -l select=1:ncpus={args.take_cores_per_job}:mem=32gb:scratch_local=50gb:vnode={devices[job_id % len(devices)]}", file=f)
+        print(f"#PBS -N GPU_ES_CROSSOVER", file=f)
+        print("#PBS -q gpu", file=f)
+        print("#PBS -l select=1:ncpus=4:mem=8gb:scratch_local=50gb:cluster=adan:ngpus=1", file=f)
         print(f"#PBS -l walltime=24:00:00", file=f)
         print(file=f)
         print("cp -r /storage/praha1/home/kowalsky/PYTHON \"$SCRATCHDIR\"", file=f)
@@ -67,11 +68,11 @@ for job_id, (fdim, fn, cross, popsize) in combinations:
         print("cp -r \"/storage/praha1/home/kowalsky/MasterThesis/src/Scripts\" \"$SCRATCHDIR\"", file=f)
         print("cd \"$SCRATCHDIR/Scripts\"", file=f)
         print(file=f)
-        print(f"python ./time_es_crossover.py", end=" ", file=f)
+        print(f"python ./timefitness_es_crossover.py", end=" ", file=f)
         print(f"--mutation AddFromNormal --mutation_params \"mutation_rate-0.2,std-0.005\"", end=" ", file=f)
         print(f"--function {fn} --dim {fdim}", end=" ", file=f)
         print(f"--repeat 100 --iterations 1000", end=" ", file=f)
-        print(f"--device cpu --cpu_count {args.cores_per_job}", end=" ", file=f)
+        print(f"--device cuda --cpu_count $(($PBS_NCPUS / 2))", end=" ", file=f)
         print(f"--selection Tournament", end=" ", file=f)
         print(f"--crossover {cross['crossover']}", end=" ", file=f)
         print(f"--crossover_offsprings {cross['offsprings']}", end=" ", file=f)
@@ -79,6 +80,7 @@ for job_id, (fdim, fn, cross, popsize) in combinations:
             print(f"--crossover_params {cross['params']}", end=" ", file=f)
         print(f"--replace_parents true --discard_parents false", end=" ", file=f)
         print(f"--popsize {popsize}", end=" ", file=f)
+        print(f"--measure {TO_MEASURE}", end=" ", file=f)
         print(file=f)
         print(file=f)
         print("rm -rf \"$SCRATCHDIR\"", file=f)
