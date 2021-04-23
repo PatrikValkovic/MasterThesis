@@ -5,9 +5,102 @@ Here I present hyperparameters used for measurements in the following chapter. I
 
 \begin{table}[h]
     \centering
+    \begin{tabular}{|l|c|}
+        \hline
+        \textbf{Parameter} & \textbf{Value} \\
+        \hline
+        Selection & Tournament \\
+        \quad Number of parents & $2$ \\
+        Mutation & Normal \\
+        \quad Mutation rate & $20\%$ \\
+        \quad Standard deviation & $0.005$ \\
+        \hline
+        Uniform crossover & \\
+        \quad Offsprings & $80\%$ \\
+        \quad Probability to inherit gene from 1st parent & $40\%$ \\
+        One--point crossover & \\
+        \quad Offsprigns & $80\%$ \\
+        Two--point crossover & \\
+        \quad Offsprigns & $80\%$ \\
+        Arithmetic crossover & \\
+        \quad Offsprigns & $40\%$ \\
+        Blend crossover & \\
+        \quad Offsprigns & $70\%$ \\
+        \quad $\alpha$ & $0.5$ \\
+        \hline
+    \end{tabular}
+    \caption{Real--coded evolutionary algorithms crossover tests hyperparameters}
+    \label{tab:escrossoverhyperparmarameters}
+\end{table}
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|l|c|}
+        \hline
+        \textbf{Parameter} & \textbf{Value} \\
+        \hline
+        Selection & Tournament \\
+        \quad Number of parents & $2$ \\
+        Crossover & Uniform \\
+        \quad Probability to inherit gene from 1st parent & $40\%$ \\
+        \quad Offsprings & $80\%$ \\
+        \hline
+        Replace mutation & \\
+        \quad Mutation rate & $20\%$ \\
+        \quad Position clipping & no \\
+        Normal mutation & \\
+        \quad Mutation rate & $20\%$ \\
+        \quad Standard deviation & $0.005$ \\
+        \quad Position clipping & no \\
+        Cauchy mutation & \\
+        \quad Mutation rate & $20\%$ \\
+        \quad Scale & $0.003$ \\
+        \quad Position clipping & yes \\
+        Adaptive step mutation & \\
+        \quad Starting deviation & $0.01$ \\
+        \quad Deviation increase & $1.3$ \\
+        \quad Deviation decrease & $0.2$ \\
+        \quad Fraction of better to increase deviation & $30\%$ \\
+        \quad Minimum deviation & $0.00001$ \\
+        \quad Maximum deviation & $1.0$ \\
+        \quad Position clipping & no \\
+        \hline
+    \end{tabular}
+    \caption{Real--coded evolutionary algorithms mutation tests hyperparameters}
+    \label{tab:esmutationhyperparmarameters}
+\end{table}
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|l|c|}
+        \hline
+        \textbf{Parameter} & \textbf{Value} \\
+        \hline
+        Selection & Tournament \\
+        \quad Number of parents & $2$ \\
+        Crossover & Uniform \\
+        \quad Probability to inherit gene from 1st parent & $40\%$ \\
+        Mutation & Normal \\
+        \quad Mutation rate & $20\%$ \\
+        \quad Standard deviation & $0.005$ \\
+        \hline
+        Standard mutation & \\
+        \quad Offsprings & $80\%$ \\
+        Plus schema & \\
+        \quad Offsprings & $150\%$ \\
+        Comma schema & \\
+        \quad Offsprings & $200\%$ \\
+        \hline
+    \end{tabular}
+    \caption{Real--coded evolutionary algorithms scheme tests hyperparameters}
+    \label{tab:esschemehyperparmarameters}
+\end{table}
+
+\begin{table}[h]
+    \centering
     \begin{tabular}{|l r|c|}
         \hline
-        \multicolumn{2}{|l|}{\textbf{Parameter}} & \thead{Value} \\
+        \multicolumn{2}{|l|}{\textbf{Parameter}} & \textbf{Value} \\
         \hline
         cognitive acceleration coefficient & $c_l$ & 1.5 \\
         social acceleration coefficient  & $c_g$ & 1.5 \\
