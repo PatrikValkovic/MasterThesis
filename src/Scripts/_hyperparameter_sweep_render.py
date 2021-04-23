@@ -11,8 +11,8 @@ import matplotlib.colors as mcolors
 import matplotlib.ticker as mticker
 
 
-SWEEP_ID = "r4pr2j0z"
-SPLIT_BY = "es.crossover.params.alpha"
+SWEEP_ID = "ggldejbq"
+SPLIT_BY = "es.crossover.offsprings"
 COLORS = [
     *mcolors.TABLEAU_COLORS.values(),
     'k','b','m','c','lime','navy','aqua','yellow','orangered'
@@ -33,7 +33,7 @@ def split_by(value):
 
 split = split_by(SPLIT_BY)(runs)
 
-plt.figure(figsize=(12,8))
+plt.figure(figsize=(36,24))
 plt.title(f'Hyperparameters {SPLIT_BY}')
 plt.yscale('log')
 for ki, k in enumerate(sorted(split.keys(), key=float)):
@@ -56,4 +56,3 @@ for ki, k in enumerate(sorted(split.keys(), key=float)):
     plt.plot(range(max_iters), q00, c=c, linestyle=':')
 plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter(useOffset=False))
 plt.legend()
-plt.show()
