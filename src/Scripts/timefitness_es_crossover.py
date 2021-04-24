@@ -5,7 +5,7 @@
 #
 ###############################
 import os
-import sys
+import time
 import argparse
 import bbobtorch
 import torch as t
@@ -44,7 +44,7 @@ args, _ = p.parse_known_args()
 args.function = list(map(int, args.function.split(',')))
 args.dim = list(map(int, args.dim.split(',')))
 args.popsize = list(map(int, args.popsize.split(',')))
-args.measure = list(map(int, args.measure.split(',')))
+args.measure = list(map(int, args.measure.split(','))) if args.measure is not None else []
 args.replace_parents = args.replace_parents.upper() == "TRUE"
 args.discard_parents = args.discard_parents.upper() == "TRUE"
 args.crossover_params = {e.split('-')[0]: float(e.split('-', maxsplit=1)[1]) for e in args.crossover_params.split(',')} if args.crossover_params is not None else {}
@@ -72,7 +72,7 @@ for fni, d, psize in itertools.product(args.function, args.dim, args.popsize):
     selection = getattr(ES.selection, args.selection)(psize)
 
     for i in range(args.repeat):
-        print(f"FN {fni}:{d} with population {psize}, running for {i}")
+        print(f"{time.asctime()}\tFN {fni}:{d} with population {psize}, running for {i}")
         with WandbExecutionTime({'config': {
             **vars(args),
             'run_type': 'time,fitness',
@@ -85,7 +85,7 @@ for fni, d, psize in itertools.product(args.function, args.dim, args.popsize):
             'problem_group': 'bbob',
             'bbob_fn': fni,
             'bbob_dim': d,
-            'alg_group': 'es_mutation',
+            'alg_group': 'es_crossover',
             'es.selection': args.selection,
             'es.crossover': args.crossover,
             'es.crossover.offsprings': args.crossover_offsprings,
@@ -108,7 +108,7 @@ for fni, d, psize in itertools.product(args.function, args.dim, args.popsize):
                         M.Fitness01Quantile(),
                         M.Fitness05Quantile(),
                         M.FitnessMedian(),
-                        MaxTimeMinItersTerminate(1 * 60 * 1000, 80 if (psize in args.measure) else args.iterations),
+                        MaxTimeMinItersTerminate(1 * 60 * 1000, 80 if (psize not in args.measure) else args.iterations),
                         reporter,
                     ),
                     selection,

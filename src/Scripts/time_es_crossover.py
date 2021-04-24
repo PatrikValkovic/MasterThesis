@@ -5,7 +5,7 @@
 #
 ###############################
 import os
-import sys
+import time
 import argparse
 import bbobtorch
 import torch as t
@@ -44,8 +44,8 @@ args.dim = list(map(int, args.dim.split(',')))
 args.popsize = list(map(int, args.popsize.split(',')))
 args.replace_parents = args.replace_parents.upper() == "TRUE"
 args.discard_parents = args.discard_parents.upper() == "TRUE"
-args.crossover_params = {e.split('-')[0]: float(e.split('-', maxsplit=1)[1]) for e in args.crossover_params.split(',')}
-args.mutation_params = {e.split('-')[0]: float(e.split('-', maxsplit=1)[1]) for e in args.mutation_params.split(',')}
+args.crossover_params = {e.split('-')[0]: float(e.split('-', maxsplit=1)[1]) for e in args.crossover_params.split(',')} if args.crossover_params is not None else {}
+args.mutation_params = {e.split('-')[0]: float(e.split('-', maxsplit=1)[1]) for e in args.mutation_params.split(',')} if args.mutation_params is not None else {}
 
 dev = t.device(args.device)
 print(f'GONNA USE {dev}')
@@ -69,10 +69,10 @@ for fni, d, psize in itertools.product(args.function, args.dim, args.popsize):
     selection = getattr(ES.selection, args.selection)(psize)
 
     for i in range(args.repeat):
-        print(f"FN {fni}:{d} with population {psize}, running for {i}")
+        print(f"{time.asctime()}\tFN {fni}:{d} with population {psize}, running for {i}")
         with WandbExecutionTime({'config': {
             **vars(args),
-            'run_type': 'time',
+            'run_type': 'test',
             'run_failed': False,
             'cputype': cpuinfo.get_cpu_info()['brand_raw'],
             'gputype': t.cuda.get_device_name(0) if t.cuda.is_available() else None,
@@ -82,7 +82,7 @@ for fni, d, psize in itertools.product(args.function, args.dim, args.popsize):
             'problem_group': 'bbob',
             'bbob_fn': fni,
             'bbob_dim': d,
-            'alg_group': 'es_mutation',
+            'alg_group': 'es_crossover',
             'es.selection': args.selection,
             'es.crossover': args.crossover,
             'es.crossover.offsprings': args.crossover_offsprings,
