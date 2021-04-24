@@ -61,6 +61,8 @@ with WandbExecutionTime({'config': {
     'problem_group': 'sat',
     'sat.literals': args.literals,
     'sat.clauses': args.clauses,
+    'sat.mliter': args.mean_literals_in_clause,
+    'sat.sliter': args.std_literals_in_clause,
 
     'alg_group': 'ga',
     'pop_size': args.popsize,

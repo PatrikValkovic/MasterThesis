@@ -33,10 +33,10 @@ def split_by(value):
 
 split = split_by(SPLIT_BY)(runs)
 
-plt.figure(figsize=(36,24))
+plt.figure(figsize=(12,8))
 plt.title(f'Hyperparameters {SPLIT_BY}')
 plt.yscale('log')
-for ki, k in enumerate(sorted(split.keys(), key=float)):
+for ki, k in enumerate(sorted(split.keys())):
     max_iters = max(map(lambda x: x.summary['iteration'], split[k]))
     mean = np.zeros((len(split[k]), max_iters), dtype=float)
     q05 = np.zeros((len(split[k]), max_iters), dtype=float)
@@ -56,3 +56,4 @@ for ki, k in enumerate(sorted(split.keys(), key=float)):
     plt.plot(range(max_iters), q00, c=c, linestyle=':')
 plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter(useOffset=False))
 plt.legend()
+plt.show()
