@@ -11,8 +11,8 @@ import matplotlib.colors as mcolors
 import matplotlib.ticker as mticker
 
 
-SWEEP_ID = "ggldejbq"
-SPLIT_BY = "es.crossover.offsprings"
+SWEEP_ID = "fn10goar"
+SPLIT_BY = "crossover"
 COLORS = [
     *mcolors.TABLEAU_COLORS.values(),
     'k','b','m','c','lime','navy','aqua','yellow','orangered'

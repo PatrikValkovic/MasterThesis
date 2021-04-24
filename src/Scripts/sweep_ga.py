@@ -10,7 +10,7 @@ import ffeat
 import ffeat.genetic as GA
 import ffeat.measure as M
 import torch as t
-from utils import WandbExecutionTime, SidewayPipe, FSubtractPipe, generate_cnf_norm
+from utils import WandbExecutionTime, SidewayPipe, FSubtractFromPipe, generate_cnf_norm
 from problems import SAT
 import cpuinfo
 import traceback
@@ -26,7 +26,7 @@ p.add_argument('--literals', type=int, help="Number of literals")
 p.add_argument('--clauses', type=int, help="Number of clauses")
 p.add_argument('--mean_literals_in_clause', type=float, help="Expected number of literals in clause")
 p.add_argument('--std_literals_in_clause', type=float, help="Deviation of number of literals in clause")
-p.add_argument('--file', type=str, defualt='tmp.cnf', help="Where to store the CNF file")
+p.add_argument('--file', type=str, default='tmp.cnf', help="Where to store the CNF file")
 p.add_argument('--iterations', type=int, help="number of iterations")
 p.add_argument('--to_mutate', type=float, help="Number of individuals to mutate")
 p.add_argument('--mutation_prob', type=float, help="Probability of mutation")
@@ -47,7 +47,7 @@ d = t.device(args.device)
 
 generate_cnf_norm(args.literals, args.clauses, 0, args.mean_literals_in_clause, args.std_literals_in_clause, args.file)
 problem_fn = SAT.from_cnf_file(args.file, d)
-selection = getattr(GA.selection, args.selection)(args.popsize)
+selection = getattr(GA.selection, args.selection)(args.popsize, **({'maximization': True} if args.selection == GA.selection.Tournament.__name__ else {}))
 crossover = getattr(GA.crossover, args.crossover)(
     args.crossover_offsprings,
     discard_parents=args.discard_parents,
@@ -64,16 +64,16 @@ with WandbExecutionTime({'config': {
 
     'alg_group': 'ga',
     'pop_size': args.popsize,
-    'es.selection': args.selection,
-    'es.crossover': args.crossover,
-    'es.crossover.offsprings': args.crossover_offsprings,
-    'es.crossover.replace_parents': args.replace_parents,
-    'es.crossover.discard_parents': args.discard_parents,
-    **{f'es.crossover.params.{k}': v for k,v in args.crossover_params.items()},
-    'es.mutation': GA.mutation.FlipBit.__name__,
-    'es.mutation.params.to_mutate': args.to_mutate,
-    'es.mutation.params.mutation_prob': args.mutation_prob,
-    'es.elitism': False,
+    'ga.selection': args.selection,
+    'ga.crossover': args.crossover,
+    'ga.crossover.offsprings': args.crossover_offsprings,
+    'ga.crossover.replace_parents': args.replace_parents,
+    'ga.crossover.discard_parents': args.discard_parents,
+    **{f'ga.crossover.params.{k}': v for k,v in args.crossover_params.items()},
+    'ga.mutation': GA.mutation.FlipBit.__name__,
+    'ga.mutation.params.to_mutate': args.to_mutate,
+    'ga.mutation.params.mutation_prob': args.mutation_prob,
+    'ga.elitism': False,
 
     'cputype': cpuinfo.get_cpu_info()['brand_raw'],
     'gputype': t.cuda.get_device_name(0) if t.cuda.is_available() else None,
@@ -83,7 +83,7 @@ with WandbExecutionTime({'config': {
             GA.initialization.Uniform(args.popsize, args.literals, device=d),
             GA.evaluation.Evaluation(problem_fn.fitness_count_satisfied),
             SidewayPipe(
-                FSubtractPipe(args.literals),
+                FSubtractFromPipe(args.clauses),
                 M.FitnessMean(),
                 M.FitnessStd(),
                 M.FitnessLowest(),
@@ -98,11 +98,9 @@ with WandbExecutionTime({'config': {
             selection,
             crossover,
             mutation,
-            ffeat.pso.clip.Position(-5,5),
             iterations=args.iterations
         )
         alg()
     except:
         traceback.print_exc()
         reporter.run.config.update({'run_failed': True}, allow_val_change=True)
-

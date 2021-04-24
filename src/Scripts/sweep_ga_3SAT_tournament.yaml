@@ -1,0 +1,36 @@
+program: sweep_ga.py
+name: GA_SEL_tournament
+method: grid
+project: "thesis"
+
+parameters:
+  aarepeat:
+    values: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
+  popsize:
+    value: 1000
+  device:
+    value: cpu
+  literals:
+    value: [100, 200, 400, 500, 800, 1000, 1500, 2000, 2600, 3400, 4000, 5000]
+  clauses:
+    values: [100, 200, 400, 500, 800, 1000, 1500, 2000, 2600, 3400, 4000, 5000, 8000, 10000, 12000, 15000, 20000, 25000, 30000, 35000]
+  mean_literals_in_clause:
+    value: 3
+  std_literals_in_clause:
+    value: 0
+  iterations:
+    value: 500
+  to_mutate:
+    value: 0.6
+  mutation_prob:
+    value: 0.001
+  selection:
+    value: Tournament
+  crossover:
+    value: [Uniform, OnePoint1D, TwoPoint1D]
+  crossover_offsprings:
+    value: 0.4
+  replace_parents:
+    value: true
+  discard_parents:
+    value: false

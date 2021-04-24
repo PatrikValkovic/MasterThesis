@@ -16,6 +16,11 @@ class FSubtractPipe(Pipe):
         return (fitnesses - self._val, *args), kwargs
 
 
+class FSubtractFromPipe(FSubtractPipe):
+    def __call__(self, fitnesses, *args, **kwargs):
+        return (self._val - fitnesses, *args), kwargs
+
+
 class DiscardValsPipe(Pipe):
     def __call__(self, *args, **kwargs) -> Tuple[Tuple[Any, ...], Dict[str, Any]]:
         return tuple(), kwargs
