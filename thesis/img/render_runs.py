@@ -154,7 +154,7 @@ legend = ax2.legend([
     *list(map(lambda x: mlines.Line2D([0],[0],c=x), PSIZE_C.values())),
 ], [
     'Fitness median', 'Fitness 0.05 quantile', 'Best fitness',
-    *list(map(lambda x: f"population size {x}", PSIZE_C.keys()))
+    *list(map(lambda x: f"Population size {x}", PSIZE_C.keys()))
 ], frameon=False, loc='lower center', ncol=10, )
 fig2 = legend.figure
 fig2.canvas.draw()
@@ -257,7 +257,7 @@ legend = ax2.legend([
     *list(map(lambda x: mlines.Line2D([0],[0],c=x), PSIZE_C.values())),
 ], [
     'Fitness median', 'Fitness 0.05 quantile', 'Best fitness',
-    *list(map(lambda x: f"population size {x}", PSIZE_C.keys()))
+    *list(map(lambda x: f"Population size {x}", PSIZE_C.keys()))
 ], frameon=False, loc='lower center', ncol=10, )
 fig2 = legend.figure
 fig2.canvas.draw()
