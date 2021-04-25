@@ -11,13 +11,13 @@ parameters:
   device:
     value: cpu
   literals:
-    value: 100
+    value: 1000
   clauses:
-    values: [300, 390, 400, 410, 420, 430, 440, 450, 500, 550]
+    values: [10000]
   mean_literals_in_clause:
-    value: 3
+    value: 5
   std_literals_in_clause:
-    value: 0
+    value: 2
   iterations:
     value: 500
   to_mutate:

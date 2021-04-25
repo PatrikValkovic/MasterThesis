@@ -11,8 +11,8 @@ import matplotlib.colors as mcolors
 import matplotlib.ticker as mticker
 
 
-SWEEP_ID = "fn10goar"
-SPLIT_BY = "crossover"
+SWEEP_ID = "uma1hdg6"
+SPLIT_BY = "sat.clauses"
 COLORS = [
     *mcolors.TABLEAU_COLORS.values(),
     'k','b','m','c','lime','navy','aqua','yellow','orangered'
@@ -36,7 +36,7 @@ split = split_by(SPLIT_BY)(runs)
 plt.figure(figsize=(12,8))
 plt.title(f'Hyperparameters {SPLIT_BY}')
 plt.yscale('log')
-for ki, k in enumerate(sorted(split.keys())):
+for ki, k in enumerate(sorted(split.keys(), key=float)):
     max_iters = max(map(lambda x: x.summary['iteration'], split[k]))
     mean = np.zeros((len(split[k]), max_iters), dtype=float)
     q05 = np.zeros((len(split[k]), max_iters), dtype=float)
