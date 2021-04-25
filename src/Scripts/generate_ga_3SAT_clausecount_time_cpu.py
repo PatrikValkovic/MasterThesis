@@ -16,8 +16,8 @@ parser.add_argument('--take_cores_per_job', type=int, default=16, help="Number o
 args, _ = parser.parse_known_args()
 
 jobs_per_machine = args.cores // args.cores_per_job
-POP_SIZE = 4000
-LITERALS = 8000
+POP_SIZE = 1000
+LITERALS = 2000
 CLAUSES = [
     '"32,2048,32768"',
     '"128,1024,5000"',
@@ -66,11 +66,10 @@ for job_id, (clauses,) in combinations:
         print(f"--device cpu --cpu_count {args.cores_per_job}", end=" ", file=f)
         print(f"--popsize {POP_SIZE}", end=" ", file=f)
         print(f"--literals {LITERALS}", end=" ", file=f)
-        print(f"--clauses {LITERALS}", end=" ", file=f)
+        print(f"--clauses {clauses}", end=" ", file=f)
         print(f"--mean_literals_in_clause 3 --std_literals_in_clause 0", end=" ", file=f)
         print(f"2>&1", end=" ", file=f)
         print(file=f)
         print(file=f)
         print("rm -rf \"$SCRATCHDIR\"", file=f)
         print("echo \"DONE\"", file=f)
-        combinations = combinations[jobs_per_machine:]

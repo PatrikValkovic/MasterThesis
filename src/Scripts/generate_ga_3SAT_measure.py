@@ -12,7 +12,6 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--output', type=str, required=True, help='Output directory')
 args, _ = parser.parse_known_args()
 
-jobs_per_machine = args.cores // args.cores_per_job
 TO_MEASURE = '"32,512,5000,10240,32768"'
 POP_SIZES = [
     '"2048,32,128,200,512,1024,5000,10240"',
@@ -68,4 +67,3 @@ for job_id, (literals, popsize) in combinations:
         print(file=f)
         print("rm -rf \"$SCRATCHDIR\"", file=f)
         print("echo \"DONE\"", file=f)
-        combinations = combinations[jobs_per_machine:]

@@ -16,7 +16,7 @@ parser.add_argument('--take_cores_per_job', type=int, default=16, help="Number o
 args, _ = parser.parse_known_args()
 
 jobs_per_machine = args.cores // args.cores_per_job
-POP_SIZE = 4000
+POP_SIZE = 1000
 LITERALS = [
     '"32,2048,32768"',
     '"128,1024,5000"',
