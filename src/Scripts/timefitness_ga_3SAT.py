@@ -61,7 +61,7 @@ for psize, literals in itertools.product(args.popsize, args.literals):
             'sat.mliter': args.mean_literals_in_clause,
             'sat.sliter': args.std_literals_in_clause,
 
-            'alg_group': 'ga',
+            'alg_group': 'ga_1',
             'pop_size': psize,
             'ga.selection': selection.__class__.__name__,
             'ga.crossover': crossover.__class__.__name__,

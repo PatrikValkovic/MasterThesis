@@ -15,8 +15,8 @@ args, _ = parser.parse_known_args()
 jobs_per_machine = args.cores // args.cores_per_job
 TO_MEASURE = '"32,512,5000,10240,32768"'
 POP_SIZES = [
-    '"2048,32,128,200,512,1024,5000,10240,16384"',
-    '32768'
+    '"2048,32,128,200,512,1024,5000,10240"',
+    '"16384,32768"'
 ]
 combinations = list(enumerate(itertools.product(
     [100, 300, 800, 2000],  # variables
@@ -63,6 +63,7 @@ for job_id, (literals, popsize) in combinations:
         print(f"--literals {literals}", end=" ", file=f)
         print(f"--mean_literals_in_clause 3 --std_literals_in_clause 0", end=" ", file=f)
         print(f"--measure {TO_MEASURE}", end=" ", file=f)
+        print(f"2>&1", end=" ", file=f)
         print(file=f)
         print(file=f)
         print("rm -rf \"$SCRATCHDIR\"", file=f)

@@ -10,12 +10,15 @@ from progressbar import progressbar
 api = wandb.Api()
 runs = api.runs(f'kowalsky/thesis', filters={
     "$and": [
-        {'createdAt': {'$gt': '2021-04-24T07:00:00'}},
+        {'config.alg_group.value': 'es_crossover'},
+        {'config.device.value': 'cpu'},
+        {'config.run_type.value': 'test'},
+        {'config.pop_size.value': {'$in': [32,128,200,512,1024,2048,5000,10240,16384,32768]}},
     ]
 })
-runs = list(runs)
+#runs = list(runs)
 print(f"Going to change {len(runs)} runs")
 
 for run in progressbar(runs):
-    run.config['run_failed'] = True
+    run.config['run_type'] = 'time'
     run.update()
