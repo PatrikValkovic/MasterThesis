@@ -25,7 +25,10 @@ class WandbReporter:
 
     def __call__(self, *args, **kwargs):
         d = dict(kwargs)
-        del d['orig_fitness']
+        if 'orig_fitness' in d:
+            del d['orig_fitness']
+        if 'new_fitness' in d:
+            del d['new_fitness']
         wandb.log(d, step=kwargs['iteration'])
         return args, kwargs
 

@@ -7,7 +7,6 @@
 import os
 import time
 import argparse
-import bbobtorch
 import torch as t
 from utils import WandbExecutionTime, MaxTimeMinItersTerminate, FSubtractFromPipe, generate_cnf_norm
 import cpuinfo
@@ -15,6 +14,8 @@ import itertools
 import ffeat.genetic as GA
 import traceback
 from problems import SAT
+import ffeat.utils.scaling as SCALE
+import ffeat
 
 
 os.environ['WANDB_SILENT'] = 'true'
@@ -27,7 +28,7 @@ p.add_argument("--device", type=str, default='cpu', help="Where to run experimen
 p.add_argument("--cpu_count", type=int, default=None, help="Number of GPU to use")
 
 p.add_argument("--popsize", type=str, help="Size of the population comma separated")
-p.add_argument("--selection", type=str, help="Selection operator")
+p.add_argument("--scaling", type=str, help="Selection operator")
 p.add_argument("--literals", type=int, help="Number of literals")
 p.add_argument('--mean_literals_in_clause', type=float, help="Expected number of literals in clause")
 p.add_argument('--std_literals_in_clause', type=float, help="Deviation of number of literals in clause")
@@ -44,17 +45,37 @@ crossover = GA.crossover.OnePoint1D(0.4)
 mutation = GA.mutation.FlipBit(0.6, 0.001)
 literals = args.literals
 clauses = int(literals * 4.5)
+
+if args.scaling == 'linear':
+    scale = SCALE.LinearScale(1.0,10.0)
+    maximization = False
+elif args.scaling == 'logarithmic':
+    scale = SCALE.LogScale(1.0,10.0)
+    maximization = False
+elif args.scaling == 'exponential':
+    scale = SCALE.ExponentialScale(1.0,10.0)
+    maximization = False
+elif args.scaling == 'rank':
+    scale = SCALE.RankScale(1.0, 10.0)
+    maximization = False
+elif args.scaling == 'inverse':
+    scale = SCALE.MultiplicativeInverse()
+    maximization = True
+else:
+    scale = ffeat.Pipe()
+    maximization = False
+
 for psize, in itertools.product(args.popsize):
-    selection = getattr(GA.selection, args.selection)(psize, **({} if args.selection != GA.selection.Tournament.__name__ else {'maximization': True}))
+    selection = GA.selection.Tournament(psize, maximization=maximization)
     for i in range(args.repeat):
         generate_cnf_norm(literals, clauses, 0, args.mean_literals_in_clause, args.std_literals_in_clause, 'tmp.cnf')
         fn = SAT.from_cnf_file("tmp.cnf", dev)
         print(f"{time.asctime()}\tselect SAT {literals}:{clauses} with population {psize}, running for {i}")
         with WandbExecutionTime({'config': {
             **vars(args),
+            'run_type': 'time',
             'repeat': i,
             'device': args.device,
-            'run_type': 'time',
             'run_failed': False,
             'problem_group': 'sat',
             'sat.literals': literals,
@@ -62,7 +83,8 @@ for psize, in itertools.product(args.popsize):
             'sat.mliter': args.mean_literals_in_clause,
             'sat.sliter': args.std_literals_in_clause,
 
-            'alg_group': 'ga_selection',
+            'alg_group': 'ga_scaling',
+            'scale': scale.__class__.__name__,
             'pop_size': psize,
             'ga.selection': selection.__class__.__name__,
             'ga.crossover': crossover.__class__.__name__,
@@ -80,9 +102,11 @@ for psize, in itertools.product(args.popsize):
             try:
                 alg = GA.GeneticAlgorithm(
                     GA.initialization.Uniform(psize, literals, device=dev),
-                    GA.evaluation.Evaluation(fn.fitness_count_satisfied),
+                    GA.evaluation.Evaluation(fn.fitness_count_unsatisfied),
                     reporter,
+                    ffeat.measure.FitnessMedian(ffeat.measure.reporting.Console('median')),
                     MaxTimeMinItersTerminate(1*60*1000,100),
+                    scale,
                     selection,
                     crossover,
                     mutation,
