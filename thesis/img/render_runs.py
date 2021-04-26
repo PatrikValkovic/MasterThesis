@@ -14,7 +14,7 @@ import gzip
 import traceback
 import math
 
-CACHE_DIR = 'D:\\runscache'
+CACHE_DIR = '/tmp'
 api = wandb.Api()
 FIGSIZE=(6, 4)
 
@@ -71,7 +71,7 @@ def plot_generatelogticks(minval, maxval, ticks):
 
 
 #region ES crossover fitness
-#new_group('ES crossover fitness')
+new_group('ES crossover fitness')
 NUM_Y_TICKS = 7
 POP_SIZES=[32,512,10240,32768]
 FNS= [19, 24]
@@ -176,7 +176,7 @@ plt.close(fig2)
 #endregion
 
 #region ES crossover times
-#new_group('ES crossover time')
+new_group('ES crossover time')
 NUM_Y_TICKS = 7
 POP_SIZES = [32,128,200,512,1024,2048,5000,10240,16384,32768]
 FNS= [19, 24]
