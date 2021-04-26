@@ -81,7 +81,6 @@ for psize, literals in itertools.product(args.popsize, args.literals):
                     GA.initialization.Uniform(psize, literals, device=dev),
                     GA.evaluation.Evaluation(fn.fitness_count_unsatisfied),
                     SidewayPipe(
-                        FSubtractFromPipe(clauses),
                         M.FitnessMean(),
                         M.FitnessStd(),
                         M.FitnessLowest(),

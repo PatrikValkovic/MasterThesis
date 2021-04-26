@@ -88,7 +88,6 @@ for psize, literals in itertools.product(args.popsize, args.literals):
                     GA.selection.Elitism(
                         elites,
                         SidewayPipe(
-                            FSubtractFromPipe(clauses),
                             M.FitnessMean(),
                             M.FitnessStd(),
                             M.FitnessLowest(),
