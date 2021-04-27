@@ -11,16 +11,38 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
 %%%%%%%%%%%%%%%%%
 \begin{figure}[ht!]
     \centering
-    \begin{minipage}[t]{0.5\textwidth}
-        \includegraphics[width=\textwidth]{img/runs/time_ga.pdf}
+    \begin{minipage}[t]{0.9\textwidth}
+        \begin{minipage}[t]{0.48\textwidth}
+            \includegraphics[width=\textwidth]{img/runs/time_ga.pdf}
+        \end{minipage}
+        \begin{minipage}[t]{0.48\textwidth}
+            \includegraphics[width=\textwidth]{img/runs/time_ga_elitism.pdf}
+        \end{minipage}
     \end{minipage}
 
-    \begin{minipage}{0.6\textwidth}
-        \centering
+    \begin{minipage}[t]{0.7\textwidth}
         \includegraphics[width=\textwidth]{img/runs/time_ga_legend.pdf}
     \end{minipage}
 
     \caption[Running times of genetic algorithm]{Genetic algorithm running time. \todo{Dopsat popisek.}}
+\end{figure}
+
+\begin{figure}[ht!]
+    \centering
+    \begin{minipage}[t]{0.9\textwidth}
+        \begin{minipage}[t]{0.48\textwidth}
+            \includegraphics[width=\textwidth]{img/runs/time_ga_varcount.pdf}
+        \end{minipage}
+        \begin{minipage}[t]{0.48\textwidth}
+            \includegraphics[width=\textwidth]{img/runs/time_ga_clausecount.pdf}
+        \end{minipage}
+    \end{minipage}
+
+    \begin{minipage}[t]{0.15\textwidth}
+        \includegraphics[width=\textwidth]{img/runs/time_ga_clausecount_legend.pdf}
+    \end{minipage}
+
+    \caption[Running times of GA depending on problem size]{Genetic algorithm running time depending on problem size. \todo{Dopsat popisek.}}
 \end{figure}
 
 
