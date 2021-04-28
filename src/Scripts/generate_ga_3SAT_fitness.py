@@ -12,23 +12,19 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--output', type=str, required=True, help='Output directory')
 args, _ = parser.parse_known_args()
 
-TO_MEASURE = '"32,512,5000,10240,32768"'
-POP_SIZES = [
-    '"2048,32,128,200,512,1024,5000,10240"',
-    '"16384,32768"'
-]
+POP_SIZES = [32,512,5000,10240,32768]
+LITERALS=[100, 300, 800, 1000, 2000, 5000]
+SCRIPT=['fitness_ga_3SAT.py', 'fitness_ga_3SAT_elitism.py']
 combinations = list(enumerate(itertools.product(
-    [100,1000,2000,5000],  # variables
-    POP_SIZES,
+    LITERALS, POP_SIZES, SCRIPT
 )))
 ctime = int(time.time())
 
-for job_id, (literals, popsize) in combinations:
+for job_id, (literals, popsize, script) in combinations:
     with open(f'{args.output}/_job.{ctime}.{job_id}.sh', "w") as f:
         print(f"#!/bin/bash", file=f)
-        print(f"#PBS -N GPU_GA_ELITISM", file=f)
-        print(f"#PBS -q gpu", file=f)
-        print(f"#PBS -l select=1:ncpus=4:mem=8gb:scratch_local=50gb:cluster=adan:ngpus=1", file=f)
+        print(f"#PBS -N GA_fitness", file=f)
+        print(f"#PBS -l select=1:ncpus=2:mem=16gb:scratch_local=50gb", file=f)
         print(f"#PBS -l walltime=24:00:00", file=f)
         print(file=f)
         print("cp -r /storage/praha1/home/kowalsky/PYTHON \"$SCRATCHDIR\"", file=f)
@@ -55,13 +51,12 @@ for job_id, (literals, popsize) in combinations:
         print("cp -r \"/storage/praha1/home/kowalsky/MasterThesis/src/Scripts\" \"$SCRATCHDIR\"", file=f)
         print("cd \"$SCRATCHDIR/Scripts\"", file=f)
         print(file=f)
-        print(f"python ./timefitness_ga_3SAT_elitism.py", end=" ", file=f)
+        print(f"python ./{script}", end=" ", file=f)
         print(f"--repeat 100 --iterations 1000", end=" ", file=f)
-        print(f"--device cuda --cpu_count $(($PBS_NCPUS / 2))", end=" ", file=f)
+        print(f"--device cpu --cpu_count 2", end=" ", file=f)
         print(f"--popsize {popsize}", end=" ", file=f)
         print(f"--literals {literals}", end=" ", file=f)
         print(f"--mean_literals_in_clause 3 --std_literals_in_clause 0", end=" ", file=f)
-        print(f"--measure {TO_MEASURE}", end=" ", file=f)
         print(f"2>&1", end=" ", file=f)
         print(file=f)
         print(file=f)

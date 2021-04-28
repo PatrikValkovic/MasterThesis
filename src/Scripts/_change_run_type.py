@@ -13,16 +13,12 @@ runs = api.runs(f'kowalsky/thesis', filters={
                 {'state': 'finished'},
                 {'config.run_failed.value': False},
                 {'config.alg_group.value': 'ga_1'},
-                {'config.run_type.value': 'time,fitness'},
-                {'config.device.value': 'cuda'},
-                {'config.pop_size.value': 32768},
-                {'config.ga.elitism.value': False},
-                {'config.sat.literals.value': 100},
+                {'config.run_type.value': 'fitness'},
             ]
         })
 runs = list(runs)
 print(f"Going to change {len(runs)} runs")
 
 for run in progressbar(runs):
-    run.config['run_type'] = 'time'
+    run.config['run_failed'] = True
     run.update()
