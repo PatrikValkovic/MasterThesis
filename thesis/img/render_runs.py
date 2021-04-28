@@ -14,7 +14,7 @@ import gzip
 import traceback
 import math
 
-CACHE_DIR = '/tmp'
+CACHE_DIR = 'D:\\runscache'
 api = wandb.Api()
 FIGSIZE=(6, 4)
 FIGISZE_BIG=(12,8)
@@ -310,230 +310,6 @@ fig2.savefig(
 plt.close(fig2)
 #endregion
 
-#region GA elitism and normal times
-#new_group('GA elitism time')
-NUM_Y_TICKS = 7
-POP_SIZES = [32,128,200,512,1024,2048,5000,10240,16384,32768]
-VARIABLES = [100, 300, 800, 2000]
-VAR_C = {
-    '100': 'tab:blue',
-    '300': 'tab:orange',
-    '800': 'tab:green',
-    '2000': 'tab:red',
-}
-TO_MEASURE = 'total_real_time'
-plt.figure(figsize=FIGSIZE)
-maxval, minval = 2000.0, 0.6
-for vars, in progressbar(list(itertools.product(
-    VARIABLES
-))):
-    runs = MyRun.load_and_cache({
-        "$and": [
-            {'state': 'finished'},
-            {'config.run_failed.value': False},
-            {'config.pop_size.value': {'$in': POP_SIZES}},
-            {'config.alg_group.value': 'ga_1'},
-            {'config.device.value': 'cpu'},
-            {'config.run_type.value': 'time'},
-            {'config.ga.elitism.value': True},
-            {'config.sat.literals.value': vars}
-        ]
-    })
-    measure = np.zeros(len(POP_SIZES))
-    run_count = np.zeros(len(POP_SIZES))
-    for run in runs:
-        try:
-            s, c = run.summary, run.config
-            progress = s['iteration'] / s['max_iteration']
-            i = POP_SIZES.index(c['pop_size'])
-            measure[i] += s[TO_MEASURE] / progress
-            run_count[i] += 1
-        except:
-            traceback.print_exc()
-            print(run)
-    measure = measure[run_count > 0] / run_count[run_count > 0]
-    for pindex in np.where(run_count==0)[0]:
-        print(f"\nWARNING GA ELITISM CPU fitness for {vars} literals with {POP_SIZES[pindex]} has no measurement")
-    plt.plot(
-        np.array(POP_SIZES)[run_count > 0],
-        measure,
-        c=VAR_C[str(vars)],
-        linestyle='-',
-    )
-
-    runs = MyRun.load_and_cache({
-        "$and": [
-            {'state': 'finished'},
-            {'config.run_failed.value': False},
-            {'config.pop_size.value': {'$in': POP_SIZES}},
-            {'config.alg_group.value': 'ga_1'},
-            {'config.device.value': 'cuda'},
-            {'$or': [
-                {'config.run_type.value': 'time,fitness'},
-                {'config.run_type.value': 'fitness'},
-            ]},
-            {'config.ga.elitism.value': True},
-            {'config.sat.literals.value': vars}
-        ]
-    })
-    measure = np.zeros(len(POP_SIZES))
-    run_count = np.zeros(len(POP_SIZES))
-    for run in runs:
-        try:
-            s, c = run.summary, run.config
-            progress = s['iteration'] / s['max_iteration']
-            i = POP_SIZES.index(c['pop_size'])
-            measure[i] += s[TO_MEASURE] / progress
-            run_count[i] += 1
-        except:
-            traceback.print_exc()
-            print(run)
-    measure = measure[run_count > 0] / run_count[run_count > 0]
-    for pindex in np.where(run_count==0)[0]:
-        print(f"\nWARNING GA ELITISM GPU fitness for {vars} literals with {POP_SIZES[pindex]} has no measurement")
-    plt.plot(
-        np.array(POP_SIZES)[run_count > 0],
-        measure,
-        c=VAR_C[str(vars)],
-        linestyle='--',
-    )
-plt.title(f"Genetic algorithm with elitism for 3SAT problem")
-plt.xscale('log')
-plt.yscale('log')
-plt.xticks([32, 128, 512, 2048, 10240, 32768])
-plt.gca().get_xaxis().set_major_formatter(mticker.ScalarFormatter())
-plt.gca().get_xaxis().set_tick_params(which='minor', size=0)
-plt.xlim(32, 32768)
-plt.xlabel('Population size')
-plt.ylim(minval, maxval)
-plt.yticks(plot_generatelogticks(minval, maxval, NUM_Y_TICKS))
-plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter())
-plt.minorticks_off()
-plt.ylabel('Running time [s]')
-plt.savefig(f"runs/time_ga_elitism.pdf")
-
-#new_group('GA time')
-NUM_Y_TICKS = 7
-POP_SIZES = [32,128,200,512,1024,2048,5000,10240,16384,32768]
-VARIABLES = [100, 300, 800, 2000]
-VAR_C = {
-    '100': 'tab:blue',
-    '300': 'tab:orange',
-    '800': 'tab:green',
-    '2000': 'tab:red',
-}
-TO_MEASURE = 'total_real_time'
-plt.figure(figsize=FIGSIZE)
-for vars, in progressbar(list(itertools.product(
-    VARIABLES
-))):
-    runs = MyRun.load_and_cache({
-        "$and": [
-            {'state': 'finished'},
-            {'config.run_failed.value': False},
-            {'config.pop_size.value': {'$in': POP_SIZES}},
-            {'config.alg_group.value': 'ga_1'},
-            {'config.device.value': 'cpu'},
-            {'config.run_type.value': 'time'},
-            {'config.ga.elitism.value': False},
-            {'config.sat.literals.value': vars}
-        ]
-    })
-    measure = np.zeros(len(POP_SIZES))
-    run_count = np.zeros(len(POP_SIZES))
-    for run in runs:
-        try:
-            s, c = run.summary, run.config
-            progress = s['iteration'] / s['max_iteration']
-            i = POP_SIZES.index(c['pop_size'])
-            measure[i] += s[TO_MEASURE] / progress
-            run_count[i] += 1
-        except:
-            traceback.print_exc()
-            print(run)
-    measure = measure[run_count > 0] / run_count[run_count > 0]
-    for pindex in np.where(run_count==0)[0]:
-        print(f"\nWARNING GA CPU fitness for {vars} literals with {POP_SIZES[pindex]} has no measurement")
-    plt.plot(
-        np.array(POP_SIZES)[run_count > 0],
-        measure,
-        c=VAR_C[str(vars)],
-        linestyle='-',
-    )
-
-    runs = MyRun.load_and_cache({
-        "$and": [
-            {'state': 'finished'},
-            {'config.run_failed.value': False},
-            {'config.pop_size.value': {'$in': POP_SIZES}},
-            {'config.alg_group.value': 'ga_1'},
-            {'config.device.value': 'cuda'},
-            {'$or': [
-                {'config.run_type.value': 'time,fitness'},
-                {'config.run_type.value': 'fitness'},
-            ]},
-            {'config.ga.elitism.value': False},
-            {'config.sat.literals.value': vars}
-        ]
-    })
-    measure = np.zeros(len(POP_SIZES))
-    run_count = np.zeros(len(POP_SIZES))
-    for run in runs:
-        try:
-            s, c = run.summary, run.config
-            progress = s['iteration'] / s['max_iteration']
-            i = POP_SIZES.index(c['pop_size'])
-            measure[i] += s[TO_MEASURE] / progress
-            run_count[i] += 1
-        except:
-            traceback.print_exc()
-            print(run)
-    measure = measure[run_count > 0] / run_count[run_count > 0]
-    for pindex in np.where(run_count==0)[0]:
-        print(f"\nWARNING GA GPU fitness for {vars} literals with {POP_SIZES[pindex]} has no measurement")
-    plt.plot(
-        np.array(POP_SIZES)[run_count > 0],
-        measure,
-        c=VAR_C[str(vars)],
-        linestyle='--',
-    )
-plt.title(f"Genetic algorithm for 3SAT problem")
-plt.xscale('log')
-plt.yscale('log')
-plt.xticks([32, 128, 512, 2048, 10240, 32768])
-plt.gca().get_xaxis().set_major_formatter(mticker.ScalarFormatter())
-plt.gca().get_xaxis().set_tick_params(which='minor', size=0)
-plt.xlim(32, 32768)
-plt.xlabel('Population size')
-plt.ylim(minval, maxval)
-plt.yticks(plot_generatelogticks(minval, maxval, NUM_Y_TICKS))
-plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter())
-plt.minorticks_off()
-plt.ylabel('Running time [s]')
-plt.savefig(f"runs/time_ga.pdf")
-
-fig2 = plt.figure()
-ax2 = fig2.add_subplot()
-ax2.axis('off')
-legend = ax2.legend([
-    mlines.Line2D([0],[0], linestyle='-', c='black'),
-    mlines.Line2D([0],[0], linestyle='--', c='black'),
-    *list(map(lambda x: mlines.Line2D([0],[0],c=x), VAR_C.values())),
-], [
-    'CPU', 'CUDA',
-    *list(map(lambda x: f'{x} literals', VAR_C.keys()))
-], frameon=False, loc='lower center', ncol=10, )
-fig2 = legend.figure
-fig2.canvas.draw()
-bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
-fig2.savefig(
-    f"runs/time_ga_legend.pdf",
-    dpi="figure",
-    bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
-)
-plt.close(fig2)
-#endregion
-
 #region GA normal and elitism fitness
 #new_group('GA fitness')
 NUM_Y_TICKS = 7
@@ -702,6 +478,231 @@ fig2.canvas.draw()
 bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
 fig2.savefig(
     f"runs/fitness_ga_3SAT_legend.pdf",
+    dpi="figure",
+    bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+)
+plt.close(fig2)
+#endregion
+
+
+#region GA elitism and normal times
+new_group('GA elitism time')
+NUM_Y_TICKS = 7
+POP_SIZES = [32,128,200,512,1024,2048,5000,10240,16384,32768]
+VARIABLES = [100, 300, 800, 2000]
+VAR_C = {
+    '100': 'tab:blue',
+    '300': 'tab:orange',
+    '800': 'tab:green',
+    '2000': 'tab:red',
+}
+TO_MEASURE = 'total_real_time'
+plt.figure(figsize=FIGSIZE)
+maxval, minval = 2000.0, 0.6
+for vars, in progressbar(list(itertools.product(
+    VARIABLES
+))):
+    runs = MyRun.load_and_cache({
+        "$and": [
+            {'state': 'finished'},
+            {'config.run_failed.value': False},
+            {'config.pop_size.value': {'$in': POP_SIZES}},
+            {'config.alg_group.value': 'ga_1'},
+            {'config.device.value': 'cpu'},
+            {'config.run_type.value': 'time'},
+            {'config.ga.elitism.value': True},
+            {'config.sat.literals.value': vars}
+        ]
+    })
+    measure = np.zeros(len(POP_SIZES))
+    run_count = np.zeros(len(POP_SIZES))
+    for run in runs:
+        try:
+            s, c = run.summary, run.config
+            progress = s['iteration'] / s['max_iteration']
+            i = POP_SIZES.index(c['pop_size'])
+            measure[i] += s[TO_MEASURE] / progress
+            run_count[i] += 1
+        except:
+            traceback.print_exc()
+            print(run)
+    measure = measure[run_count > 0] / run_count[run_count > 0]
+    for pindex in np.where(run_count==0)[0]:
+        print(f"\nWARNING GA ELITISM CPU fitness for {vars} literals with {POP_SIZES[pindex]} has no measurement")
+    plt.plot(
+        np.array(POP_SIZES)[run_count > 0],
+        measure,
+        c=VAR_C[str(vars)],
+        linestyle='-',
+    )
+
+    runs = MyRun.load_and_cache({
+        "$and": [
+            {'state': 'finished'},
+            {'config.run_failed.value': False},
+            {'config.pop_size.value': {'$in': POP_SIZES}},
+            {'config.alg_group.value': 'ga_1'},
+            {'config.device.value': 'cuda'},
+            {'$or': [
+                {'config.run_type.value': 'time,fitness'},
+                {'config.run_type.value': 'time'},
+            ]},
+            {'config.ga.elitism.value': True},
+            {'config.sat.literals.value': vars}
+        ]
+    })
+    measure = np.zeros(len(POP_SIZES))
+    run_count = np.zeros(len(POP_SIZES))
+    for run in runs:
+        try:
+            s, c = run.summary, run.config
+            progress = s['iteration'] / s['max_iteration']
+            i = POP_SIZES.index(c['pop_size'])
+            measure[i] += s[TO_MEASURE] / progress
+            run_count[i] += 1
+        except:
+            traceback.print_exc()
+            print(run)
+    measure = measure[run_count > 0] / run_count[run_count > 0]
+    for pindex in np.where(run_count==0)[0]:
+        print(f"\nWARNING GA ELITISM GPU fitness for {vars} literals with {POP_SIZES[pindex]} has no measurement")
+    plt.plot(
+        np.array(POP_SIZES)[run_count > 0],
+        measure,
+        c=VAR_C[str(vars)],
+        linestyle='--',
+    )
+plt.title(f"Genetic algorithm with elitism for 3SAT problem")
+plt.xscale('log')
+plt.yscale('log')
+plt.xticks([32, 128, 512, 2048, 10240, 32768])
+plt.gca().get_xaxis().set_major_formatter(mticker.ScalarFormatter())
+plt.gca().get_xaxis().set_tick_params(which='minor', size=0)
+plt.xlim(32, 32768)
+plt.xlabel('Population size')
+plt.ylim(minval, maxval)
+plt.yticks(plot_generatelogticks(minval, maxval, NUM_Y_TICKS))
+plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter())
+plt.minorticks_off()
+plt.ylabel('Running time [s]')
+plt.savefig(f"runs/time_ga_elitism.pdf")
+
+new_group('GA time')
+NUM_Y_TICKS = 7
+POP_SIZES = [32,128,200,512,1024,2048,5000,10240,16384,32768]
+VARIABLES = [100, 300, 800, 2000]
+VAR_C = {
+    '100': 'tab:blue',
+    '300': 'tab:orange',
+    '800': 'tab:green',
+    '2000': 'tab:red',
+}
+TO_MEASURE = 'total_real_time'
+plt.figure(figsize=FIGSIZE)
+for vars, in progressbar(list(itertools.product(
+    VARIABLES
+))):
+    runs = MyRun.load_and_cache({
+        "$and": [
+            {'state': 'finished'},
+            {'config.run_failed.value': False},
+            {'config.pop_size.value': {'$in': POP_SIZES}},
+            {'config.alg_group.value': 'ga_1'},
+            {'config.device.value': 'cpu'},
+            {'config.run_type.value': 'time'},
+            {'config.ga.elitism.value': False},
+            {'config.sat.literals.value': vars}
+        ]
+    })
+    measure = np.zeros(len(POP_SIZES))
+    run_count = np.zeros(len(POP_SIZES))
+    for run in runs:
+        try:
+            s, c = run.summary, run.config
+            progress = s['iteration'] / s['max_iteration']
+            i = POP_SIZES.index(c['pop_size'])
+            measure[i] += s[TO_MEASURE] / progress
+            run_count[i] += 1
+        except:
+            traceback.print_exc()
+            print(run)
+    measure = measure[run_count > 0] / run_count[run_count > 0]
+    for pindex in np.where(run_count==0)[0]:
+        print(f"\nWARNING GA CPU fitness for {vars} literals with {POP_SIZES[pindex]} has no measurement")
+    plt.plot(
+        np.array(POP_SIZES)[run_count > 0],
+        measure,
+        c=VAR_C[str(vars)],
+        linestyle='-',
+    )
+
+    runs = MyRun.load_and_cache({
+        "$and": [
+            {'state': 'finished'},
+            {'config.run_failed.value': False},
+            {'config.pop_size.value': {'$in': POP_SIZES}},
+            {'config.alg_group.value': 'ga_1'},
+            {'config.device.value': 'cuda'},
+            {'$or': [
+                {'config.run_type.value': 'time,fitness'},
+                {'config.run_type.value': 'time'},
+            ]},
+            {'config.ga.elitism.value': False},
+            {'config.sat.literals.value': vars}
+        ]
+    })
+    measure = np.zeros(len(POP_SIZES))
+    run_count = np.zeros(len(POP_SIZES))
+    for run in runs:
+        try:
+            s, c = run.summary, run.config
+            progress = s['iteration'] / s['max_iteration']
+            i = POP_SIZES.index(c['pop_size'])
+            measure[i] += s[TO_MEASURE] / progress
+            run_count[i] += 1
+        except:
+            traceback.print_exc()
+            print(run)
+    measure = measure[run_count > 0] / run_count[run_count > 0]
+    for pindex in np.where(run_count==0)[0]:
+        print(f"\nWARNING GA GPU fitness for {vars} literals with {POP_SIZES[pindex]} has no measurement")
+    plt.plot(
+        np.array(POP_SIZES)[run_count > 0],
+        measure,
+        c=VAR_C[str(vars)],
+        linestyle='--',
+    )
+plt.title(f"Genetic algorithm for 3SAT problem")
+plt.xscale('log')
+plt.yscale('log')
+plt.xticks([32, 128, 512, 2048, 10240, 32768])
+plt.gca().get_xaxis().set_major_formatter(mticker.ScalarFormatter())
+plt.gca().get_xaxis().set_tick_params(which='minor', size=0)
+plt.xlim(32, 32768)
+plt.xlabel('Population size')
+plt.ylim(minval, maxval)
+plt.yticks(plot_generatelogticks(minval, maxval, NUM_Y_TICKS))
+plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter())
+plt.minorticks_off()
+plt.ylabel('Running time [s]')
+plt.savefig(f"runs/time_ga.pdf")
+
+fig2 = plt.figure()
+ax2 = fig2.add_subplot()
+ax2.axis('off')
+legend = ax2.legend([
+    mlines.Line2D([0],[0], linestyle='-', c='black'),
+    mlines.Line2D([0],[0], linestyle='--', c='black'),
+    *list(map(lambda x: mlines.Line2D([0],[0],c=x), VAR_C.values())),
+], [
+    'CPU', 'CUDA',
+    *list(map(lambda x: f'{x} literals', VAR_C.keys()))
+], frameon=False, loc='lower center', ncol=10, )
+fig2 = legend.figure
+fig2.canvas.draw()
+bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+fig2.savefig(
+    f"runs/time_ga_legend.pdf",
     dpi="figure",
     bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
 )
