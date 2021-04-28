@@ -104,7 +104,6 @@ for psize, in itertools.product(args.popsize):
                     GA.initialization.Uniform(psize, literals, device=dev),
                     GA.evaluation.Evaluation(fn.fitness_count_unsatisfied),
                     reporter,
-                    ffeat.measure.FitnessMedian(ffeat.measure.reporting.Console('median')),
                     MaxTimeMinItersTerminate(1*60*1000,100),
                     scale,
                     selection,
