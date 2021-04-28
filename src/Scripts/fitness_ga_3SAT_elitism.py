@@ -30,12 +30,10 @@ p.add_argument("--popsize", type=str, help="Size of the population comma separat
 p.add_argument("--literals", type=str, help="Number of literals")
 p.add_argument('--mean_literals_in_clause', type=float, help="Expected number of literals in clause")
 p.add_argument('--std_literals_in_clause', type=float, help="Deviation of number of literals in clause")
-p.add_argument('--measure', type=str, help="Which population size to measure")
 p.add_argument('--elites', type=float, default=0.003, help="Number of elites")
 args, _ = p.parse_known_args()
 args.popsize = list(map(int, args.popsize.split(',')))
 args.literals = list(map(int, args.literals.split(',')))
-args.measure = list(map(int, args.measure.split(',')))
 
 dev = t.device(args.device)
 print(f'GONNA USE {dev}')
@@ -57,7 +55,7 @@ for psize, literals in itertools.product(args.popsize, args.literals):
         with WandbExecutionTime({'config': {
             **vars(args),
             'repeat': i,
-            'run_type': 'time',
+            'run_type': 'fitness',
             'run_failed': False,
             'problem_group': 'sat',
             'sat.literals': literals,
@@ -94,9 +92,10 @@ for psize, literals in itertools.product(args.popsize, args.literals):
                             M.Fitness01Quantile(),
                             M.Fitness05Quantile(),
                             M.FitnessMedian(),
+                            M.Fitness95Quantile(),
+                            M.Fitness99Quantile(),
+                            M.FitnessHighest(),
                             reporter,
-                            MaxTimeMinItersTerminate(1 * 60 * 1000,
-                                                     80 if (psize not in args.measure) else args.iterations),
                         ),
                         selection,
                         crossover,

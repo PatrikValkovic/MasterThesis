@@ -30,12 +30,9 @@ p.add_argument("--popsize", type=str, help="Size of the population comma separat
 p.add_argument("--literals", type=str, help="Number of literals")
 p.add_argument('--mean_literals_in_clause', type=float, help="Expected number of literals in clause")
 p.add_argument('--std_literals_in_clause', type=float, help="Deviation of number of literals in clause")
-p.add_argument('--measure', type=str, help="Which population size to measure")
-p.add_argument('--elites', type=float, default=0.003, help="Number of elites")
 args, _ = p.parse_known_args()
 args.popsize = list(map(int, args.popsize.split(',')))
 args.literals = list(map(int, args.literals.split(',')))
-args.measure = list(map(int, args.measure.split(',')))
 
 dev = t.device(args.device)
 print(f'GONNA USE {dev}')
@@ -48,16 +45,13 @@ mutation = GA.mutation.FlipBit(0.6, 0.001)
 for psize, literals in itertools.product(args.popsize, args.literals):
     clauses = int(literals * 4.5)
     selection = GA.selection.Tournament(psize)
-    elites = max(1, int(args.elites * psize))
     for i in range(args.repeat):
         generate_cnf_norm(literals, clauses, 0, args.mean_literals_in_clause, args.std_literals_in_clause, 'tmp.cnf')
         fn = SAT.from_cnf_file("tmp.cnf", dev)
         print(f"{time.asctime()}\tSAT {literals}:{clauses} with population {psize}, running for {i}")
-        print(f"Elitism with {elites} elites")
         with WandbExecutionTime({'config': {
             **vars(args),
-            'repeat': i,
-            'run_type': 'time',
+            'run_type': 'fitness',
             'run_failed': False,
             'problem_group': 'sat',
             'sat.literals': literals,
@@ -75,8 +69,7 @@ for psize, literals in itertools.product(args.popsize, args.literals):
             'ga.mutation': GA.mutation.FlipBit.__name__,
             'ga.mutation.params.to_mutate': 0.6,
             'ga.mutation.params.mutation_prob': 0.001,
-            'ga.elitism': True,
-            'ga.elitism.size': elites,
+            'ga.elitism': False,
 
             'cputype': cpuinfo.get_cpu_info()['brand_raw'],
             'gputype': t.cuda.get_device_name(0) if t.cuda.is_available() else None,
@@ -85,23 +78,21 @@ for psize, literals in itertools.product(args.popsize, args.literals):
                 alg = GA.GeneticAlgorithm(
                     GA.initialization.Uniform(psize, literals, device=dev),
                     GA.evaluation.Evaluation(fn.fitness_count_unsatisfied),
-                    GA.selection.Elitism(
-                        elites,
-                        SidewayPipe(
-                            M.FitnessMean(),
-                            M.FitnessStd(),
-                            M.FitnessLowest(),
-                            M.Fitness01Quantile(),
-                            M.Fitness05Quantile(),
-                            M.FitnessMedian(),
-                            reporter,
-                            MaxTimeMinItersTerminate(1 * 60 * 1000,
-                                                     80 if (psize not in args.measure) else args.iterations),
-                        ),
-                        selection,
-                        crossover,
-                        mutation,
+                    SidewayPipe(
+                        M.FitnessMean(),
+                        M.FitnessStd(),
+                        M.FitnessLowest(),
+                        M.Fitness01Quantile(),
+                        M.Fitness05Quantile(),
+                        M.FitnessHighest(),
+                        M.Fitness95Quantile(),
+                        M.Fitness99Quantile(),
+                        M.FitnessMedian(),
+                        reporter,
                     ),
+                    selection,
+                    crossover,
+                    mutation,
                     iterations=args.iterations
                 )
                 alg()
