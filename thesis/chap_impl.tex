@@ -67,7 +67,7 @@ The \acrlongpl{acc:ga} are in the \incode{ffeat.genetic} module. This module is 
 
 I implemented uniform, one--point, and two--point crossovers for \acrshort{acc:ga} (classes \incode{Uniform}, \incode{OnePoint1D}, and \incode{TwoPoint1D}). The uniform crossover may handle individuals with an arbitrary number of dimensions because it simply generates a random mask of genes to inherit from the first parent. For one--, and two--point crossovers would be the position of the crossover point ambiguous; they, therefore, expect individuals to be one--dimensional.
 \todo{Rozhodnout jestli psát o implementaci point crossover operátorů na základě měření.}
-All the crossover operators allow specifying whether to replace parents or concatenate them with the population (plus schema known from the \acrshort{acc:es}), or whether to discard parents (comma schema from \acrshort{acc:es}).
+All the crossover operators allow specifying whether to replace parents or concatenate them with the population (plus schema known from the \acrshort{acc:es}), or whether to discard parents (comma schema from \acrshort{acc:es}).\todo{Lépe popsat všechny 3 varianty.}
 
 \begin{algorithm}[b!]
     \begin{lstlisting}[language=Python, xrightmargin=18pt]
@@ -103,17 +103,20 @@ roulette (\incode{Roulette} class),
 and \acrlong{acc:sus} (\incode{StochasticUniversalSampling} class)
 selection operators. The tournament selection allows to specify whether is it maximization or minimization problem and a number of parents, as I discussed in chapter \ref{chap:eva}. The rank--based selection operator is in fact roulette or \acrshort{acc:sus} selection with preprocessing of fitness values. I will get to fitness transformation later.
 
-I also implement elitism in the \incode{ffeat.genetic.selection.Elitism} class. It copies the $n$ best individuals from the population and temporarily stored them aside from the population. After all the \acrshort{acc:ga} operators execute, it copies them back. The implementation does not follow the exact description found in books \citep{IntroductionToEA}, because it may replace better individuals (when the elite improve).
-\todo{Možná zmínit, že je malá pravděpodobnost, že se to stane (zdroj?) a nebo že nám to nevadí (měření?). Popřípadě že to zjednodušuje implementaci.}
+I also implement elitism in the \incode{ffeat.genetic.selection.Elitism} class. It copies the $n$ best individuals from the population and temporarily stores them aside. After all the \acrshort{acc:ga} operators execute, it copies them back. The implementation does not follow the exact description found in books \citep{IntroductionToEA}, because it may replace better individuals (when the elite improve). The standard implementations of elitism prohibit elites change by the following operators, or append the elites to the population after all the operators are executed. Because the operators following the elitism may be arbitrarily complicated, or the user of the library may decide to implement their own set of operators, ensuring the elites would not change would be thorough and delicate work. From the \gpu programming point of view, copying small amount of memory between already allocated memory space is more efficient than appending the elites to the population, because that would require reallocation of the whole population.
+\todo{Možná zmínit, že je malá pravděpodobnost, že se to stane (zdroj?) a nebo že nám to nevadí (měření?) -- to že elita přepíše lepšího jedince. Popřípadě že to zjednodušuje implementaci.}
 \todo{Na základě měření diskuze o implementaci.}
 
 For convenience, the parameters dealing with population size, typically the number of individuals to sample during selection or the number of offsprings in crossovers, can be specified using an absolute number or a fraction of population size. Moreover, some operators may change during algorithms, for example mutation probability of Flip--Bit mutation, and these also accept callable object evaluated each iteration. Finally, there is no need to use \incode{ffeat.flow} module directly, but the flow is wrap in the \incode{ffeat.genetic.GeneticAlgorithm} class, into which the user just needs to plug the operators.
 
-Some operators, for example tournament selection and crossovers, should get distinct parents in order for the operator to do something useful. Unfortunately, this requirement is hard to satisfy, especially for \gpuns, because the parent indices are generated independently. It is nevertheless still possible using PyTorch's \incode{torch.multinomial} function. The problem is, this function takes significantly more time than generating a random integer in a provided range. I decide to allow specification of the parent sampling strategy for all these algorithms.
+Some operators, for example crossovers and differential evolution, should get distinct parents in order for the operator to do something useful. Unfortunately, this requirement is hard to satisfy, especially for \gpuns, because the parent indices are generated independently. It is nevertheless still possible using PyTorch's \incode{torch.multinomial} function. The problem is, this function takes significantly more time than generating a random integer in a provided range. I decide to allow specification of the parent sampling strategy for all these algorithms.
 \todo{Pravděpodobně změřit čas a fitness hodnoty pro obě strategie. Předpokládal bych, že s větší populací je pravděpodobnost duplicity menší a nebude to takový problém. Sem dát stručný popis, že to nevadí, a detailnější rozbor udělat v další kapitole.}
 
 Example of genetic algorithm in the \acrshort{acc:ffeat} library is in the algorithm \ref{alg:gaffeat}.
 
+\todo{Někam vrazit problémy GPU programování a jak jsme je řešil. Může být spojeno s parental sampling.}
+
+\todo{Přidat ukázky nějakých operátorů.}
 
 
 
