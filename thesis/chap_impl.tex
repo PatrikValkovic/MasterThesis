@@ -24,6 +24,8 @@ some_function(1, 2, karg=5)
 
 I use this design to implement operators in Pipe and Filter architecture. The operator accepts a variable number of normal and keyword arguments and returns a list of variables and a dictionary. The list of variables, respectively the dictionary serves as the input for the following operator as normal, respectively as keyword arguments. Following this design, a new operator may be easily plugin into the algorithm. At the same time, it allows using the same underlying architecture both for genetic algorithms (the argument is only the population), as well as \acrshort{acc:pso} algorithms (using particles' position, velocity, and their best--known positions as three distinct arguments).
 
+The library expects the population to be represented as the tensor, respectively, as a list of tensors, where the first dimension enumerates over the individuals (note that the tensor needs to be aligned in each dimension). I resolve to this assumption because it allows me to implement the operators more efficiently. Nevertheless, the architecture is general enough, and it may easily adjust to the problem at hand; the user would just need to reimplement the operators where necessary. In most cases, it is enough to represent the population using a single, two--dimensional tensor. Some operators are implemented in a way, they may handle multi--dimensional tensors as well (for example uniform crossover). In the case of \acrshort{acc:pso} algorithm, using a single tensor is not sufficient. The library represents the swarm using a list of tensors -- one tensor for each component of the population. Specifically, the library works with six tensors: particles' position and velocity, local and best--known positions, and their corresponding fitness values. Although the \acrshort{acc:pso} uses list of tensors, each of them still fulfills the requirement to use the first dimension to enumerate over individual particles. The operators can hence effectively run in parallel.
+
 The library is split into several modules, focusing on different kinds of evolutionary algorithms or solving particular problems.
 \begin{itemize}
     \item \incode{ffeat.flow} module includes basic classes to control the flow of the algorithm with the Pipe and Filter architecture in mind.
@@ -67,6 +69,34 @@ I implemented uniform, one--point, and two--point crossovers for \acrshort{acc:g
 \todo{Rozhodnout jestli psát o implementaci point crossover operátorů na základě měření.}
 All the crossover operators allow specifying whether to replace parents or concatenate them with the population (plus schema known from the \acrshort{acc:es}), or whether to discard parents (comma schema from \acrshort{acc:es}).
 
+\begin{algorithm}[b!]
+    \begin{lstlisting}[language=Python, xrightmargin=18pt]
+    import ffeat.genetic as GA
+    
+    
+    fn = create_problem_function()
+    
+    alg = GA.GeneticAlgorithm(
+        # Randomly initialize 100 individuals 
+        # with gene of length 40
+        GA.initialization.Uniform(100, 40),
+        # Evaluate the population
+        GA.evaluation.Evaluation(fn),
+        # Sample 100 individuals into new generation
+        GA.selection.Tournament(100),
+        # Crossover 40% of them
+        GA.crossover.OnePoint1D(0.4),
+        # Mutate 60 of them with 1% mutation chance
+        GA.mutation.FlipBit(60, mutate_prob=0.01),
+        # repeat for 100 generations
+        iterations=100
+    )
+    alg() # run the evolution
+    \end{lstlisting}
+    \caption{Simple \acrshort*{acc:ga} in \acrshort*{acc:ffeat}}
+    \label{alg:gaffeat}
+    \end{algorithm}
+
 In the \incode{ffeat.genetic.selection} module the library keeps implementations of the 
 tournament (\incode{Tournament} class)
 roulette (\incode{Roulette} class), 
@@ -78,34 +108,6 @@ I also implement elitism in the \incode{ffeat.genetic.selection.Elitism} class. 
 \todo{Na základě měření diskuze o implementaci.}
 
 For convenience, the parameters dealing with population size, typically the number of individuals to sample during selection or the number of offsprings in crossovers, can be specified using an absolute number or a fraction of population size. Moreover, some operators may change during algorithms, for example mutation probability of Flip--Bit mutation, and these also accept callable object evaluated each iteration. Finally, there is no need to use \incode{ffeat.flow} module directly, but the flow is wrap in the \incode{ffeat.genetic.GeneticAlgorithm} class, into which the user just needs to plug the operators.
-
-\begin{algorithm}[b!]
-\begin{lstlisting}[language=Python, xrightmargin=18pt]
-import ffeat.genetic as GA
-
-
-fn = create_problem_function()
-
-alg = GA.GeneticAlgorithm(
-    # Randomly initialize 100 individuals 
-    # with gene of length 40
-    GA.initialization.Uniform(100, 40),
-    # Evaluate the population
-    GA.evaluation.Evaluation(fn),
-    # Sample 100 individuals into new generation
-    GA.selection.Tournament(100),
-    # Crossover 40% of them
-    GA.crossover.OnePoint1D(0.4),
-    # Mutate 60 of them with 1% mutation chance
-    GA.mutation.FlipBit(60, mutate_prob=0.01),
-    # repeat for 100 generations
-    iterations=100
-)
-alg() # run the evolution
-\end{lstlisting}
-\caption{Simple \acrshort*{acc:ga} in \acrshort*{acc:ffeat}}
-\label{alg:gaffeat}
-\end{algorithm}
 
 Some operators, for example tournament selection and crossovers, should get distinct parents in order for the operator to do something useful. Unfortunately, this requirement is hard to satisfy, especially for \gpuns, because the parent indices are generated independently. It is nevertheless still possible using PyTorch's \incode{torch.multinomial} function. The problem is, this function takes significantly more time than generating a random integer in a provided range. I decide to allow specification of the parent sampling strategy for all these algorithms.
 \todo{Pravděpodobně změřit čas a fitness hodnoty pro obě strategie. Předpokládal bych, že s větší populací je pravděpodobnost duplicity menší a nebude to takový problém. Sem dát stručný popis, že to nevadí, a detailnější rozbor udělat v další kapitole.}
