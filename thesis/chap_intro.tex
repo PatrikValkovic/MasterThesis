@@ -2,7 +2,7 @@
 
 \acrfull{acc:ai} has become phenomenon of these days. Latest advances in this field achieved magnificent results and allowed creation of systems and tools, which we would not think were possible thirty years back. The biggest credit goes to the \acrfull{acc:ann}, which allowed this rapid and astonishing growth of the field in the last years. More precisely, the \acrfull{acc:dann} sparkled this process in 2011, when they started to exceed human performance on German traffic sign recognition benchmark \citep{CIRESAN2012333}.
 
-Even though there were already known industrial applications of AI at the beginning of the 2000s, such as automatic check processing \citep{ChecksDocumentRecognition} or speaker recognition \citep{HECK2000181}, it were mainly achievements in 2011 and 2012 which acquired attention from academia and the broader community. The progress in \acrshort{acc:ai} is faster each day and we can observe new results almost on a daily basis. Current state-of-the-art system already exceed human performance and traditional methods in number of various tasks -- like 
+Even though there were already known industrial applications of AI at the beginning of the 2000s, such as automatic check processing \citep{ChecksDocumentRecognition} or speaker recognition \citep{HECK2000181}, it were mainly achievements in 2011 and 2012 which acquired attention from academia and the broader community. The progress in \acrshort{acc:ai} move forward each day and we can see new results almost on a daily basis. Current state-of-the-art system already exceed human performance and traditional methods in number of various tasks -- like 
 image recognition \citep{pham2021meta}\citep{ZawadzkaGosk2019},
 object detection \citep{ghiasi2020simple}\citep{lehner2019patch},
 video editing \citep{lu2020layered},
@@ -18,9 +18,9 @@ and countless more amaze scientists with accuracy and attention to details.
 healthcare \citep{fakoor2013using}\allowbreak\citep{BreastCancerAISystem},
 Hollywood \citep{aiinhollywood},
 robotics \citep{pierson2017deep}\allowbreak\citep{Lee_2020},
-and learning computer games \citep{openai2019dota}\allowbreak\citep{alphastar}.
+and can even learn computer games \citep{openai2019dota}\allowbreak\citep{alphastar}.
 
-This long and incomplete list of successes would not be possible without the computation power of computers and data centers nowadays. In fact, the achievements of \acrshort{acc:dann} in 2011 and 2012 were driven mainly by the effective implementation of \acrfull{acc:cnn} in kernels and running them inside the \acrfull{acc:gpu} \citep{CIRESAN2012333}. Since then, the \acrshort{acc:gpu} and more recently the \acrfull{acc:tpu} have overcome traditional processors in terms of usage in \acrshort{acc:ann} and allowed these advancements in the field we can see now.
+This long and incomplete list of successes would not be possible without the computation power of computers and data centers nowadays. In fact, the achievements of \acrshort{acc:dann} in 2011 and 2012 were driven mainly by the effective implementation of \acrfull{acc:cnn} in kernels and running them inside the \acrfull{acc:gpu} \citep{CIRESAN2012333}. Since then, the \acrshort{acc:gpu} and more recently the \acrfull{acc:tpu} have overcome traditional processors in the terms of speed and performance for \acrshort{acc:ann}, and allowed these advancements in the field we can see now.
 
 Another interesting field of \acrlong{acc:ai} is evolutionary computation. Similarly to \acrshort{acc:ann}, it performs parameters search in order to best solve the task in hand. Evolutionary algorithms and their variations have been successfully applied in variety of fields -- for example 
 electronic circuits design \citep{NASAantenaDesign}\allowbreak\citep{circuitdesignoptimizationea},
@@ -32,7 +32,7 @@ and many more.
 
 There has been attempts to implement and run evolutionary algorithms on \acrshort{acc:gpu} \citep{CHENG2019514} and use the computation power available. However, most of these methods focus on \acrfull{acc:cuda} or similar technology. \acrshort{acc:cuda} and alike technologies have drawbacks -- they use low-end languages like C or \cpp, require deep knowledge of the underlying hardware and algorithms are harder to modify.
 
-Goal of this work is therefore to analyze existing implementations of evolutionary algorithms and propose their implementations on \acrshort{acc:gpu}. The implementation needs to be easy to understand, extendable, and easily to modify. In order to meet given criteria, implementation should reuse existing frameworks available for neural networks if possible.
+Goal of this work is therefore to analyze existing implementations of evolutionary algorithms and propose their implementations on \acrshort{acc:gpu}. The implementation needs to be easy to understand, extendable, and easily to modify. In order to meet the given criteria, implementation should reuse existing frameworks available for neural networks if possible.
 
 The rest of this thesis is organized as follows. 
 In the next Section, the evolutionary algorithms and their variants are introduced. 
