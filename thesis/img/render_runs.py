@@ -55,16 +55,16 @@ class MyRun:
 def new_group(name):
     exit()
     print(f"RUNNING {name}")
-def round_plotup(val):
-    base = math.floor(math.log10(val))
+def round_plotup(val, pos=0):
+    base = math.floor(math.log10(val)) - pos
     round_to = 10 ** base
     return (int(val / round_to)+1) * round_to
-def round_plotdown(val):
-    base = math.floor(math.log10(val) if val > 0 else 0)
+def round_plotdown(val, pos=0):
+    base = math.floor(math.log10(val)-pos if val > 0 else 0.0)
     round_to = 10 ** base
     return int(val / round_to) * round_to
 def plot_generatelogticks(minval, maxval, ticks):
-    lm = math.log(minval) if minval > 0 else 0
+    lm = math.log(minval) if minval > 0 else 0.0
     diff = math.log(maxval) - lm
     points = [math.exp(lm + diff * s / ticks) for s in range(ticks+1)]
     points[0] = minval
@@ -76,106 +76,6 @@ def plot_generatelogticks(minval, maxval, ticks):
     return points
 #endregion
 
-
-#region GA normal and elitism fitness
-#new_group('GA fitness')
-REFETCH=True
-NUM_Y_TICKS = 7
-POP_SIZES=[32,512,5000,10240,32768]
-VARIABLES=[100, 300, 800, 1000, 2000, 5000]
-PSIZE_C = {
-    '32': 'tab:blue',
-    '512': 'tab:orange',
-    '5000': 'tab:green',
-    '10240': 'tab:red',
-    '32768': 'tab:gray',
-}
-STYLES=['-','-',':']
-ELITISM=[False,True]
-for vars,elitism in progressbar(list(itertools.product(
-    VARIABLES, ELITISM
-))):
-    plt.figure(figsize=FIGSIZE)
-    maxval = -math.inf
-    minval = math.inf
-    iters_render = -1
-    for psize in POP_SIZES:
-        runs = MyRun.load_and_cache({
-            "$and": [
-                {'state' : 'finished'},
-                {'config.run_failed.value': False},
-                {'config.pop_size.value': psize},
-                {'config.alg_group.value': 'ga_1'},
-                {'config.run_type.value': 'fitness'},
-                {'config.ga.elitism.value': elitism},
-                {'config.sat.literals.value': vars}
-            ]
-        }, keep_history=True, restore_files=REFETCH, reporting_metric=True)
-        runs = list(filter(lambda r: 'iteration' in r.summary, runs))
-        if len(runs) < 10:
-            print(f"\nWARNING: {len(runs)} runs for GA fitness with {vars} variables and {psize} individuals")
-            continue
-        max_iter = max(map(lambda r: r.summary['iteration'], runs))
-        medians, q05, best = [], [], []
-        for step in range(max_iter+1):
-            cmedians, cq05, cbest = [], [], []
-            for r in runs:
-                h = r.scan_history()
-                if len(h) <= step:
-                    continue
-                h = h[step]
-                cmedians.append(h['fitness_median'])
-                cq05.append(h['fitness_q05'])
-                cbest.append(h['fitness_lowest'])
-            medians.append(np.mean(cmedians))
-            q05.append(np.mean(cq05))
-            best.append(np.mean(cbest))
-        minval = min(minval, np.min(best))
-        maxval = max(maxval, np.max(medians))
-        best = np.array(best)
-        if np.any(best == 0):
-            iters_render = max(iters_render, np.where(best == 0)[0].min())
-        #plt.plot(range(len(medians)), medians, c=PSIZE_C[str(psize)], linestyle=STYLES[0])
-        plt.plot(range(len(q05)), q05,         c=PSIZE_C[str(psize)], linestyle=STYLES[1])
-        #plt.plot(range(len(best)), best,       c=PSIZE_C[str(psize)], linestyle=STYLES[2])
-    if minval == math.inf:
-        print(f"\nWARNING GA fitness with {vars} literals has no measurements")
-        continue
-    if iters_render == -1:
-        iters_render = 1000
-    plt.xlim(0, iters_render)
-    plt.xlabel('Generation')
-    minval = round_plotdown(minval)
-    maxval = round_plotup(maxval)
-    plt.ylim(minval, maxval)
-    plt.ylabel('Objective function')
-    plt.title(f"GA fitness of 3SAT{' with elitism' if elitism else ''} problem with {vars} literals")
-    plt.savefig(f'runs/fitness_ga{"_elitism" if elitism else ""}_3SAT_d{vars}.pdf')
-    plt.close()
-
-fig2 = plt.figure()
-ax2 = fig2.add_subplot()
-ax2.axis('off')
-legend = ax2.legend([
-    #mlines.Line2D([0],[0], linestyle='-', c='black'),
-    #mlines.Line2D([0],[0], linestyle='--', c='black'),
-    #mlines.Line2D([0],[0], linestyle=':', c='black'),
-    *list(map(lambda x: mlines.Line2D([0],[0],c=x), PSIZE_C.values())),
-], [
-    #'Fitness median', 'Fitness 0.05 quantile', 'Best fitness',
-    *list(map(lambda x: f"Population size {x}", PSIZE_C.keys()))
-], frameon=False, loc='lower center', ncol=10, )
-fig2 = legend.figure
-fig2.canvas.draw()
-bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
-fig2.savefig(
-    f"runs/fitness_ga_3SAT_legend.pdf",
-    dpi="figure",
-    bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
-)
-plt.close(fig2)
-#endregion
-exit()
 
 #region GA selection times
 #new_group('GA selection time')
@@ -291,6 +191,105 @@ fig2.savefig(
 plt.close(fig2)
 #endregion
 
+
+#region GA normal and elitism fitness
+new_group('GA fitness')
+NUM_Y_TICKS = 7
+POP_SIZES=[32,512,5000,10240,32768]
+VARIABLES=[100, 300, 800, 1000, 2000, 5000]
+PSIZE_C = {
+    '32': 'tab:blue',
+    '512': 'tab:orange',
+    '5000': 'tab:green',
+    '10240': 'tab:red',
+    '32768': 'tab:gray',
+}
+STYLES=['-','-',':']
+ELITISM=[False,True]
+for vars,elitism in progressbar(list(itertools.product(
+    VARIABLES, ELITISM
+))):
+    print()
+    plt.figure(figsize=FIGSIZE)
+    maxval = -math.inf
+    minval = math.inf
+    iters_render = -1
+    for psize in POP_SIZES:
+        runs = MyRun.load_and_cache({
+            "$and": [
+                {'state' : 'finished'},
+                {'config.run_failed.value': False},
+                {'config.pop_size.value': psize},
+                {'config.alg_group.value': 'ga_1'},
+                {'config.run_type.value': 'fitness'},
+                {'config.ga.elitism.value': elitism},
+                {'config.sat.literals.value': vars}
+            ]
+        }, keep_history=True)
+        runs = list(filter(lambda r: 'iteration' in r.summary, runs))
+        if len(runs) < 10:
+            print(f"\nWARNING: {len(runs)} runs for GA fitness with {vars} variables and {psize} individuals")
+            continue
+        max_iter = max(map(lambda r: r.summary['iteration'], runs))
+        medians, q05, best = [], [], []
+        for step in range(max_iter+1):
+            cmedians, cq05, cbest = [], [], []
+            for r in runs:
+                h = r.scan_history()
+                if len(h) <= step:
+                    continue
+                h = h[step]
+                cmedians.append(h['fitness_median'])
+                cq05.append(h['fitness_q05'])
+                cbest.append(h['fitness_lowest'])
+            medians.append(np.mean(cmedians))
+            q05.append(np.mean(cq05))
+            best.append(np.mean(cbest))
+        minval = min(minval, np.min(q05))
+        maxval = max(maxval, np.max(q05))
+        q05 = np.array(q05)
+        if np.any(q05 == 0):
+            iters_render = max(iters_render, np.where(q05 == 0)[0].min())
+        else:
+            iters_render = 1000
+        #plt.plot(range(len(medians)), medians, c=PSIZE_C[str(psize)], linestyle=STYLES[0])
+        plt.plot(range(len(q05)), q05,         c=PSIZE_C[str(psize)], linestyle=STYLES[1])
+        #plt.plot(range(len(best)), best,       c=PSIZE_C[str(psize)], linestyle=STYLES[2])
+    if minval == math.inf:
+        print(f"\nWARNING GA fitness with {vars} literals has no measurements")
+        continue
+    plt.xlim(0, iters_render)
+    plt.xlabel('Generation')
+    minval = round_plotdown(minval)
+    maxval = round_plotup(maxval,pos=1 if vars==2000 else 0)
+    plt.ylim(minval, maxval)
+    plt.ylabel('Objective function')
+    plt.title(f"GA fitness of 3SAT{' with elitism' if elitism else ''} problem with {vars} literals")
+    plt.savefig(f'runs/fitness_ga{"_elitism" if elitism else ""}_3SAT_d{vars}.pdf')
+    plt.close()
+
+fig2 = plt.figure()
+ax2 = fig2.add_subplot()
+ax2.axis('off')
+legend = ax2.legend([
+    #mlines.Line2D([0],[0], linestyle='-', c='black'),
+    #mlines.Line2D([0],[0], linestyle='--', c='black'),
+    #mlines.Line2D([0],[0], linestyle=':', c='black'),
+    *list(map(lambda x: mlines.Line2D([0],[0],c=x), PSIZE_C.values())),
+], [
+    #'Fitness median', 'Fitness 0.05 quantile', 'Best fitness',
+    *list(map(lambda x: f"Population size {x}", PSIZE_C.keys()))
+], frameon=False, loc='lower center', ncol=10, )
+fig2 = legend.figure
+fig2.canvas.draw()
+bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+fig2.savefig(
+    f"runs/fitness_ga_3SAT_legend.pdf",
+    dpi="figure",
+    bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+)
+plt.close(fig2)
+#endregion
 
 #region GA scale times
 new_group('GA scale time')
