@@ -3,35 +3,6 @@
 
 Here I present hyperparameters used for measurements in the following chapter. I run a rough hyperparameter search to use reasonably good enough parameters, and the algorithm does not diverge. As this work goal is to evaluate the execution speed of the algorithm, rather than its quality or performance, these parameters may not be optimal for the given problem at hand. I recommend the available literature for more appropriate hyperparameter selection. 
 
-\begin{table}[h]
-    \centering
-    \begin{tabular}{|l|c|}
-        \hline
-        \textbf{Parameter} & \textbf{Value} \\
-        \hline
-        Selection & Tournament \\
-        \quad Number of parents & $2$ \\
-        Mutation & Normal \\
-        \quad Mutation rate & $20\%$ \\
-        \quad Standard deviation & $0.005$ \\
-        \hline
-        Uniform crossover & \\
-        \quad Offsprings & $80\%$ \\
-        \quad Probability to inherit gene from 1st parent & $40\%$ \\
-        One--point crossover & \\
-        \quad Offsprigns & $80\%$ \\
-        Two--point crossover & \\
-        \quad Offsprigns & $80\%$ \\
-        Arithmetic crossover & \\
-        \quad Offsprigns & $40\%$ \\
-        Blend crossover & \\
-        \quad Offsprigns & $70\%$ \\
-        \quad $\alpha$ & $0.5$ \\
-        \hline
-    \end{tabular}
-    \caption{Real--coded evolutionary algorithms crossover tests hyperparameters}
-    \label{tab:escrossoverhyperparmarameters}
-\end{table}
 
 \begin{table}[h]
     \centering
@@ -68,6 +39,36 @@ Here I present hyperparameters used for measurements in the following chapter. I
     \end{tabular}
     \caption{Real--coded evolutionary algorithms mutation tests hyperparameters}
     \label{tab:esmutationhyperparmarameters}
+\end{table}
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|l|c|}
+        \hline
+        \textbf{Parameter} & \textbf{Value} \\
+        \hline
+        Selection & Tournament \\
+        \quad Number of parents & $2$ \\
+        Mutation & Normal \\
+        \quad Mutation rate & $20\%$ \\
+        \quad Standard deviation & $0.005$ \\
+        \hline
+        Uniform crossover & \\
+        \quad Offsprings & $80\%$ \\
+        \quad Probability to inherit gene from 1st parent & $40\%$ \\
+        One--point crossover & \\
+        \quad Offsprigns & $80\%$ \\
+        Two--point crossover & \\
+        \quad Offsprigns & $80\%$ \\
+        Arithmetic crossover & \\
+        \quad Offsprigns & $40\%$ \\
+        Blend crossover & \\
+        \quad Offsprigns & $70\%$ \\
+        \quad $\alpha$ & $0.5$ \\
+        \hline
+    \end{tabular}
+    \caption{Real--coded evolutionary algorithms crossover tests hyperparameters}
+    \label{tab:escrossoverhyperparmarameters}
 \end{table}
 
 \begin{table}[h]

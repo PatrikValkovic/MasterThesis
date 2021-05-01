@@ -24,7 +24,7 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
         \includegraphics[width=\textwidth]{img/runs/time_ga_legend.pdf}
     \end{minipage}
 
-    \caption[Running times of genetic algorithm]{Genetic algorithm running time. \todo{Dopsat popisek.}}
+    \caption[Genetic algorithm running time with and without elitism]{Running time of \acrlong{acc:ga} with and without elitism for \acrshort{acc:3sat} problem. All the formulas have been satisfiable and had $4.5$ times more clauses than literals. The algorithm run for $1000$ generations.}
 \end{figure}
 
 \begin{figure}[ht!]
@@ -42,7 +42,7 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
         \includegraphics[width=\textwidth]{img/runs/time_ga_clausecount_legend.pdf}
     \end{minipage}
 
-    \caption[Running times of GA depending on problem size]{Genetic algorithm running time depending on problem size. \todo{Dopsat popisek.}}
+    \caption[Running time of Genetic Algorithm in respect to problem size]{Running time of \acrlong{acc:ga} for \acrshort{acc:3sat} problem in respect to problem size. On the left in respect to number of literals with $4.5$ times clauses, and in repsect to number of clauses for $2000$ literals on the right. All the formulas have been satisfiable and measurements are done for population size $1000$. The algorithm run for $1000$ generations.}
 \end{figure}
 
 \begin{figure}[ht!]
@@ -81,7 +81,7 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
         \includegraphics[width=0.8\textwidth]{img/runs/fitness_ga_3SAT_legend.pdf}
     \end{minipage}
 
-    \caption[Fitness of genetic algorithm]{Fitness of genetic algorithm on 3SAT problem.\todo{Dopsat popisek.}}
+    \caption[Fitness of genetic algorithm]{Fitness of \acrlong{acc:ga} on \acrshort{acc:3sat} problem. Algorithm run for maximum of $1000$ generations and had $4.5$ times number of clauses than the literals.}
 \end{figure}
 
 \begin{figure}[ht!]
@@ -120,7 +120,7 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
         \includegraphics[width=0.8\textwidth]{img/runs/fitness_ga_3SAT_legend.pdf}
     \end{minipage}
 
-    \caption[Fitness of genetic algorithm with elitism]{Fitness of genetic algorithm with elitism on 3SAT problem.\todo{Dopsat popisek.}}
+    \caption[Fitness of genetic algorithm with elitism]{Fitness of \acrlong{acc:ga} with elitism on \acrshort{acc:3sat} problem. Algorithm run for maximum of $1000$ generations and had $4.5$ times number of clauses than the literals.}
 \end{figure}
 
 
@@ -148,7 +148,7 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
         \includegraphics[width=\textwidth]{img/runs/time_ga_scale_legend.pdf}
     \end{minipage}
 
-    \caption[Fitness scale operators running time]{Running times of fitness scale operators. \todo{Dopsat popisek.}}
+    \caption[Running time of genetic algorithm with various scale operators]{Running time of \acrlong{acc:ga} with various fitness scale operators. The algorithm were solving \acrshort{acc:3sat} problem with $100$ (left) resp. $1000$ (right) literals and $450$, resp. $4500$ clauses. The algorithm run for $1000$ generations.}
 \end{figure}
 
 
@@ -169,7 +169,7 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
         \includegraphics[width=\textwidth]{img/runs/time_ga_selections_legend.pdf}
     \end{minipage}
 
-    \caption[Running times of select operators]{Running times of select operators. \todo{Dopsat popisek.}}
+    \caption[Running time of selection operators]{Running time of \acrlong{acc:ga} with various selection operators. The algorithm were solving \acrshort{acc:3sat} problem with $1000$ literals and $4500$ clauses, and run for $1000$ generations.}
 \end{figure}
 
 
@@ -216,7 +216,7 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
         \includegraphics[width=0.8\textwidth]{img/runs/time_es_mutation_legend.pdf}
     \end{minipage}
 
-    \caption[Running times of mutation operators]{Running times of various mutation operators for real--coded evolutionary algorithms. I chose to measure only \acrshort{acc:bbob} functions $f_{19}$ and $f_{22}$. \todo{Dopsat popisek.}}
+    \caption[Running time of mutation operators]{Running time of real--coded evolutionary algorithm with various mutation operators. I chose to measure only \acrshort{acc:bbob} functions $f_{19}$ and $f_{22}$. Algorithm used hyperparameters specified in table \ref{tab:esmutationhyperparmarameters} and run for $1000$ generations.}
 \end{figure}
 
 
@@ -287,7 +287,7 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
         \includegraphics[width=\textwidth]{img/runs/fitness_es_mutation_legend.pdf}
     \end{minipage}
 
-    \caption[Real--coded mutation fitness over generations]{\todo{Real--coded mutation fitness over generations. Dopsat zbytek.}}
+    \caption[Fitness of various mutation operators in real--coded evolutionary algorithms]{Fitness of real--coded evolutionary algorithm with various mutation operators. Measured on \acrshort{acc:bbob} functions $f_{19}$ and $f_{24}$ (available in attachments). Algorithm used hyperparameters specified in table \ref{tab:esmutationhyperparmarameters}.}
 \end{figure}
 
 
@@ -333,7 +333,7 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
         \includegraphics[width=\textwidth]{img/runs/time_es_crossover_legend.pdf}
     \end{minipage}
 
-    \caption[Running times of crossover operators]{\todo{Crossover operators running time. Dopsat zbytek.}}
+    \caption[Running time of crossover operators]{Running time of real--coded evolutionary algorithm with various crossover operators. I chose to measure only \acrshort{acc:bbob} functions $f_{19}$ and $f_{24}$. Algorithm used hyperparameters specified in table \ref{tab:escrossoverhyperparmarameters} and run for $1000$ generations.}
 \end{figure}
 
 
@@ -391,7 +391,7 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
         \includegraphics[width=\textwidth]{img/runs/fitness_es_crossovers_legend.pdf}
     \end{minipage}
 
-    \caption[Fitness of crossover operators]{\todo{Fitness of crossover operators. Dopsat zbytek.}}
+    \caption[Fitness of various crossover operators in real--coded evolutionary algorithms]{Fitness of real--coded evolutionary algorithm with various crossover operators. Measured only on \acrshort{acc:bbob} functions $f_{19}$ and $f_{24}$ with dimensions $24$, $128$, and $384$. Algorithm used hyperparameters specified in table \ref{tab:escrossoverhyperparmarameters}. I present only function $f_{19}$ with $24$ dimensions and function $f_{24}$ with $384$ dimensions, rest of the measurements are in the attachments.}
 \end{figure}
 
 
@@ -435,10 +435,10 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
 
     \begin{minipage}{\textwidth}
         \centering
-        \includegraphics[width=0.8\textwidth]{img/runs/time_es_schema_legend.pdf}
+        \includegraphics[width=0.6\textwidth]{img/runs/time_es_schema_legend.pdf}
     \end{minipage}
 
-    \caption[Running times crossover schemas]{\todo{Crossover schemas running times. Dopsat zbytek.}}
+    \caption[Running time of crossover schemas]{Running time of real--coded evolutionary algorithm with various crossover schemas. I measure the algorithm on \acrshort{acc:bbob} functions $f_{19}$ and $f_{22}$ with $24$, $128$, and $384$ dimensions. Algorithm used hyperparameters specified in table \ref{tab:esschemehyperparmarameters} and run for $1000$ generations.}
 \end{figure}
 
 
@@ -485,7 +485,7 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
         \includegraphics[width=\textwidth]{img/runs/time_pso2006_alldim_legend.pdf}
     \end{minipage}
 
-    \caption[PSO2006 running times]{Running times of \acrlong{acc:spso2006} algorithm using problems of dimension $6$, $32$, $128$, and $384$. The algorithm run for $1000$ generations. Populations with over $1000$ particles takes advantage of \gpu and are clearly faster to evaluate.}
+    \caption[Running time of PSO2006]{Running time of \acrlong{acc:spso2006} algorithm using problems of dimension $6$, $32$, $128$, and $384$. The algorithm run for $1000$ generations. Populations with over $1000$ particles takes advantage of \gpu and are clearly faster to evaluate.}
 \end{figure}
 
 \begin{figure}[ht!]
@@ -524,7 +524,7 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
         \includegraphics[width=\textwidth]{img/runs/fitness_pso2011_legend.pdf}
     \end{minipage}
 
-    \caption[PSO2006 fitness over generations]{Median, $0.05$ quantile, and best fitness of \acrlong{acc:spso2006} algorithm using random neighborhood on problem with $128$ dimensions. I measured populations consisting of $32$, $512$, $10240$, and $32768$ particles. All the problem functions take advantage of more particles, except of function $f_7$. Given hyperparameters in table \ref{tab:psohyperparameters}, \acrshort{acc:spso2006} seems to have better convergence properties in comparison to \acrshort{acc:spso2011}.}
+    \caption[Fitness of PSO2006 algorithm]{Median, $0.05$ quantile, and best fitness of \acrlong{acc:spso2006} algorithm using random neighborhood on problem with $128$ dimensions. I measured populations consisting of $32$, $512$, $10240$, and $32768$ particles. All the problem functions take advantage of more particles, except of function $f_7$. Given hyperparameters in table \ref{tab:psohyperparameters}, \acrshort{acc:spso2006} seems to have better convergence properties in comparison to \acrshort{acc:spso2011}.}
 \end{figure}
 
 
@@ -568,10 +568,10 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
 
     \begin{minipage}{\textwidth}
         \centering
-        \includegraphics[width=0.5\textwidth]{img/runs/time_pso_neigh_legend.pdf}
+        \includegraphics[width=0.6\textwidth]{img/runs/time_pso_neigh_legend.pdf}
     \end{minipage}
 
-    \caption[PSO2006 neighborhood running times]{Running times of \acrlong{acc:spso2011} algorithm with different neighborhood types. The algorithm run for 1000 generations on problem with 128 dimensions. Neighborhood sizes are at table \ref{tab:psohyperparameters}. The nearest neighborhood topology was run only to population of size 4900, as it compares all pairs of individuals and the device does not have enough memory. The minimum population size for grid topologies were 225, because topologies size were specified as a fraction of population size and for smaller populations neighborhood could not be constructed. The grid topologies were always assembled into square. Running times of circle, linear grid, compact grid, and diamond grid were almost identical (depending only on the size of neighborhood, see chapter \ref{chap:impl}), so I plot only measurements for circle and diamond grid.}
+    \caption[PSO2006 neighborhood running time]{Running time of \acrlong{acc:spso2011} algorithm with different neighborhood types. The algorithm run for 1000 generations on problem with 128 dimensions. Neighborhood sizes are at table \ref{tab:psohyperparameters}. The nearest neighborhood topology was run only to population of size 4900, as it compares all pairs of individuals and the device does not have enough memory. The minimum population size for grid topologies were 225, because topologies size were specified as a fraction of population size and for smaller populations neighborhood could not be constructed. The grid topologies were always assembled into square. Running times of circle, linear grid, compact grid, and diamond grid were almost identical (depending only on the size of neighborhood, see chapter \ref{chap:impl}), so I plot only measurements for circle and diamond grid.}
 \end{figure}
 
 
@@ -612,7 +612,7 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
         \includegraphics[width=0.8\textwidth]{img/runs/fitness_pso_neigh_legend.pdf}
     \end{minipage}
 
-    \caption[PSO neighborhood fitness]{Fitness of neighborhoods using $121$, $529$, $4900$, and $22500$ particles and \acrshort{acc:spso2006} update algorithm. Nearest neighborhood for $22500$ particles is not present, because of the memory demands. Grid neighborhoods for $121$ particles is not present, because there was not enough particles to build it. 
+    \caption[Fitness of PSO neighborhoods]{Fitness of neighborhoods using $121$, $529$, $4900$, and $22500$ particles and \acrshort{acc:spso2006} update algorithm. Nearest neighborhood for $22500$ particles is not present, because of the memory demands. Grid neighborhoods for $121$ particles is not present, because there was not enough particles to build it. 
     All the neighborhoods clearly benefit from greater number of particles with the exception of compact grid and diamond grid. This is probably caused by premature convergence rather than degredation of the performance.
     Measurements for \acrshort{acc:bbob} functions $f_1$, $f_7$, $f_{15}$, and $f_{22}$ report similar properties.}
 \end{figure}
@@ -661,7 +661,7 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
         \includegraphics[width=\textwidth]{img/runs/time_pso2011_alldim_legend.pdf}
     \end{minipage}
 
-    \caption[PSO2011 running times]{Running times of \acrlong{acc:spso2011} algorithm using problems of dimension $6$, $32$, $128$, and $384$. The algorithm run for $1000$ generations. Populations with over $1000$ particles takes clear advantage of \gpu.}
+    \caption[Running time of PSO2011]{Running time of \acrlong{acc:spso2011} algorithm using problems of dimension $6$, $32$, $128$, and $384$. The algorithm run for $1000$ generations. Populations with over $1000$ particles takes clear advantage of \gpu.}
 \end{figure}
 
 \begin{figure}[ht!]
@@ -700,5 +700,5 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
         \includegraphics[width=\textwidth]{img/runs/fitness_pso2011_legend.pdf}
     \end{minipage}
 
-    \caption[PSO2011 fitness over generations]{Median, $0.05$ quantile, and best fitness of \acrlong{acc:spso2011} algorithm using random neighborhood on problem with $128$ dimensions. I measured populations consisting of $32$, $512$, $10240$, and $32768$ particles. All the problem functions take advantage of more particles.}
+    \caption[Fitness of PSO2011 algorithm]{Median, $0.05$ quantile, and best fitness of \acrlong{acc:spso2011} algorithm using random neighborhood on problem with $128$ dimensions. I measured populations consisting of $32$, $512$, $10240$, and $32768$ particles. All the problem functions take advantage of more particles.}
 \end{figure}
