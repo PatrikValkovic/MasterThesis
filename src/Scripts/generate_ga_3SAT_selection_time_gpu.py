@@ -14,16 +14,15 @@ args, _ = parser.parse_known_args()
 
 LITERALS = 1000
 POP_SIZES = [
-    '"2048,32,128,200,512,1024,5000,10240"',
-    '"16384,32768"'
+    '"2048,32,128,200,512,1024,5000"',
+    '"10240,16384,32768"'
 ]
-SELECTIONS = ['Tournament', 'Roulette', 'StochasticUniversalSampling']
+SELECTIONS = ['Roulette', 'StochasticUniversalSampling','Rank']#, 'Tournament]
 combinations = list(enumerate(itertools.product(
     POP_SIZES,
     SELECTIONS
 )))
 ctime = int(time.time())
-devices = ['pcr16']
 
 for job_id, (popsize, selection) in combinations:
     with open(f'{args.output}/_job.{ctime}.{job_id}.sh', "w") as f:

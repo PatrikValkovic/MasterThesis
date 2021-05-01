@@ -7,12 +7,12 @@
 import os
 import time
 import argparse
-import bbobtorch
 import torch as t
-from utils import WandbExecutionTime, MaxTimeMinItersTerminate, FSubtractFromPipe, generate_cnf_norm
+from utils import WandbExecutionTime, MaxTimeMinItersTerminate, generate_cnf_norm
 import cpuinfo
 import itertools
 import ffeat.genetic as GA
+import ffeat
 import traceback
 from problems import SAT
 
@@ -45,7 +45,13 @@ mutation = GA.mutation.FlipBit(0.6, 0.001)
 literals = args.literals
 clauses = int(literals * 4.5)
 for psize, in itertools.product(args.popsize):
-    selection = getattr(GA.selection, args.selection)(psize, **({} if args.selection != GA.selection.Tournament.__name__ else {'maximization': True}))
+    if args.selection == 'Rank':
+        selection = ffeat.flow.Sequence(
+            ffeat.utils.scaling.RankScale(1.0,100.0),
+            GA.selection.Roulette(psize)
+        )
+    else:
+        selection = getattr(GA.selection, args.selection)(psize, **({} if args.selection != GA.selection.Tournament.__name__ else {'maximization': True}))
     for i in range(args.repeat):
         generate_cnf_norm(literals, clauses, 0, args.mean_literals_in_clause, args.std_literals_in_clause, 'tmp.cnf')
         fn = SAT.from_cnf_file("tmp.cnf", dev)
