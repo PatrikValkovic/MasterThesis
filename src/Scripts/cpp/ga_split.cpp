@@ -154,6 +154,124 @@ void delete_problem(Problem problem){
 }
 
 
+bool early_terminate(int iter, int min_iters, int max_time, chrono::time_point<chrono::high_resolution_clock> &start){
+    auto now = chrono::high_resolution_clock::now();
+    chrono::duration<double> running_for = now-start;
+    return iter > min_iters && running_for.count() > max_time;
+}
+
+void evaluate(MyCounter& counter, int psize, Problem &p, int literals, bool* pop, int* fitness, BlockingQueue &queue){
+    counter.reset();
+    for(int i=0;i<psize;i++){
+        EvalStruct e;
+        e.problem = &p;
+        e.individual = pop+i*literals;
+        e.unsatisfied = fitness+i;
+        queue.push(e);
+    }
+    counter.wait();
+}
+
+void selection(int psize, int* fitness, bool* &pop, bool* &second_pop, int literals){
+    for(int i=0;i<psize;i++){
+        int first= rand() % psize;
+        int second = rand() % psize;
+        int better = fitness[first] < fitness[second] ? first : second;
+        memcpy(second_pop+i*literals, pop+better*literals, literals * sizeof(bool));
+    }
+    swap(second_pop, pop);
+}
+
+void crossover(int psize, int literals, bool* crossover_tmp, bool* pop){
+    int to_crossover_pop = 0.4 * psize;
+    for(int i=0;i<to_crossover_pop;i++){
+        int p1 = rand() % psize;
+        int p2 = p1;
+        while(p2 == p1){
+            p2 = rand() % psize;
+        }
+        int split = rand() % (literals - 1) + 1;
+        memcpy(crossover_tmp, pop+p1*literals+split,literals-split);
+        memcpy(pop+p1*literals+split, pop+p2*literals+split, literals-split);
+        memcpy(pop+p2*literals+split, crossover_tmp, literals-split);
+    }
+}
+
+void mutation(int psize, int literals, bool* pop){
+    int to_mutate_pop = 0.6 * psize;
+    for(int i=0;i<to_mutate_pop;i++){
+        int to_mutate = rand() % psize;
+        for(int j=0;j<literals;j++){
+            if(rand() % 1000 == 0){
+                pop[to_mutate * literals + j] = !pop[to_mutate * literals + j];
+            }
+        }
+    }
+}
+
+void alg(vector<int> popsize,
+         int literals,
+         int clauses,
+         int repeat,
+         int min_iters,
+         int max_time,
+         MyCounter& counter,
+         BlockingQueue &queue,
+         ofstream& outfile,
+         int num_threads,
+         int iterations
+){
+    for(int psize : popsize){
+        counter.fire_at = psize;
+        int iter = 0;
+        for(int rep=0;rep < repeat;rep++){
+            cout << "Running SAT for population of size " << psize << " for the " << rep << " time" << endl;
+            Problem p = create_problem(literals, clauses, 3);
+            auto start = chrono::high_resolution_clock::now();
+            // allocation
+            bool* pop = new bool[psize * literals];
+            bool* second_pop = new bool[psize * literals];
+            bool* crossover_tmp = new bool[literals];
+            for(int i=0;i<psize*literals;i++)
+                pop[i] = (rand() % 2) == 0;
+            int* fitness = new int[psize];
+            for(iter=0;iter<iterations;iter++){
+                // early termination
+                if(early_terminate(iter, min_iters, max_time, start))
+                    break;
+                // evaluate
+                evaluate(counter, psize, p, literals,pop,fitness,queue);
+                /*int mi = clauses;
+                double me = 0;
+                for(int i=0;i<psize;i++){
+                    mi = min(mi, fitness[i]);
+                    me += fitness[i];
+                }
+                me = me / psize;
+                cout << "MEAN:" << me << endl << "MIN :" << mi << endl;*/
+                // selection
+                selection(psize, fitness, pop, second_pop, literals);
+                // crossover
+                crossover(psize, literals, crossover_tmp, pop);
+                // mutation
+                mutation(psize, literals, pop);
+            }
+            delete [] fitness;
+            delete [] pop;
+            delete [] second_pop;
+            delete [] crossover_tmp;
+            auto end = chrono::high_resolution_clock::now();
+            chrono::duration<double> running_time = end-start;
+            // report
+            // popsize;literals;clauses;iterations;threads;executed_iterations;time
+            outfile << psize << ';' << literals << ';' << clauses << ';' << iterations << ';';
+            outfile << num_threads << ';' << iter << ';';
+            outfile << running_time.count() << endl;
+            delete_problem(p);
+        }
+    }
+}
+
 
 int main(int argc, char** args) {
     // help
@@ -198,82 +316,6 @@ int main(int argc, char** args) {
         threads[i].detach();
     }
     // run the algorithm
-    for(int psize : popsize){
-        counter.fire_at = psize;
-        int iter = 0;
-        for(int rep=0;rep < repeat;rep++){
-            cout << "Running SAT for population of size " << psize << " for the " << rep << " time" << endl;
-            Problem p = create_problem(literals, clauses, 3);
-            auto start = chrono::high_resolution_clock::now();
-            // allocation
-            bool* pop = new bool[psize * literals];
-            bool* second_pop = new bool[psize * literals];
-            bool* crossover_tmp = new bool[literals];
-            for(int i=0;i<psize*literals;i++)
-                pop[i] = (rand() % 2) == 0;
-            int* fitness = new int[psize];
-            for(iter=0;iter<iterations;iter++){
-                // early termination
-                auto now = chrono::high_resolution_clock::now();
-                chrono::duration<double> running_for = now-start;
-                if(iter > min_iters && running_for.count() > max_time)
-                    break;
-                // evaluate
-                counter.reset();
-                for(int i=0;i<psize;i++){
-                    EvalStruct e;
-                    e.problem = &p;
-                    e.individual = pop+i*literals;
-                    e.unsatisfied = fitness+i;
-                    queue.push(e);
-                }
-                counter.wait();
-                // selection
-                for(int i=0;i<psize;i++){
-                    int first= rand() % psize;
-                    int second = rand() % psize;
-                    int better = fitness[first] < fitness[second] ? first : second;
-                    memcpy(second_pop+i*literals, pop+better*literals, literals * sizeof(bool));
-                }
-                swap(second_pop, pop);
-                // crossover
-                int to_crossover_pop = 0.4 * psize;
-                for(int i=0;i<to_crossover_pop;i++){
-                    int p1 = rand() % psize;
-                    int p2 = p1;
-                    while(p2 == p1){
-                        p2 = rand() % psize;
-                    }
-                    int split = rand() % (literals - 1) + 1;
-                    memcpy(crossover_tmp, pop+p1*literals+split,literals-split);
-                    memcpy(pop+p1*literals+split, pop+p2*literals+split, literals-split);
-                    memcpy(pop+p2*literals+split, crossover_tmp, literals-split);
-                }
-                // mutation
-                int to_mutate_pop = 0.6 * psize;
-                for(int i=0;i<to_mutate_pop;i++){
-                    int to_mutate = rand() % psize;
-                    for(int j=0;j<literals;j++){
-                        if(rand() % 1000 == 0){
-                            pop[to_mutate * literals + j] = !pop[to_mutate * literals + j];
-                        }
-                    }
-                }
-            }
-            delete [] fitness;
-            delete [] pop;
-            delete [] second_pop;
-            delete [] crossover_tmp;
-            auto end = chrono::high_resolution_clock::now();
-            chrono::duration<double> running_time = end-start;
-            // report
-            // popsize;literals;clauses;iterations;threads;executed_iterations;time
-            outfile << psize << ';' << literals << ';' << clauses << ';' << iterations << ';';
-            outfile << num_threads << ';' << iter << ';';
-            outfile << running_time.count() << endl;
-            delete_problem(p);
-        }
-    }
-    // clean and exit
+    alg(popsize, literals, clauses, repeat, min_iters, max_time, counter, queue,outfile,num_threads, iterations);    // clean
     exit(0);
 }
