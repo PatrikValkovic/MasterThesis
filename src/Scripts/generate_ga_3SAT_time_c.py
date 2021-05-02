@@ -62,6 +62,7 @@ for job_id, (popsize,) in combinations:
         print("cp -r \"/storage/praha1/home/kowalsky/MasterThesis/src/Scripts\" \"$SCRATCHDIR\"", file=f)
         print("cd \"$SCRATCHDIR/Scripts\"", file=f)
         print(file=f)
+        print("chmod +x ./ga.exe", file=f)
         print(f"./ga.exe", end=" ", file=f)
         print(f"800", end=" ", file=f) # literals
         print(f"3600", end=" ", file=f) # clauses
@@ -72,6 +73,7 @@ for job_id, (popsize,) in combinations:
         print(f"8", end=" ", file=f) # threads
         print(f"100", end=" ", file=f) # min iterations
         print(f"60", end=" ", file=f) # max time
+        print(file=f)
         print(f'cp tmp.out "$PBS_O_WORKDIR/$REALJOBID.out"', end=" ", file=f)
         print(file=f)
         print(file=f)
