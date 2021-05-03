@@ -1,11 +1,11 @@
 \chapter{Evaluation}
 
-\todo{Sem neco dopsat.}
+In this chapter, I will begin by introducing testing problems, against which I will evaluate the implementation. The subsequent section describes the hardware specification of the machines I tested the implementation on. The discussion about the results is in the last section with selected measurements. You can see complete results in appendix chapter \ref{chap:results}. The hyperparameters used for these measurements are in appendix chapter \ref{chap:hyperparameters}.
 
 
 
 
-\section{Problem description}
+\section{Problems description}
 
 For the \acrlong{acc:ga} evolution I used \acrshort{acc:sat} and \acrshort{acc:3sat} problems with various number of literals and clauses. The fitness function sum number of unsatisfied (for minimization problem) or satisfied (for maximization problem) clauses. I implemented the fitness evaluation is a vectorized manner in PyTorch, so the whole population is evaluated at once. I generate new problem for every new measurement and all the problems has been satisfiable. I achieved that by generating first assignment of all the literals and then generating desired number of clauses, such that at least one literal in each clause match the value with his corresponding counterpart in the previously generated assignment. Because I am more concerned with the running time of the algorithm rather that its performance, the satisfiability of the formulas do not make a big impact on the measurements.
 
@@ -17,7 +17,7 @@ For the \acrlong{acc:pso} and real--coded evolutionary algorithms I used well--e
 
 To eliminate possible algorithm's bias toward specific area of the search space, the functions are randomly shifted. The $\mathbf{x}^{opt}$ specifies the position of the optimum. The optimum is always kept in the $\left[-5,5\right]$ interval in each dimension. Moreover, to eliminate dependency of the algorithm on the absolute value of the function, the functions value is shifted by the $f_{opt}$ value sampled from the Cauchy distribution with zero mean and scale equal $100$. This make it more difficult to use directly proportional--based selection operators, because the optimum value differ each run and may be even negative. Clearly, the algorithm do not know the $\mathbf{x}^{opt}$ and $f_{opt}$ values and these are only used for the measurements. Except $\mathbf{x}^{opt}$ and $f_{opt}$, the functions may have other parameters (typically rotation matrices $\mathbf{R}$ and $\mathbf{Q}$, or diagonal scaling matrix $\Lambda$), that I will not describe here. You can see the exact definition in the \acrshort{acc:bbob} specification \citep{hansen2010comparing}. These parameters are initialized randomly before each run. Lastly, the functions allows to specify their dimension $D$ at runtime and the parameters are initialized accordingly. It is therefore easy to evaluate the algorithm on the same function with different number of dimensions and therefore on the problem with different difficulty.
 
-I chose the following functions to evaluate the implementation. Note that not all the aspects of the algorithms were tested on all of these functions.
+I chose the following functions to evaluate the implementation. Not all the aspects of the algorithms were tested on all of these functions.
 \begin{itemize}
     \item Function $f_1$ -- sphere function, that is unimodal, highly symmetric, rotationally and scale invariant. Sphere function is probably the simplest one, and can be easily solved using local search techniques.
     \begin{align*}
@@ -41,7 +41,6 @@ I chose the following functions to evaluate the implementation. Note that not al
         f_{15} &= 10\left( D-\sum_{i=1}^D \cos\left(2 \pi z_i\right) \right) + \norm{\mathbf{z}}^2+f_{opt} \\
         \mathbf{z} &= \mathbf{R}\Lambda^{10}\mathbf{Q}T_{asy}^{0.2} \left( T_{osz}\left(\mathbf{R}\left(\mathbf{z}-\mathbf{x}^{opt}\right)\right) \right)
     \end{align*}
-    \clearpage
     \item Function $f_{19}$ -- composite Griewank--Rosenbrock function. This function is highly multimodal and noisy.
     \begin{align*}
         f_{19}\left(\mathbf{x}\right) &= \frac{10}{D-1}\sum_{i=1}^{D-1}\left( \frac{s_i}{4000} - \cos\left(s_i\right) \right) + 10 + f_{opt}\\
@@ -72,7 +71,7 @@ I chose the following functions to evaluate the implementation. Note that not al
                 \alpha_i \in \left\{1000^{2\frac{j}{19}}|j=0,\dots,19\right\} &
                     \begin{array}{l}
                         \text{sampled randomly without} \\
-                        \text{replacement otherwise}
+                        \text{replacement for}\ i \neq 1
                     \end{array}
             \end{array}
         \right.
@@ -84,13 +83,71 @@ I chose the following functions to evaluate the implementation. Note that not al
             &+ 10\left(D-\sum_{i=1}^D \cos\left(2\pi z_i\right)\right)
             + 10^4 f_{pen}\left(\mathbf{x}\right) \\
         \hat{\mathbf{x}} &= 2 \text{sign}\left(\mathbf{x}^{opt}\right) \bigotimes \mathbf{x} \\
-        \mathbf{x}^{opt} &= \mu_0 \mathbf{1} \\
+        \mathbf{x}^{opt} &= \mu_0 \mathbf{1}^{+}_{-} \\
         \mathbf{z} &= \mathbf{Q}\Lambda^{100}\mathbf{R}\left(\hat{\mathbf{x}}-\mu_0\mathbf{1}\right) \\
         \mu_0&=2.5,\mu_1=-\sqrt{\frac{\mu_0^2-d}{s}}, s=1-\frac{1}{2\sqrt{D+20}-8.2},d=1
     \end{align*}
 \end{itemize}
 
+I reimplement all the \acrshort{acc:bbob} functions in PyTorch. They are fully vectorized, so the whole population can be evaluated at once. The implementation of these function is in the attachment, and is also available as can be installed from PyPI as the \href{https://pypi.org/project/BBOBtorch/}{\textit{BBOBtorch}} package.
 
 
 
-\section{\todo{Hardware descrption}}
+\section{Hardware specification}
+
+I run all my experiments in \href{https://metavo.metacentrum.cz/en/}{MetaCentrum}. For workloads running on \cpu I used servers with specification in table \ref{tab:cpuspec}. For \gpu specialized tasks I used servers with hardware specified in table \ref{tab:gpuspec}.
+
+
+\begin{table}[t]
+    \begin{subtable}[b]{0.4\textwidth}
+        \begin{tabular}[b]{|l|l|}
+            \hline
+            CPU     &   AMD EPYC 7452 \\
+            \hline
+            RAM     &   $256$ GiB \\
+            \hline
+            Disk    &   $2\times4$ TB HDD \\
+            \hline
+            Owner   &   \makecell{Faculty of Science,\\Charles University} \\
+            \hline
+        \end{tabular}
+        \caption{Hardware specification for \acrshort*{acc:cpu} measurements}
+        \label{tab:cpuspec}
+    \end{subtable}
+    \hfill
+    \begin{subtable}[b]{0.55\textwidth}
+        \begin{tabular}[b]{|l|l|}
+            \hline
+            CPU     &   Intel\textsuperscript{\textregistered} {X}eon\textsuperscript{\textregistered} Gold 5218 \\
+            \hline
+            RAM     &   $192$ GiB \\
+            \hline
+            Disk    &   $4\times240$ GB SSD \\
+            \hline
+            GPU     &   nVidia Tesla T4 \\
+            \hline
+            GPU memory     &   16GB \\
+            \hline
+            \cuda cores     &   2560 \\
+            \hline
+            Tensor cores     &   320 \\
+            \hline
+            Owner   &   CESNET \\
+            \hline
+        \end{tabular}
+        \caption{Hardware specification for \acrshort*{acc:gpu} measurements}
+        \label{tab:gpuspec}
+    \end{subtable}
+    \caption{Hardware specification of server implementation was tested on}
+\end{table}
+
+One drawback of using MetaCentrum is that the machines are shared amongst the academic community of the Czech Republic. I could not block the whole machine for a longer period of time, especially because it would not be morally correct. I have done all the \cpu workloads using tasks with eight cores allocated, and all the \gpu workloads with two cores.
+
+While some of the resource, for example \gpu and RAM memory, are allocated exclusively to the running task, other, for example disk, network bandwidth, and \cpu to some extent, are not. The \cpu situation is further complicated by the Hyper--Threading technology. This technology duplicate one physical processor core into two logical ones. While the first may use the full utilization of the core, the second one uses the idle portion of it. All the processors currently installed in the MetaCentrum, including the AMD EPYC 7452 processor, dispose this technology. As the goal of this work is focused on the computation quantity rather than on the raw computation power, measurements done on this second logical core may have significant impact on the execution time, especially for the \cpu workloads. I did my best to mitigate this issue by allocating extra cores, running the measurements during unoccupied hours, and running the measurements on the same machine, so no other user could interfere. Nevertheless, the measurements may still be noisy.
+
+
+
+
+\section{Results discussion}
+
+\todo{Pokračovat.}
