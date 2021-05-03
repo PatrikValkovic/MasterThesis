@@ -135,6 +135,11 @@ Problem create_problem(int literals, int clauses, int literals_in_clause){
                 lit *= -1;
             formula[i][j]=lit;
         }
+        int to_change = rand() % (literals_in_clause-1);
+        for(int j=0;j<to_change;j++){
+        	int literal_to_change = rand() % literals_in_clause;
+        	formula[i][literal_to_change] *= -1;
+        }
     }
     Problem p;
     p.literals = literals;
