@@ -3,8 +3,9 @@ export TEXINPUTS=../tex//:
 all: thesis.pdf abstract.pdf
 
 # LaTeX must be run multiple times to get references right
-thesis.pdf: thesis.tex $(wildcard *.tex) bibliography.bib thesis.xmpdata
+thesis.pdf: thesis.tex $(wildcard *.tex) bibliography.bib bibliographyintro.bib thesis.xmpdata
 	pdflatex $<
+	makeglossaries thesis
 	bibtex thesis
 	pdflatex $<
 	pdflatex $<

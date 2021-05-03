@@ -1,3 +1,96 @@
 \chapter{Evaluation}
 
-\todo{write evaluation}
+\todo{Sem neco dopsat.}
+
+
+
+
+\section{Problem description}
+
+For the \acrlong{acc:ga} evolution I used \acrshort{acc:sat} and \acrshort{acc:3sat} problems with various number of literals and clauses. The fitness function sum number of unsatisfied (for minimization problem) or satisfied (for maximization problem) clauses. I implemented the fitness evaluation is a vectorized manner in PyTorch, so the whole population is evaluated at once. I generate new problem for every new measurement and all the problems has been satisfiable. I achieved that by generating first assignment of all the literals and then generating desired number of clauses, such that at least one literal in each clause match the value with his corresponding counterpart in the previously generated assignment. Because I am more concerned with the running time of the algorithm rather that its performance, the satisfiability of the formulas do not make a big impact on the measurements.
+
+The problem formula is kept as a matrix, where rows correspond to clauses and columns to indices of literals in the clause. For a negative literal, the index is negative. This coding is efficient for \acrshort{acc:3sat} problem, but I run into a problem with generic \acrshort{acc:sat} problem with diverse number of literals in clause. Because the tensors in PyTorch need to be aligned in each dimension, I transform genetic \acrshort{acc:sat} problem into $k$-SAT problem, where $k$ is equal to the length of the longest clause. The shorter clauses duplicate their first literal, so their truth evaluation does not change and have exactly $k$ literals. This may lead to a considerable inefficiency if the length variance between clauses is high. It may be worth divide long clauses into smaller one to reduce overall size of the tensor and save some memory and computation. I believe this is not a serious obstacle for a broader application of the implementation.
+
+The implementation process files in the \textit{DIMACS CNF} format, which is the general and standard file format to define Boolean expression written in conjunctive normal form \citep{challenge1993satisfiability}. The implementation of the evaluation and the parser, along the script that generates the problems for the measurements, are in the attachment.
+
+For the \acrlong{acc:pso} and real--coded evolutionary algorithms I used well--established \acrfull{acc:coco} \acrfull{acc:bbob} test suite \citep{hansen2010comparing}. The suite consists of $24$ functions in $5$ groups with increasing difficulty. The groups vary in separability, conditioning, unimodality, and global structure. It would not be feasible for me to measure the algorithm on all of them. Furthermore, as I am more interested in the running time of the algorithm, there is no need to evaluate the implementation on all of them. The shifts in the running time would be caused primarily by the speed of the function evaluation rather than the algorithm itself.
+
+To eliminate possible algorithm's bias toward specific area of the search space, the functions are randomly shifted. The $\mathbf{x}^{opt}$ specifies the position of the optimum. The optimum is always kept in the $\left[-5,5\right]$ interval in each dimension. Moreover, to eliminate dependency of the algorithm on the absolute value of the function, the functions value is shifted by the $f_{opt}$ value sampled from the Cauchy distribution with zero mean and scale equal $100$. This make it more difficult to use directly proportional--based selection operators, because the optimum value differ each run and may be even negative. Clearly, the algorithm do not know the $\mathbf{x}^{opt}$ and $f_{opt}$ values and these are only used for the measurements. Except $\mathbf{x}^{opt}$ and $f_{opt}$, the functions may have other parameters (typically rotation matrices $\mathbf{R}$ and $\mathbf{Q}$, or diagonal scaling matrix $\Lambda$), that I will not describe here. You can see the exact definition in the \acrshort{acc:bbob} specification \citep{hansen2010comparing}. These parameters are initialized randomly before each run. Lastly, the functions allows to specify their dimension $D$ at runtime and the parameters are initialized accordingly. It is therefore easy to evaluate the algorithm on the same function with different number of dimensions and therefore on the problem with different difficulty.
+
+I chose the following functions to evaluate the implementation. Note that not all the aspects of the algorithms were tested on all of these functions.
+\begin{itemize}
+    \item Function $f_1$ -- sphere function, that is unimodal, highly symmetric, rotationally and scale invariant. Sphere function is probably the simplest one, and can be easily solved using local search techniques.
+    \begin{align*}
+        f_{1}\left(\mathbf{x}\right) &= \norm{\mathbf{z}}^2+f_{opt} \\
+        \mathbf{z} &= \mathbf{x} - \mathbf{x}^{opt}
+    \end{align*}
+    \item Function $f_7$ -- step ellipsoidal function. This function is unimodal, non--separable and has low conditioning. Because of the step nature of the algorithm, it has many plateaus with zero gradient, so the gradient--based methods would not be very successful. Nevertheless, the function still exhibit ellipsoidal shape. 
+    \begin{align*}
+        f_{7}\left(\mathbf{x}\right) &= 0.1\max\left( \frac{\abs{\hat{z}_1}}{10^4}, \sum_{i=0}^D 10^{2\frac{i-1}{D-i}}z_i^2 \right) + f_{pen}\left( \mathbf{x} \right)+f_{opt} \\
+        \hat{\mathbf{z}} &= \Lambda^{10}\mathbf{R} \left( \mathbf{x} - \mathbf{x}^{opt} \right) \\
+        \tilde{z}_i &=\left\{ 
+            \begin{array}{ll}
+                \lceil 0.5 + \hat{z}_i \rceil       & \text{if}\ \hat{z}_i>0.5 \\
+                \lceil 0.5 + 10\hat{z}_i\rceil / 10 & \text{otherwise}        \\
+            \end{array}  
+            \right. \\
+        \mathbf{z} &= \mathbf{Q}\mathbf{\tilde{z}} 
+    \end{align*}
+    \item Function $f_{15}$ -- Rastrigin function, that is non--separable, have roughly $10^D$ local optimima, low conditioning and local amplitude large compared to local amplitudes. The function is highly multimodal and is not symetric or regular.
+    \begin{align*}
+        f_{15} &= 10\left( D-\sum_{i=1}^D \cos\left(2 \pi z_i\right) \right) + \norm{\mathbf{z}}^2+f_{opt} \\
+        \mathbf{z} &= \mathbf{R}\Lambda^{10}\mathbf{Q}T_{asy}^{0.2} \left( T_{osz}\left(\mathbf{R}\left(\mathbf{z}-\mathbf{x}^{opt}\right)\right) \right)
+    \end{align*}
+    \clearpage
+    \item Function $f_{19}$ -- composite Griewank--Rosenbrock function. This function is highly multimodal and noisy.
+    \begin{align*}
+        f_{19}\left(\mathbf{x}\right) &= \frac{10}{D-1}\sum_{i=1}^{D-1}\left( \frac{s_i}{4000} - \cos\left(s_i\right) \right) + 10 + f_{opt}\\
+        \mathbf{z} &= \max\left(1,\frac{\sqrt{D}}{8}\right)\mathbf{R}\mathbf{x}+0.5 \\
+        s_i &= 100 \left(z_i^2 - z_{i+1}\right)^2 + \left(z_i-1\right)^2 \\
+        \mathbf{z}_{opt} &= \mathbf{1}
+    \end{align*}
+    \item Function $f_{22}$ -- Gallagher's Gaussian 21--hi peaks function with 21 unrelated and random optimas.
+    \begin{align*}
+        f_{22}\left(\mathbf{x}\right) &= T_{osz}\left( 
+            10 - \max_{i=1}^{21} w_i \exp\left( -\frac{1}{2D}\left(\mathbf{x}-\mathbf{y_i}\right)^T\mathbf{R}^T\mathbf{C}_i\mathbf{R}\left(\mathbf{x}-\mathbf{y_i}\right) \right) 
+        \right)^2 + \\
+        & + f_{pen}(\mathbf{x}) + f_{opt} \\
+        w_i &= \left\{
+            \begin{array}{ll}
+                1.1+8\frac{i-2}{19} & \text{for}\ i=2,\dots,21 \\
+                10                  & \text{for}\ i=1 \\
+            \end{array}
+        \right.
+        \\
+        \mathbf{C}_i &= \Lambda^{\alpha_i} / \sqrt[4]{\alpha_i} \\
+        \alpha_i &= \left\{ 
+            \begin{array}{ll}
+                \alpha_i = 10^6 & 
+                    \begin{array}{l}
+                        \text{for}\ i=1
+                    \end{array} \\
+                \alpha_i \in \left\{1000^{2\frac{j}{19}}|j=0,\dots,19\right\} &
+                    \begin{array}{l}
+                        \text{sampled randomly without} \\
+                        \text{replacement otherwise}
+                    \end{array}
+            \end{array}
+        \right.
+    \end{align*}
+    \item Function $f_{24}$ -- Lunacek bi--Rastrigin function. This function is highly multimodal and deceptive, because of the promising area with local optima.
+    \begin{align*}
+        f_{24}\left(\mathbf{x}\right) &=
+            \min\left( \sum_{i=1}^D\left(\hat{x}_i-\mu_0\right)^2, dD+s\sum_{i=1}^D\left(\hat{x}_i-\mu_1\right)^2 \right) + \\
+            &+ 10\left(D-\sum_{i=1}^D \cos\left(2\pi z_i\right)\right)
+            + 10^4 f_{pen}\left(\mathbf{x}\right) \\
+        \hat{\mathbf{x}} &= 2 \text{sign}\left(\mathbf{x}^{opt}\right) \bigotimes \mathbf{x} \\
+        \mathbf{x}^{opt} &= \mu_0 \mathbf{1} \\
+        \mathbf{z} &= \mathbf{Q}\Lambda^{100}\mathbf{R}\left(\hat{\mathbf{x}}-\mu_0\mathbf{1}\right) \\
+        \mu_0&=2.5,\mu_1=-\sqrt{\frac{\mu_0^2-d}{s}}, s=1-\frac{1}{2\sqrt{D+20}-8.2},d=1
+    \end{align*}
+\end{itemize}
+
+
+
+
+\section{\todo{Hardware descrption}}
