@@ -1,4 +1,5 @@
 \chapter{Results}
+\label{chap:results}
 
 All the algorithms were run with hyperparameters from chpater \ref{chap:hyperparameters}. Each configuration run a hundred times and the plotted values are mean of specified metric.
 
@@ -120,7 +121,7 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
         \includegraphics[width=0.8\textwidth]{img/runs/fitness_ga_3SAT_legend.pdf}
     \end{minipage}
 
-    \caption[Fitness of genetic algorithm with elitism]{Fitness of \acrlong{acc:ga} with elitism on \acrshort{acc:3sat} problem. Algorithm run for maximum of $1000$ generations and had $4.5$ times number of clauses than the literals.}
+    \caption[Fitness of genetic algorithm with elitism]{Fitness of \acrlong{acc:ga} with elitism on \acrshort{acc:3sat} problem. Algorithm run for maximum of $1000$ generations and had $4.5$ times number of clauses than the literals. The graphs show $0.05$ quantile of the fitness function.}
 \end{figure}
 
 
@@ -170,6 +171,28 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
     \end{minipage}
 
     \caption[Running time of selection operators]{Running time of \acrlong{acc:ga} with various selection operators. The algorithm were solving \acrshort{acc:3sat} problem with $1000$ literals and $4500$ clauses, and run for $1000$ generations.}
+\end{figure}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                      %%
+%%   CPP IMPLEMENTACE   %%
+%%                      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{figure}[ht!]
+    \centering
+    \begin{minipage}[t]{0.9\textwidth}
+        \includegraphics[width=\textwidth]{img/runs/time_ga_c.pdf}
+    \end{minipage}
+
+    \begin{minipage}[t]{0.9\textwidth}
+        \includegraphics[width=\textwidth]{img/runs/time_ga_c_legend.pdf}
+    \end{minipage}
+
+    \caption[Comparison of PyTorch and \cpp implementation]{Running time of \acrlong{acc:ga} implemented in PyTorch and \cppns. The algorithm were solving \acrshort{acc:3sat} problem with $800$ literals and $3600$ clauses, and run for $1000$ generations. The \cpp implementation used the master--worker approach to evaluate fitness function in parallel.}
 \end{figure}
 
 
@@ -571,7 +594,7 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
         \includegraphics[width=0.6\textwidth]{img/runs/time_pso_neigh_legend.pdf}
     \end{minipage}
 
-    \caption[PSO2006 neighborhood running time]{Running time of \acrlong{acc:spso2011} algorithm with different neighborhood types. The algorithm run for 1000 generations on problem with 128 dimensions. Neighborhood sizes are at table \ref{tab:psohyperparameters}. The nearest neighborhood topology was run only to population of size 4900, as it compares all pairs of individuals and the device does not have enough memory. The minimum population size for grid topologies were 225, because topologies size were specified as a fraction of population size and for smaller populations neighborhood could not be constructed. The grid topologies were always assembled into square. Running times of circle, linear grid, compact grid, and diamond grid were almost identical (depending only on the size of neighborhood, see chapter \ref{chap:impl}), so I plot only measurements for circle and diamond grid.}
+    \caption[PSO2006 neighborhood running time]{Running time of \acrlong{acc:spso2006} algorithm with different neighborhood types. The algorithm run for 1000 generations on problem with 128 dimensions. Neighborhood sizes are at table \ref{tab:psohyperparameters}. The nearest neighborhood topology was run only to population of size 4900, as it compares all pairs of individuals and the device does not have enough memory. The minimum population size for grid topologies were 225, because topologies size were specified as a fraction of population size and for smaller populations neighborhood could not be constructed. The grid topologies were always assembled into square. Running times of circle, linear grid, compact grid, and diamond grid were almost identical (depending only on the size of neighborhood, see chapter \ref{chap:impl}), so I plot only measurements for circle and diamond grid.}
 \end{figure}
 
 

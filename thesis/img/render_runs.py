@@ -14,12 +14,10 @@ import gzip
 import traceback
 import math
 
-from tensorflow.lite.python import lite
-
 CACHE_DIR = 'D:\\runscache'
 api = wandb.Api()
-FIGSIZE=(6, 4)
 FIGISZE_BIG=(12,8)
+FIGSIZE=(6, 4)
 
 #region support
 class MyRun:
@@ -44,6 +42,7 @@ class MyRun:
         if not os.path.exists(f'{CACHE_DIR}/{h.hexdigest()}.run') or restore_files:
             runs = api.runs(f'kowalsky/thesis', filters=filters)
             runs = [MyRun(run, keep_history) for run in runs]
+            runs = list(filter(lambda run: 'iteration' in run.summary, runs))
             with gzip.open(f'{CACHE_DIR}/{h.hexdigest()}.run', 'wb') as f:
                 pickle.dump(runs, f)
         else:
@@ -53,7 +52,7 @@ class MyRun:
             print(f"\n{h.hexdigest()}.run for\n{as_str}\nHas {len(runs)} runs")
         return runs
 def new_group(name):
-    exit()
+    #exit()
     print(f"RUNNING {name}")
 def round_plotup(val, pos=0):
     base = math.floor(math.log10(val)) - pos
@@ -77,14 +76,256 @@ def plot_generatelogticks(minval, maxval, ticks):
 #endregion
 
 
-#region GA selection times
-#new_group('GA selection time')
+#region running time C vs PyTorch
+new_group('GA running time PyTorch vs C')
 NUM_Y_TICKS = 7
 POP_SIZES = [32,128,200,512,1024,2048,5000,10240,16384,32768]
+TO_MEASURE = 'total_real_time'
+plt.figure(figsize=FIGISZE_BIG)
+maxval, minval = -math.inf, math.inf
+# C 1 core
+for _ in range(1):
+    runs = MyRun.load_and_cache({
+        "$and": [
+            {'state': 'finished'},
+            {'config.run_failed.value': False},
+            {'config.alg_group.value': 'ga_c'},
+            {'config.run_type.value': 'time'},
+            {'config.threads.value': 1},
+            {'config.pop_size.value': {'$in': POP_SIZES}},
+        ]
+    })
+    if len(runs) == 0:
+        print("Warning, 0 runs for GA C implementation with 1 thread")
+        continue
+    measure = np.zeros(len(POP_SIZES))
+    run_count = np.zeros(len(POP_SIZES))
+    for run in runs:
+        try:
+            s, c = run.summary, run.config
+            progress = s['iteration'] / s['max_iteration']
+            i = POP_SIZES.index(c['pop_size'])
+            measure[i] += s[TO_MEASURE] / progress
+            run_count[i] += 1
+        except:
+            traceback.print_exc()
+            print(run)
+    if np.any(run_count == 0):
+        print(f"\nWARNING, missing measurements for GA C with 1 thread for pop sizes {list(map(lambda x: POP_SIZES[x], np.where(run_count == 0)[0].tolist()))}")
+    measure = measure[run_count > 0] / run_count[run_count > 0]
+    minval, maxval = min(measure.min(), minval), max(measure.max(), maxval)
+    plt.plot(
+        np.array(POP_SIZES)[run_count > 0],
+        measure,
+        c='tab:blue',
+        linestyle='-',
+    )
+# C 8 core
+for _ in range(1):
+    runs = MyRun.load_and_cache({
+        "$and": [
+            {'state': 'finished'},
+            {'config.run_failed.value': False},
+            {'config.alg_group.value': 'ga_c'},
+            {'config.run_type.value': 'time'},
+            {'config.threads.value': 8},
+            {'config.pop_size.value': {'$in': POP_SIZES}},
+        ]
+    })
+    if len(runs) == 0:
+        print("Warning, 0 runs for GA C implementation with 8 thread")
+        continue
+    measure = np.zeros(len(POP_SIZES))
+    run_count = np.zeros(len(POP_SIZES))
+    for run in runs:
+        try:
+            s, c = run.summary, run.config
+            progress = s['iteration'] / s['max_iteration']
+            i = POP_SIZES.index(c['pop_size'])
+            measure[i] += s[TO_MEASURE] / progress
+            run_count[i] += 1
+        except:
+            traceback.print_exc()
+            print(run)
+    if np.any(run_count == 0):
+        print(f"\nWARNING, missing measurements for GA C with 8 thread for pop sizes {list(map(lambda x: POP_SIZES[x], np.where(run_count == 0)[0].tolist()))}")
+    measure = measure[run_count > 0] / run_count[run_count > 0]
+    minval, maxval = min(measure.min(), minval), max(measure.max(), maxval)
+    plt.plot(
+        np.array(POP_SIZES)[run_count > 0],
+        measure,
+        c='tab:orange',
+        linestyle='-',
+    )
+# PyTorch CPU 1 core
+for _ in range(1):
+    runs = MyRun.load_and_cache({
+        "$and": [
+            {'state': 'finished'},
+            {'config.run_failed.value': False},
+            {'config.alg_group.value': 'ga_1core'},
+            {'config.run_type.value': 'time'},
+            {'config.pop_size.value': {'$in': POP_SIZES}},
+        ]
+    })
+    if len(runs) == 0:
+        print("Warning, 0 runs for GA PyTorch CPU implementation with 1 thread")
+        continue
+    measure = np.zeros(len(POP_SIZES))
+    run_count = np.zeros(len(POP_SIZES))
+    for run in runs:
+        try:
+            s, c = run.summary, run.config
+            progress = s['iteration'] / s['max_iteration']
+            i = POP_SIZES.index(c['pop_size'])
+            measure[i] += s[TO_MEASURE] / progress
+            run_count[i] += 1
+        except:
+            traceback.print_exc()
+            print(run)
+    if np.any(run_count == 0):
+        print(f"\nWARNING, missing measurements for GA PyTorch CPU with 1 thread for pop sizes {list(map(lambda x: POP_SIZES[x], np.where(run_count == 0)[0].tolist()))}")
+    measure = measure[run_count > 0] / run_count[run_count > 0]
+    minval, maxval = min(measure.min(), minval), max(measure.max(), maxval)
+    plt.plot(
+        np.array(POP_SIZES)[run_count > 0],
+        measure,
+        c='tab:green',
+        linestyle='-',
+    )
+# PyTorch CPU 8 core
+for _ in range(1):
+    runs = MyRun.load_and_cache({
+        "$and": [
+            {'state': 'finished'},
+            {'config.run_failed.value': False},
+            {'config.alg_group.value': 'ga_1'},
+            {'config.run_type.value': 'time'},
+            {'config.device.value': 'cpu'},
+            {'config.sat.literals.value': 800},
+            {'config.ga.elitism.value': False},
+            {'config.pop_size.value': {'$in': POP_SIZES}},
+        ]
+    })
+    if len(runs) == 0:
+        print("Warning, 0 runs for GA PyTorch CPU implementation with 8 thread")
+        continue
+    measure = np.zeros(len(POP_SIZES))
+    run_count = np.zeros(len(POP_SIZES))
+    for run in runs:
+        try:
+            s, c = run.summary, run.config
+            progress = s['iteration'] / s['max_iteration']
+            i = POP_SIZES.index(c['pop_size'])
+            measure[i] += s[TO_MEASURE] / progress
+            run_count[i] += 1
+        except:
+            traceback.print_exc()
+            print(run)
+    if np.any(run_count == 0):
+        print(f"\nWARNING, missing measurements for GA PyTorch CPU with 8 thread for pop sizes {list(map(lambda x: POP_SIZES[x], np.where(run_count == 0)[0].tolist()))}")
+    measure = measure[run_count > 0] / run_count[run_count > 0]
+    minval, maxval = min(measure.min(), minval), max(measure.max(), maxval)
+    plt.plot(
+        np.array(POP_SIZES)[run_count > 0],
+        measure,
+        c='tab:red',
+        linestyle='-',
+    )
+# PyTorch CUDA core
+for _ in range(1):
+    runs = MyRun.load_and_cache({
+        "$and": [
+            {'state': 'finished'},
+            {'config.run_failed.value': False},
+            {'config.alg_group.value': 'ga_1'},
+            {'config.run_type.value': 'time,fitness'},
+            {'config.device.value': 'cuda'},
+            {'config.sat.literals.value': 800},
+            {'config.ga.elitism.value': False},
+            {'config.pop_size.value': {'$in': POP_SIZES}},
+        ]
+    })
+    if len(runs) == 0:
+        print("Warning, 0 runs for GA PyTorch CUDA implementation")
+        continue
+    measure = np.zeros(len(POP_SIZES))
+    run_count = np.zeros(len(POP_SIZES))
+    for run in runs:
+        try:
+            s, c = run.summary, run.config
+            progress = s['iteration'] / s['max_iteration']
+            i = POP_SIZES.index(c['pop_size'])
+            measure[i] += s[TO_MEASURE] / progress
+            run_count[i] += 1
+        except:
+            traceback.print_exc()
+            print(run)
+    if np.any(run_count == 0):
+        print(f"\nWARNING, missing measurements for GA PyTorch CUDA for pop sizes {list(map(lambda x: POP_SIZES[x], np.where(run_count == 0)[0].tolist()))}")
+    measure = measure[run_count > 0] / run_count[run_count > 0]
+    minval, maxval = min(measure.min(), minval), max(measure.max(), maxval)
+    plt.plot(
+        np.array(POP_SIZES)[run_count > 0],
+        measure,
+        c='tab:gray',
+        linestyle='-',
+    )
+
+plt.title(f"PyTorch versus C implementation")
+plt.xscale('log')
+plt.yscale('log')
+plt.xticks([32, 128, 512, 2048, 10240, 32768])
+plt.gca().get_xaxis().set_major_formatter(mticker.ScalarFormatter())
+plt.gca().get_xaxis().set_tick_params(which='minor', size=0)
+plt.xlim(32, 32768)
+plt.xlabel('Population size')
+minval = round_plotdown(minval)
+maxval = round_plotup(maxval)
+plt.ylim(minval, maxval)
+plt.yticks(plot_generatelogticks(minval, maxval, NUM_Y_TICKS))
+plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter(useOffset=False))
+plt.minorticks_off()
+plt.ylabel('Running time [s]')
+plt.savefig(f"runs/time_ga_c.pdf")
+plt.close()
+
+fig2 = plt.figure()
+ax2 = fig2.add_subplot()
+ax2.axis('off')
+legend = ax2.legend([
+    mlines.Line2D([0],[0], linestyle='-', c='tab:blue'),
+    mlines.Line2D([0],[0], linestyle='-', c='tab:orange'),
+    mlines.Line2D([0], [0], linestyle='-', c='tab:green'),
+    mlines.Line2D([0], [0], linestyle='-', c='tab:red'),
+    mlines.Line2D([0], [0], linestyle='-', c='tab:gray'),
+], [
+    'C with 1 core',
+    'C with 8 cores',
+    'PyTorch with 1 core',
+    'PyTorch with 8 cores',
+    'PyTorch on GPU',
+], frameon=False, loc='lower center', ncol=10, )
+fig2 = legend.figure
+fig2.canvas.draw()
+bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+fig2.savefig(
+    f"runs/time_ga_c_legend.pdf",
+    dpi="figure",
+    bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+)
+plt.close(fig2)
+#endregion
+
+#region GA selection times
+new_group('GA selection time')
+NUM_Y_TICKS = 7
+POP_SIZES = [32,128,200,512,1024,2048,5000,10240,16384]
 SELECTIONS = [
     {'label': 'Tournament selection', 'key': 'Tournament', 'c': 'tab:blue'},
     {'label': 'Roulette selection', 'key': 'Roulette', 'c': 'tab:orange'},
     {'label': 'Stochastic Universal Sampling', 'key': 'StochasticUniversalSampling', 'c': 'tab:green'},
+    {'label': 'Rank selection', 'key': 'Sequence', 'c': 'tab:red'},
 ]
 TO_MEASURE = 'total_real_time'
 plt.figure(figsize=FIGISZE_BIG)
@@ -100,7 +341,7 @@ for selection in progressbar(SELECTIONS):
             {'config.pop_size.value': {'$in': POP_SIZES}},
             {'config.ga.selection.value': selection['key']},
         ]
-    }, reporting_metric=True)
+    })
     measure = np.zeros(len(POP_SIZES))
     run_count = np.zeros(len(POP_SIZES))
     for run in runs:
@@ -131,7 +372,7 @@ for selection in progressbar(SELECTIONS):
             {'config.pop_size.value': {'$in': POP_SIZES}},
             {'config.ga.selection.value': selection['key']},
         ]
-    }, reporting_metric=True)
+    })
     measure = np.zeros(len(POP_SIZES))
     run_count = np.zeros(len(POP_SIZES))
     for run in runs:
@@ -155,10 +396,11 @@ for selection in progressbar(SELECTIONS):
 plt.title(f"Running time of selection operators")
 plt.xscale('log')
 plt.yscale('log')
-plt.xticks([32, 128, 512, 2048, 10240, 32768])
+plt.xticks([32,200,1024,5000,16384]) # TODO write
+#plt.xticks([32, 128, 512, 2048, 10240, 16384])
 plt.gca().get_xaxis().set_major_formatter(mticker.ScalarFormatter())
 plt.gca().get_xaxis().set_tick_params(which='minor', size=0)
-plt.xlim(32, 32768)
+plt.xlim(32, 16384)
 plt.xlabel('Literals')
 minval = round_plotdown(minval)
 maxval = round_plotup(maxval)
@@ -168,6 +410,7 @@ plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter(useOffset=Fals
 plt.minorticks_off()
 plt.ylabel('Running time [s]')
 plt.savefig(f"runs/time_ga_selections.pdf")
+plt.close()
 
 fig2 = plt.figure()
 ax2 = fig2.add_subplot()
@@ -191,7 +434,6 @@ fig2.savefig(
 plt.close(fig2)
 #endregion
 
-
 #region GA normal and elitism fitness
 new_group('GA fitness')
 NUM_Y_TICKS = 7
@@ -209,10 +451,9 @@ ELITISM=[False,True]
 for vars,elitism in progressbar(list(itertools.product(
     VARIABLES, ELITISM
 ))):
-    print()
     plt.figure(figsize=FIGSIZE)
     maxval = -math.inf
-    minval = math.inf
+    minval = 0
     iters_render = -1
     for psize in POP_SIZES:
         runs = MyRun.load_and_cache({
@@ -226,7 +467,6 @@ for vars,elitism in progressbar(list(itertools.product(
                 {'config.sat.literals.value': vars}
             ]
         }, keep_history=True)
-        runs = list(filter(lambda r: 'iteration' in r.summary, runs))
         if len(runs) < 10:
             print(f"\nWARNING: {len(runs)} runs for GA fitness with {vars} variables and {psize} individuals")
             continue
@@ -245,7 +485,6 @@ for vars,elitism in progressbar(list(itertools.product(
             medians.append(np.mean(cmedians))
             q05.append(np.mean(cq05))
             best.append(np.mean(cbest))
-        minval = min(minval, np.min(q05))
         maxval = max(maxval, np.max(q05))
         q05 = np.array(q05)
         if np.any(q05 == 0):
@@ -264,7 +503,7 @@ for vars,elitism in progressbar(list(itertools.product(
     maxval = round_plotup(maxval,pos=1 if vars==2000 else 0)
     plt.ylim(minval, maxval)
     plt.ylabel('Objective function')
-    plt.title(f"GA fitness of 3SAT{' with elitism' if elitism else ''} problem with {vars} literals")
+    plt.title(f"3SAT with {vars} literals")
     plt.savefig(f'runs/fitness_ga{"_elitism" if elitism else ""}_3SAT_d{vars}.pdf')
     plt.close()
 
@@ -388,7 +627,7 @@ for liters in LITERALS:
             c=scale['c'],
             linestyle='--',
         )
-    plt.title(f"Scale functions running times for {liters} literals")
+    plt.title(f"3SAT with {liters} literals")
     plt.xscale('log')
     plt.yscale('log')
     plt.xticks([32, 128, 512, 2048, 10240, 32768])
@@ -404,6 +643,7 @@ for liters in LITERALS:
     plt.minorticks_off()
     plt.ylabel('Running time [s]')
     plt.savefig(f"runs/time_ga_scale_{liters}l.pdf")
+    plt.close()
 
 fig2 = plt.figure()
 ax2 = fig2.add_subplot()
@@ -514,7 +754,7 @@ for vars, in progressbar(list(itertools.product(
         c=VAR_C[str(vars)],
         linestyle='--',
     )
-plt.title(f"Genetic algorithm with elitism for 3SAT problem")
+plt.title(f"Running time of genetic algorithm with elitism")
 plt.xscale('log')
 plt.yscale('log')
 plt.xticks([32, 128, 512, 2048, 10240, 32768])
@@ -528,6 +768,7 @@ plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter())
 plt.minorticks_off()
 plt.ylabel('Running time [s]')
 plt.savefig(f"runs/time_ga_elitism.pdf")
+plt.close()
 
 new_group('GA time')
 NUM_Y_TICKS = 7
@@ -614,7 +855,7 @@ for vars, in progressbar(list(itertools.product(
         c=VAR_C[str(vars)],
         linestyle='--',
     )
-plt.title(f"Genetic algorithm for 3SAT problem")
+plt.title(f"Running time of genetic algorithm")
 plt.xscale('log')
 plt.yscale('log')
 plt.xticks([32, 128, 512, 2048, 10240, 32768])
@@ -628,6 +869,7 @@ plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter())
 plt.minorticks_off()
 plt.ylabel('Running time [s]')
 plt.savefig(f"runs/time_ga.pdf")
+plt.close()
 
 fig2 = plt.figure()
 ax2 = fig2.add_subplot()
@@ -653,7 +895,6 @@ plt.close(fig2)
 
 #region GA clausecount times
 new_group('GA clausecount time')
-print('Clausecount')
 NUM_Y_TICKS = 7
 CLAUSES = [32,128,200,512,1024,2048,5000,10240,16384,32768]
 TO_MEASURE = 'total_real_time'
@@ -717,7 +958,7 @@ plt.plot(
     c='tab:orange',
     linestyle='-',
 )
-plt.title(f"Running time of 3SAT")
+plt.title(f"In respect to number of clauses")
 plt.xscale('log')
 plt.yscale('log')
 plt.xticks([32, 128, 512, 2048, 10240, 32768])
@@ -733,6 +974,7 @@ plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter(useOffset=Fals
 plt.minorticks_off()
 plt.ylabel('Running time [s]')
 plt.savefig(f"runs/time_ga_clausecount.pdf")
+plt.close()
 
 fig2 = plt.figure()
 ax2 = fig2.add_subplot()
@@ -756,7 +998,6 @@ plt.close(fig2)
 
 #region GA varcount times
 new_group('GA varcount time')
-print('Varcount')
 NUM_Y_TICKS = 7
 VARS = [32,128,200,512,1024,2048,5000,10240,16384,32768]
 TO_MEASURE = 'total_real_time'
@@ -820,7 +1061,7 @@ plt.plot(
     c='tab:orange',
     linestyle='-',
 )
-plt.title(f"Running time of 3SAT")
+plt.title(f"In respect to number of literals")
 plt.xscale('log')
 plt.yscale('log')
 plt.xticks([32, 128, 512, 2048, 10240, 32768])
@@ -836,6 +1077,7 @@ plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter(useOffset=Fals
 plt.minorticks_off()
 plt.ylabel('Running time [s]')
 plt.savefig(f"runs/time_ga_varcount.pdf")
+plt.close()
 
 fig2 = plt.figure()
 ax2 = fig2.add_subplot()
@@ -899,9 +1141,7 @@ for fn, dim, crossover in progressbar(list(itertools.product(
                 {'config.es.crossover.value': crossover['crossover']},
             ]
         }, keep_history=True)
-        print()
-        print(f"fn {fn}:{dim} for {crossover['label']}, runs: {len(runs)} for pop size {psize}")
-        print()
+        #print(f"fn {fn}:{dim} for {crossover['label']}, runs: {len(runs)} for pop size {psize}")
         max_iter = max(map(lambda r: r.summary['iteration'], runs))
         medians, q05, best = [], [], []
         for step in range(max_iter+1):
@@ -996,8 +1236,7 @@ for fn, dim in progressbar(list(itertools.product(
                 {'config.es.crossover.value': crossover['crossover']},
             ]
         })
-        print()
-        print(f"CROSSOVER for fn {fn}:{dim} - {crossover['label']} has {len(runs)} runs")
+        #print(f"CROSSOVER for fn {fn}:{dim} - {crossover['label']} has {len(runs)} runs")
         measure = np.zeros(len(POP_SIZES))
         run_count = np.zeros(len(POP_SIZES))
         for run in runs:
@@ -1032,8 +1271,7 @@ for fn, dim in progressbar(list(itertools.product(
                 {'config.es.crossover.value': crossover['crossover']},
             ]
         })
-        print()
-        print(f"CROSSOVER for fn {fn}:{dim} - {crossover['label']} has {len(runs)} runs")
+        #print(f"CROSSOVER for fn {fn}:{dim} - {crossover['label']} has {len(runs)} runs")
         measure = np.zeros(len(POP_SIZES))
         run_count = np.zeros(len(POP_SIZES))
         for run in runs:
@@ -1070,6 +1308,7 @@ for fn, dim in progressbar(list(itertools.product(
     plt.minorticks_off()
     plt.ylabel('Running time [s]')
     plt.savefig(f"runs/time_es_crossover_fn{fn}_{dim}d.pdf")
+    plt.close()
 
 fig2 = plt.figure()
 ax2 = fig2.add_subplot()
@@ -1098,6 +1337,12 @@ new_group('ES mutation fitness')
 NUM_Y_TICKS = 7
 POP_SIZES=[32, 512, 10240, 32768]
 MUTATIONS = ['AddFromNormal', 'AddFromCauchy', 'ReplaceUniform', 'AdaptiveStep']
+NAMES = {
+    'AddFromNormal': 'Normal',
+    'AddFromCauchy': 'Cauchy',
+    'ReplaceUniform': 'Replace',
+    'AdaptiveStep': 'Adaptive step',
+}
 PSIZE_C = {
     '32': 'tab:blue',
     '512': 'tab:orange',
@@ -1126,10 +1371,7 @@ for fn, dim, mut in progressbar(list(itertools.product(
                 {'config.es.mutation.value': mut}
             ]
         }, keep_history=True)
-        runs = list(filter(lambda r: 'iteration' in r.summary, runs))
-        print()
-        print(f"fn {fn} with {dim} dim for {mut}, runs: {len(runs)} for pop size {psize}")
-        print()
+        #print(f"fn {fn} with {dim} dim for {mut}, runs: {len(runs)} for pop size {psize}")
         max_iter = max(map(lambda r: r.summary['iteration'], runs))
         medians, q05, best = [], [], []
         for step in range(max_iter+1):
@@ -1163,7 +1405,7 @@ for fn, dim, mut in progressbar(list(itertools.product(
     plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter(useOffset=False))
     plt.minorticks_off()
     plt.ylabel('Objective function')
-    plt.title(f"{mut} mutation of $f_{{{fn}}}$ with {dim} dimensions")
+    plt.title(f"{NAMES[mut]} mutation of $f_{{{fn}}}$ with {dim} dimensions")
     plt.savefig(f'runs/fitness_es_mutation_f{fn}_dim{dim}_{mut}.pdf')
     plt.close()
 
@@ -1195,7 +1437,7 @@ new_group('ES schema fitness')
 NUM_Y_TICKS = 7
 POP_SIZES=[32, 512, 10240, 32768]
 SCHEMAS = [
-    {'name': 'ordinary', 'discard': False, 'replace': True},
+    {'name': 'default', 'discard': False, 'replace': True},
     {'name': 'comma', 'discard': True, 'replace': True},
     {'name': 'plus', 'discard': False, 'replace': False},
 ]
@@ -1228,10 +1470,7 @@ for fn, dim, schema in progressbar(list(itertools.product(
                 {'config.es.crossover.replace_parents.value': schema['replace']},
             ]
         }, keep_history=True)
-        runs = list(filter(lambda r: 'iteration' in r.summary, runs))
-        print()
-        print(f"fn {fn} with {dim} dim for {schema['name']}, runs: {len(runs)} for pop size {psize}")
-        print()
+        #print(f"fn {fn} with {dim} dim for {schema['name']}, runs: {len(runs)} for pop size {psize}")
         max_iter = max(map(lambda r: r.summary['iteration'], runs))
         medians, q05, best = [], [], []
         for step in range(max_iter+1):
@@ -1268,7 +1507,6 @@ for fn, dim, schema in progressbar(list(itertools.product(
     plt.title(f"{schema['name']} mutation of $f_{{{fn}}}$ with {dim} dimensions")
     plt.savefig(f'runs/fitness_es_schema_f{fn}_dim{dim}_{schema["name"]}.pdf')
     plt.close()
-exit()
 
 fig2 = plt.figure()
 ax2 = fig2.add_subplot()
@@ -1300,7 +1538,7 @@ POP_SIZES = [32,128,200,512,1024,2048,5000,10240,16384,32768]
 FNS= [19, 22]
 DIMS= [24, 128, 384]
 SCHEMAS = [
-    {'name': 'ordinary', 'discard': False, 'replace': True, 'c': 'tab:blue'},
+    {'name': 'default', 'discard': False, 'replace': True, 'c': 'tab:blue'},
     {'name': 'comma', 'discard': True, 'replace': True, 'c': 'tab:orange'},
     {'name': 'plus', 'discard': False, 'replace': False, 'c': 'tab:green'},
 ]
@@ -1325,15 +1563,12 @@ for fn, dim in progressbar(list(itertools.product(
                 {'config.es.crossover.replace_parents.value': schema['replace']},
             ]
         })
-        print()
-        print(f"SCHEMA for {fn} fn with {dim} dim, schema {schema['name']} has {len(runs)} runs")
+        #print(f"SCHEMA for {fn} fn with {dim} dim, schema {schema['name']} has {len(runs)} runs")
         measure = np.zeros(len(POP_SIZES))
         run_count = np.zeros(len(POP_SIZES))
         for run in runs:
             try:
                 s, c = run.summary, run.config
-                if 'iteration' not in s:
-                    continue
                 progress = s['iteration'] / s['max_iteration']
                 i = POP_SIZES.index(c['pop_size'])
                 measure[i] += s[TO_MEASURE] / progress
@@ -1363,14 +1598,12 @@ for fn, dim in progressbar(list(itertools.product(
                 {'config.es.crossover.replace_parents.value': schema['replace']},
             ]
         })
-        print(f"SCHEMA for {fn} fn with {dim} dim, schema {schema['name']} has {len(runs)} runs")
+        #print(f"SCHEMA for {fn} fn with {dim} dim, schema {schema['name']} has {len(runs)} runs")
         measure = np.zeros(len(POP_SIZES))
         run_count = np.zeros(len(POP_SIZES))
         for run in runs:
             try:
                 s, c = run.summary, run.config
-                if 'iteration' not in s:
-                    continue
                 progress = s['iteration'] / s['max_iteration']
                 i = POP_SIZES.index(c['pop_size'])
                 measure[i] += s[TO_MEASURE] / progress
@@ -1402,6 +1635,7 @@ for fn, dim in progressbar(list(itertools.product(
     plt.minorticks_off()
     plt.ylabel('Running time [s]')
     plt.savefig(f"runs/time_es_schema_fn{fn}_{dim}d.pdf")
+    plt.close()
 
 fig2 = plt.figure()
 ax2 = fig2.add_subplot()
@@ -1438,6 +1672,12 @@ MUT_COLORS = {
     'ReplaceUniform': 'tab:green',
     'AdaptiveStep': 'tab:red',
 }
+NAMES = {
+    'AddFromNormal': 'Normal mutation',
+    'AddFromCauchy': 'Cauchy mutation',
+    'ReplaceUniform': 'Replace mutation',
+    'AdaptiveStep': 'Adaptive mutation',
+}
 TO_MEASURE = 'total_real_time'
 for fn, dim in progressbar(list(itertools.product(
     FNS,
@@ -1463,8 +1703,6 @@ for fn, dim in progressbar(list(itertools.product(
         for run in runs:
             try:
                 s, c = run.summary, run.config
-                if 'iteration' not in s:
-                    continue
                 progress = s['iteration'] / s['max_iteration']
                 i = POP_SIZES.index(c['pop_size'])
                 measure[i] += s[TO_MEASURE] / progress
@@ -1498,8 +1736,6 @@ for fn, dim in progressbar(list(itertools.product(
         for run in runs:
             try:
                 s, c = run.summary, run.config
-                if 'iteration' not in s:
-                    continue
                 progress = s['iteration'] / s['max_iteration']
                 i = POP_SIZES.index(c['pop_size'])
                 measure[i] += s[TO_MEASURE] / progress
@@ -1531,6 +1767,7 @@ for fn, dim in progressbar(list(itertools.product(
     plt.minorticks_off()
     plt.ylabel('Running time [s]')
     plt.savefig(f"runs/time_es_mutation_fn{fn}_{dim}d.pdf")
+    plt.close()
 
 fig2 = plt.figure()
 ax2 = fig2.add_subplot()
@@ -1541,7 +1778,7 @@ legend = ax2.legend([
     *list(map(lambda x: mlines.Line2D([0],[0],c=MUT_COLORS[x]), MUTATIONS)),
 ], [
     'CPU', 'CUDA',
-    *MUTATIONS
+    *[NAMES[mut] for mut in MUTATIONS]
 ], frameon=False, loc='lower center', ncol=10, )
 fig2 = legend.figure
 fig2.canvas.draw()
@@ -1611,11 +1848,8 @@ for fn, neig in progressbar(list(itertools.product(
                 *neig['selection'],
             ]
         }, keep_history=True)
-        runs = list(filter(lambda r: 'iteration' in r.summary, runs))
-        print()
-        print(neig)
-        print(f"psize {psize}, {fn}fn, runs: {len(runs)}")
-        print()
+        #print(neig)
+        #print(f"psize {psize}, {fn}fn, runs: {len(runs)}")
         max_iter = max(map(lambda r: r.summary['iteration'], runs))
         medians, q05, best = [], [], []
         for step in range(max_iter+1):
@@ -1730,8 +1964,6 @@ for fn, in progressbar(list(itertools.product(
         for run in runs:
             try:
                 s, c = run.summary, run.config
-                if 'iteration' not in s:
-                    continue
                 progress = s['iteration'] / s['max_iteration']
                 i = POP_RENDER.index(c['pop_size'])
                 measure[i] += s['total_perf_time'] / progress
@@ -1766,8 +1998,6 @@ for fn, in progressbar(list(itertools.product(
         for run in runs:
             try:
                 s, c = run.summary, run.config
-                if 'iteration' not in s:
-                    continue
                 progress = s['iteration'] / s['max_iteration']
                 psize = c['pop_size']
                 i = POP_RENDER.index(c['pop_size'])
@@ -1800,6 +2030,7 @@ for fn, in progressbar(list(itertools.product(
     plt.minorticks_off()
     plt.ylabel('Running time [s]')
     plt.savefig(f"runs/time_pso2006_fn{fn}_neigh.pdf")
+    plt.close()
 
 fig2 = plt.figure()
 ax2 = fig2.add_subplot()
@@ -1952,13 +2183,21 @@ for fn, in progressbar(list(itertools.product(
 
 #region PSO2006 run times
 new_group('PSO2006 run times')
+NUM_Y_TICKS = 7
 POP_RENDER = [32, 128, 512, 2048, 10240, 32768]
 pop_list = [32, 128, 200, 512, 1024, 2048, 5000, 10240, 16384, 32768]
-linestyles = [':','-.','--','-']
+DIM_COLORS = {
+    '6': 'tab:blue',
+    '32': 'tab:orange',
+    '128': 'tab:green',
+    '384': 'tab:red',
+}
 for fn, in progressbar(list(itertools.product(
         [1, 7, 15, 19, 22, 24],
 ))):
     plt.figure(figsize=FIGSIZE)
+    maxval = -math.inf
+    minval = math.inf
     for idim, dim in enumerate([6,32,128,384]):
         runs = MyRun.load_and_cache({
             "$and": [
@@ -1978,8 +2217,6 @@ for fn, in progressbar(list(itertools.product(
         for run in runs:
             try:
                 s, c = run.summary, run.config
-                if 'iteration' not in s:
-                    continue
                 progress = s['iteration'] / s['max_iteration']
                 i = pop_list.index(c['pop_size'])
                 measure[i] += s['total_perf_time'] / progress
@@ -1987,7 +2224,10 @@ for fn, in progressbar(list(itertools.product(
             except:
                 traceback.print_exc()
                 print(run)
-        plt.plot(pop_list, measure / run_count, label=f'CPU {dim}', linestyle=linestyles[idim], c='tab:blue')
+        minval = min(minval, np.min(measure / run_count))
+        maxval = max(maxval, np.max(measure / run_count))
+        plt.plot(pop_list, measure / run_count,
+                 linestyle='-', c=DIM_COLORS[str(dim)])
         runs = MyRun.load_and_cache({
             "$and": [
                 {'config.run_type.value': 'time'},
@@ -2005,8 +2245,6 @@ for fn, in progressbar(list(itertools.product(
         for run in runs:
             try:
                 s, c = run.summary, run.config
-                if 'iteration' not in s:
-                    continue
                 progress = s['iteration'] / s['max_iteration']
                 psize = c['pop_size']
                 i = pop_list.index(c['pop_size'])
@@ -2015,7 +2253,10 @@ for fn, in progressbar(list(itertools.product(
             except:
                 traceback.print_exc()
                 print(run)
-        plt.plot(pop_list, measure / run_count, label=f'GPU {dim}', linestyle=linestyles[idim], c='tab:orange')
+        minval = min(minval, np.min(measure / run_count))
+        maxval = max(maxval, np.max(measure / run_count))
+        plt.plot(pop_list, measure / run_count,
+                 linestyle='--', c=DIM_COLORS[str(dim)])
     plt.title(f"BBOB function $f_{{{fn}}}$")
     plt.xscale('log')
     plt.yscale('log')
@@ -2024,10 +2265,12 @@ for fn, in progressbar(list(itertools.product(
     plt.gca().get_xaxis().set_tick_params(which='minor', size=0)
     plt.xlim(32, 32768)
     plt.xlabel('Population size')
-    plt.yticks([0.3, 1, 3, 10, 30, 100, 300, 1000, 3000, 10000])
-    plt.ylim(0.3, 10000.0)
-    #plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter())
-    plt.gca().get_yaxis().set_tick_params(which='minor', width=0)
+    minval = round_plotdown(minval)
+    maxval = round_plotup(maxval)
+    plt.ylim(minval, maxval)
+    plt.yticks(plot_generatelogticks(minval, maxval, NUM_Y_TICKS))
+    plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter(useOffset=False))
+    plt.minorticks_off()
     plt.ylabel('Running time [s]')
     plt.savefig(f"runs/time_pso2006_fn{fn}_alldim.pdf")
     plt.close()
@@ -2036,15 +2279,12 @@ fig2 = plt.figure()
 ax2 = fig2.add_subplot()
 ax2.axis('off')
 legend = ax2.legend([
-    mlines.Line2D([0],[0], linestyle=':', c='black'),
-    mlines.Line2D([0], [0], linestyle='-.', c='black'),
-    mlines.Line2D([0], [0], linestyle='--', c='black'),
     mlines.Line2D([0], [0], linestyle='-', c='black'),
-    mlines.Line2D([0], [0], c='tab:blue'),
-    mlines.Line2D([0], [0], c='tab:orange'),
+    mlines.Line2D([0], [0], linestyle='--', c='black'),
+    *[mlines.Line2D([0],[0],c=col) for col in DIM_COLORS.values()]
 ], [
-    'Problem dimension 6', 'Problem dimension 32', 'Problem dimension 128', 'Problem dimension 384',
-    'CPU implementation', 'CUDA implementation',
+    'CPU','CUDA',
+    *[f'Problem dimension {dom}' for dom in DIM_COLORS.keys()]
 ], frameon=False, loc='lower center', ncol=10, )
 fig2 = legend.figure
 fig2.canvas.draw()
@@ -2058,10 +2298,19 @@ fig2.savefig(
 
 # region PSO2011 run times
 new_group('PSO2011 run times')
+NUM_Y_TICKS = 7
+DIM_COLORS = {
+    '6': 'tab:blue',
+    '32': 'tab:orange',
+    '128': 'tab:green',
+    '384': 'tab:red',
+}
 for fn, in progressbar(list(itertools.product(
         [1, 7, 15, 19, 22, 24],
 ))):
     plt.figure(figsize=FIGSIZE)
+    maxval = -math.inf
+    minval = math.inf
     for idim, dim in enumerate([6,32,128,384]):
         runs = MyRun.load_and_cache({
             "$and": [
@@ -2081,8 +2330,6 @@ for fn, in progressbar(list(itertools.product(
         for run in runs:
             try:
                 s, c = run.summary, run.config
-                if 'iteration' not in s:
-                    continue
                 progress = s['iteration'] / s['max_iteration']
                 i = pop_list.index(c['pop_size'])
                 measure[i] += s['total_perf_time'] / progress
@@ -2090,7 +2337,10 @@ for fn, in progressbar(list(itertools.product(
             except:
                 traceback.print_exc()
                 print(run)
-        plt.plot(pop_list, measure / run_count, label=f'CPU {dim}', linestyle=linestyles[idim], c='tab:blue')
+        minval = min(minval, np.min(measure / run_count))
+        maxval = max(maxval, np.max(measure / run_count))
+        plt.plot(pop_list, measure / run_count,
+                 linestyle='-', c=DIM_COLORS[str(dim)])
         runs = MyRun.load_and_cache({
             "$and": [
                 {'config.run_type.value': 'time,fitness'},
@@ -2108,8 +2358,6 @@ for fn, in progressbar(list(itertools.product(
         for run in runs:
             try:
                 s, c = run.summary, run.config
-                if 'iteration' not in s:
-                    continue
                 progress = s['iteration'] / s['max_iteration']
                 psize = c['pop_size']
                 i = pop_list.index(c['pop_size'])
@@ -2118,7 +2366,10 @@ for fn, in progressbar(list(itertools.product(
             except:
                 traceback.print_exc()
                 print(run)
-        plt.plot(pop_list, measure / run_count, label=f'GPU {dim}', linestyle=linestyles[idim], c='tab:orange')
+        minval = min(minval, np.min(measure / run_count))
+        maxval = max(maxval, np.max(measure / run_count))
+        plt.plot(pop_list, measure / run_count,
+                 linestyle='--', c=DIM_COLORS[str(dim)])
     plt.title(f"BBOB function $f_{{{fn}}}$")
     plt.xscale('log')
     plt.yscale('log')
@@ -2127,10 +2378,12 @@ for fn, in progressbar(list(itertools.product(
     plt.gca().get_xaxis().set_tick_params(which='minor', size=0)
     plt.xlim(32, 32768)
     plt.xlabel('Population size')
-    plt.yticks([0.3, 1, 3, 10, 30, 100, 300, 1000, 3000, 10000])
-    plt.ylim(0.3, 10000.0)
-    #plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter())
-    plt.gca().get_yaxis().set_tick_params(which='minor', width=0)
+    minval = round_plotdown(minval)
+    maxval = round_plotup(maxval)
+    plt.ylim(minval, maxval)
+    plt.yticks(plot_generatelogticks(minval, maxval, NUM_Y_TICKS))
+    plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter(useOffset=False))
+    plt.minorticks_off()
     plt.ylabel('Running time [s]')
     plt.savefig(f"runs/time_pso2011_fn{fn}_alldim.pdf")
     plt.close()
@@ -2139,15 +2392,12 @@ fig2 = plt.figure()
 ax2 = fig2.add_subplot()
 ax2.axis('off')
 legend = ax2.legend([
-    mlines.Line2D([0],[0], linestyle=':', c='black'),
-    mlines.Line2D([0], [0], linestyle='-.', c='black'),
-    mlines.Line2D([0], [0], linestyle='--', c='black'),
     mlines.Line2D([0], [0], linestyle='-', c='black'),
-    mlines.Line2D([0], [0], c='tab:blue'),
-    mlines.Line2D([0], [0], c='tab:orange'),
+    mlines.Line2D([0], [0], linestyle='--', c='black'),
+    *[mlines.Line2D([0],[0],c=col) for col in DIM_COLORS.values()]
 ], [
-    'Problem dimension 6', 'Problem dimension 32', 'Problem dimension 128', 'Problem dimension 384',
-    'CPU implementation', 'CUDA implementation',
+    'CPU','CUDA',
+    *[f'Problem dimension {dom}' for dom in DIM_COLORS.keys()]
 ], frameon=False, loc='lower center', ncol=10, )
 fig2 = legend.figure
 fig2.canvas.draw()
