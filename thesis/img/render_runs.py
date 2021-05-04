@@ -77,6 +77,210 @@ def plot_generatelogticks(minval, maxval, ticks):
 #endregion
 
 
+#region GA selection slowdown
+new_group('GA selection slowdown')
+NUM_Y_TICKS = 7
+POP_SIZES = [32,128,200,512,1024,2048,5000,10240,16384]
+SELECTIONS = [
+    {'label': 'Tournament selection', 'key': 'Tournament', 'c': 'tab:blue'},
+    {'label': 'Roulette selection', 'key': 'Roulette', 'c': 'tab:orange'},
+    {'label': 'SUS', 'key': 'StochasticUniversalSampling', 'c': 'tab:green'},
+    {'label': 'Rank selection', 'key': 'Sequence', 'c': 'tab:red'},
+]
+TO_MEASURE = 'total_real_time'
+plt.figure(figsize=FIGSIZE)
+for selection in progressbar(SELECTIONS[:1]):
+    runs = MyRun.load_and_cache({
+        "$and": [
+            {'state': 'finished'},
+            {'config.run_failed.value': False},
+            {'config.alg_group.value': 'ga_selection'},
+            {'config.device.value': 'cuda'},
+            {'config.run_type.value': 'time'},
+            {'config.pop_size.value': {'$in': POP_SIZES}},
+            {'config.ga.selection.value': selection['key']},
+        ]
+    })
+    measure = np.zeros(len(POP_SIZES))
+    run_count = np.zeros(len(POP_SIZES))
+    for run in runs:
+        try:
+            s, c = run.summary, run.config
+            progress = s['iteration'] / s['max_iteration']
+            i = POP_SIZES.index(c['pop_size'])
+            measure[i] += s[TO_MEASURE] / progress
+            run_count[i] += 1
+        except:
+            traceback.print_exc()
+            print(run)
+    measure = measure[run_count > 0] / run_count[run_count > 0]
+tournamentmeasure = measure
+maxval, minval = -math.inf, math.inf
+for selection in progressbar(SELECTIONS[1:]):
+    runs = MyRun.load_and_cache({
+        "$and": [
+            {'state': 'finished'},
+            {'config.run_failed.value': False},
+            {'config.alg_group.value': 'ga_selection'},
+            {'config.device.value': 'cuda'},
+            {'config.run_type.value': 'time'},
+            {'config.pop_size.value': {'$in': POP_SIZES}},
+            {'config.ga.selection.value': selection['key']},
+        ]
+    })
+    measure = np.zeros(len(POP_SIZES))
+    run_count = np.zeros(len(POP_SIZES))
+    for run in runs:
+        try:
+            s, c = run.summary, run.config
+            progress = s['iteration'] / s['max_iteration']
+            i = POP_SIZES.index(c['pop_size'])
+            measure[i] += s[TO_MEASURE] / progress
+            run_count[i] += 1
+        except:
+            traceback.print_exc()
+            print(run)
+    measure = measure[run_count > 0] / run_count[run_count > 0]
+    measure = measure / tournamentmeasure
+    minval, maxval = min(measure.min(), minval), max(measure.max(), maxval)
+    plt.plot(
+        POP_SIZES,
+        measure,
+        c=selection['c'],
+        linestyle='-',
+        label=selection['label']
+    )
+plt.title(f"Selection operators slowdown")
+plt.xscale('log')
+plt.yscale('log')
+plt.xticks([32,128,512,2048,5000,16384])
+plt.gca().get_xaxis().set_major_formatter(mticker.ScalarFormatter())
+plt.gca().get_xaxis().set_tick_params(which='minor', size=0)
+plt.xlim(32, 16384)
+plt.xlabel('Literals')
+minval = round_plotdown(minval)
+maxval = round_plotup(maxval)
+plt.ylim(minval, maxval)
+plt.yticks(plot_generatelogticks(minval, maxval, NUM_Y_TICKS))
+plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter(useOffset=False))
+plt.minorticks_off()
+plt.ylabel('Slowdown')
+plt.legend()
+plt.savefig(f"runs/time_ga_selection_slowdown.pdf")
+plt.close()
+#endregion
+
+#region GA speedup
+new_group('GA speed up')
+POP_SIZES = [32,128,200,512,1024,2048,5000,10240,16384,32768]
+VARIABLES = [100, 300, 800, 2000]
+VAR_C = {
+    '100': 'tab:blue',
+    '300': 'tab:orange',
+    '800': 'tab:green',
+    '2000': 'tab:red',
+}
+TO_MEASURE = 'total_real_time'
+plt.figure(figsize=FIGSIZE)
+plt.hlines(1, 32, 32768, colors='k', linestyle=':')
+minval = math.inf
+maxval = -math.inf
+for vars, in progressbar(list(itertools.product(
+    VARIABLES
+))):
+    runs = MyRun.load_and_cache({
+        "$and": [
+            {'state': 'finished'},
+            {'config.run_failed.value': False},
+            {'config.pop_size.value': {'$in': POP_SIZES}},
+            {'config.alg_group.value': 'ga_1'},
+            {'config.device.value': 'cpu'},
+            {'config.run_type.value': 'time'},
+            {'config.ga.elitism.value': False},
+            {'config.sat.literals.value': vars}
+        ]
+    })
+    measure = np.zeros(len(POP_SIZES))
+    run_count = np.zeros(len(POP_SIZES))
+    for run in runs:
+        try:
+            s, c = run.summary, run.config
+            progress = s['iteration'] / s['max_iteration']
+            i = POP_SIZES.index(c['pop_size'])
+            measure[i] += s[TO_MEASURE] / progress
+            run_count[i] += 1
+        except:
+            traceback.print_exc()
+            print(run)
+    cpu_measure = measure[run_count > 0] / run_count[run_count > 0]
+    for pindex in np.where(run_count==0)[0]:
+        print(f"\nWARNING GA ELITISM CPU fitness for {vars} literals with {POP_SIZES[pindex]} has no measurement")
+        exit()
+    runs = MyRun.load_and_cache({
+        "$and": [
+            {'state': 'finished'},
+            {'config.run_failed.value': False},
+            {'config.pop_size.value': {'$in': POP_SIZES}},
+            {'config.alg_group.value': 'ga_1'},
+            {'config.device.value': 'cuda'},
+            {'$or': [
+                {'config.run_type.value': 'time,fitness'},
+                {'config.run_type.value': 'time'},
+            ]},
+            {'config.ga.elitism.value': False},
+            {'config.sat.literals.value': vars}
+        ]
+    })
+    measure = np.zeros(len(POP_SIZES))
+    run_count = np.zeros(len(POP_SIZES))
+    for run in runs:
+        try:
+            s, c = run.summary, run.config
+            progress = s['iteration'] / s['max_iteration']
+            i = POP_SIZES.index(c['pop_size'])
+            measure[i] += s[TO_MEASURE] / progress
+            run_count[i] += 1
+        except:
+            traceback.print_exc()
+            print(run)
+    cuda_measure = measure[run_count > 0] / run_count[run_count > 0]
+    for pindex in np.where(run_count==0)[0]:
+        print(f"\nWARNING GA GPU fitness for {vars} literals with {POP_SIZES[pindex]} has no measurement")
+        exit()
+    result = np.zeros_like(cpu_measure)
+    is_better = cpu_measure > cuda_measure
+    result[is_better] = (cpu_measure / cuda_measure)[is_better]
+    is_worse = np.logical_not(is_better)
+    result[is_worse] = -(cuda_measure / cpu_measure)[is_worse]
+    plt.plot(
+        POP_SIZES,
+        cpu_measure / cuda_measure,
+        c=VAR_C[str(vars)],
+        linestyle='-',
+        label=f'{vars} literals'
+    )
+    minval = min(minval, (cpu_measure / cuda_measure).min())
+    maxval = max(maxval, (cpu_measure / cuda_measure).max())
+plt.title(f"Genetic Algorithm speedup")
+plt.xscale('log')
+plt.xticks([32, 128, 512, 2048, 10240, 32768])
+plt.gca().get_xaxis().set_major_formatter(mticker.ScalarFormatter())
+plt.gca().get_xaxis().set_tick_params(which='minor', size=0)
+plt.xlim(32, 32768)
+plt.xlabel('Population size')
+minval = round_plotdown(minval)
+maxval = round_plotup(maxval)
+plt.yscale('log')
+plt.ylim(minval, maxval)
+plt.yticks(plot_generatelogticks(minval, maxval, 7))
+plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter(useOffset=False))
+plt.minorticks_off()
+plt.ylabel('speedup')
+plt.legend()
+plt.savefig(f"runs/speedup_ga.pdf")
+plt.close()
+#endregion
+
 #region running time C vs PyTorch
 new_group('GA running time PyTorch vs C++')
 NUM_Y_TICKS = 7
@@ -411,8 +615,7 @@ for selection in progressbar(SELECTIONS):
 plt.title(f"Running time of selection operators")
 plt.xscale('log')
 plt.yscale('log')
-plt.xticks([32,200,1024,5000,16384]) # TODO write
-#plt.xticks([32, 128, 512, 2048, 10240, 16384])
+plt.xticks(POP_SIZES)
 plt.gca().get_xaxis().set_major_formatter(mticker.ScalarFormatter())
 plt.gca().get_xaxis().set_tick_params(which='minor', size=0)
 plt.xlim(32, 16384)
@@ -643,6 +846,8 @@ for liters in LITERALS:
                 traceback.print_exc()
                 print(run)
         measure = measure[run_count > 0] / run_count[run_count > 0]
+        print(scale['label'])
+        print(measure)
         minval, maxval = min(measure.min(), minval), max(measure.max(), maxval)
         if np.any(run_count == 0):
             print(f"\nWARNING, missing measurements for GPU GA SCALING with {liters} literals and {scale['label']} for pop sizes {list(map(lambda x: POP_SIZES[x], np.where(run_count == 0)[0].tolist()))}")

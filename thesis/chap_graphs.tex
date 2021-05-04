@@ -26,6 +26,7 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
     \end{minipage}
 
     \caption[Genetic algorithm running time with and without elitism]{Running time of \acrlong{acc:ga} with and without elitism for \acrshort{acc:3sat} problem. All the formulas have been satisfiable and had $4.5$ times more clauses than literals. The algorithm run for $1000$ generations.}
+    \label{meas:garuntime}
 \end{figure}
 
 \begin{figure}[ht!]
@@ -44,6 +45,7 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
     \end{minipage}
 
     \caption[Running time of Genetic Algorithm in respect to problem size]{Running time of \acrlong{acc:ga} for \acrshort{acc:3sat} problem in respect to problem size. On the left in respect to number of literals with $4.5$ times the number of clauses, and in respect to number of clauses for $2000$ literals on the right. All the formulas have been satisfiable and measurements are done for population size $1000$. The algorithm run for $1000$ generations.}
+    \label{meas:garuntimeproblemsize}
 \end{figure}
 
 \begin{figure}[ht!]
@@ -82,7 +84,8 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
         \includegraphics[width=0.8\textwidth]{img/runs/fitness_ga_3SAT_legend.pdf}
     \end{minipage}
 
-    \caption[Fitness of genetic algorithm]{Fitness of \acrlong{acc:ga} on \acrshort{acc:3sat} problem. Algorithm run for maximum of $1000$ generations and had $4.5$ times number of clauses than the literals.}
+    \caption[Fitness of genetic algorithm]{Fitness of \acrlong{acc:ga} on \acrshort{acc:3sat} problem. Algorithm run for maximum of $1000$ generations and had $4.5$ times number of clauses than the literals. The graphs show $0.05$ quantile of the fitness value in the population.}
+    \label{meas:gafitness}
 \end{figure}
 
 \begin{figure}[ht!]
@@ -121,7 +124,8 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
         \includegraphics[width=0.8\textwidth]{img/runs/fitness_ga_3SAT_legend.pdf}
     \end{minipage}
 
-    \caption[Fitness of genetic algorithm with elitism]{Fitness of \acrlong{acc:ga} with elitism on \acrshort{acc:3sat} problem. Algorithm run for maximum of $1000$ generations and had $4.5$ times number of clauses than the literals. The graphs show $0.05$ quantile of the fitness function.}
+    \caption[Fitness of genetic algorithm with elitism]{Fitness of \acrlong{acc:ga} with elitism on \acrshort{acc:3sat} problem. Algorithm run for maximum of $1000$ generations and had $4.5$ times number of clauses than the literals. The graphs show $0.05$ quantile of the fitness value in the population.}
+    \label{meas:gafitnesselite}
 \end{figure}
 
 
@@ -150,6 +154,7 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
     \end{minipage}
 
     \caption[Running time of genetic algorithm with various scale operators]{Running time of \acrlong{acc:ga} with various fitness scale operators. The algorithm were solving \acrshort{acc:3sat} problem with $100$ (left) resp. $1000$ (right) literals and $450$, resp. $4500$ clauses. The algorithm run for $1000$ generations.}
+    \label{meas:scale}
 \end{figure}
 
 
@@ -171,6 +176,7 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
     \end{minipage}
 
     \caption[Running time of selection operators]{Running time of \acrlong{acc:ga} with various selection operators. The algorithm were solving \acrshort{acc:3sat} problem with $1000$ literals and $4500$ clauses, and run for $1000$ generations.}
+    \label{meas:selection}
 \end{figure}
 
 
@@ -193,6 +199,7 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
     \end{minipage}
 
     \caption[Comparison of PyTorch and \cpp implementation]{Running time of \acrlong{acc:ga} implemented in PyTorch and \cppns. The algorithm were solving \acrshort{acc:3sat} problem with $800$ literals and $3600$ clauses, and run for $1000$ generations. The \cpp implementation used the master--worker approach to evaluate fitness function in parallel.}
+    \label{meas:cimpl}
 \end{figure}
 
 

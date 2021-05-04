@@ -3,7 +3,6 @@
 
 Here I present hyperparameters used for measurements in the following chapter. I run a rough hyperparameter search to use reasonably good enough parameters, and the algorithm does not diverge. As this work goal is to evaluate the execution speed of the algorithm, rather than its quality or performance, these parameters may not be optimal for the given problem at hand. I recommend the available literature for more appropriate hyperparameter selection. 
 
-
 \begin{table}[h]
     \centering
     \begin{tabular}{|l|c|}
@@ -37,8 +36,27 @@ Here I present hyperparameters used for measurements in the following chapter. I
         \quad Position clipping & no \\
         \hline
     \end{tabular}
-    \caption{Real--coded evolutionary algorithms mutation tests hyperparameters}
+    \caption{Real--coded evolutionary algorithm mutation tests hyperparameters}
     \label{tab:esmutationhyperparmarameters}
+\end{table}
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|l|c|}
+        \hline
+        \textbf{Parameter} & \textbf{Value} \\
+        \hline
+        Selection & Tournament \\
+        \quad Number of parents & $2$ \\
+        Crossover & One--point \\
+        \quad Mutated individuals & $40\%$ \\
+        Mutation & Flip--Bit \\
+        \quad Mutated individuals & $60\%$ \\
+        \quad Mutation probability & $0.1\%$ \\
+        \hline
+    \end{tabular}
+    \caption{\acrlong*{acc:ga} hyperparameters}
+    \label{tab:gahyperparameters}
 \end{table}
 
 \begin{table}[h]
@@ -67,7 +85,7 @@ Here I present hyperparameters used for measurements in the following chapter. I
         \quad $\alpha$ & $0.5$ \\
         \hline
     \end{tabular}
-    \caption{Real--coded evolutionary algorithms crossover tests hyperparameters}
+    \caption{Real--coded evolutionary algorithm crossover tests hyperparameters}
     \label{tab:escrossoverhyperparmarameters}
 \end{table}
 
@@ -93,7 +111,7 @@ Here I present hyperparameters used for measurements in the following chapter. I
         \quad Offsprings & $200\%$ \\
         \hline
     \end{tabular}
-    \caption{Real--coded evolutionary algorithms scheme tests hyperparameters}
+    \caption{Real--coded evolutionary algorithm scheme tests hyperparameters}
     \label{tab:esschemehyperparmarameters}
 \end{table}
 
