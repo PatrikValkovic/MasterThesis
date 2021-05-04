@@ -18,6 +18,7 @@ CACHE_DIR = 'D:\\runscache'
 api = wandb.Api()
 FIGISZE_BIG=(12,8)
 FIGSIZE=(6, 4)
+SHOW_LEGEND = False
 
 #region support
 class MyRun:
@@ -77,10 +78,24 @@ def plot_generatelogticks(minval, maxval, ticks):
 
 
 #region running time C vs PyTorch
-new_group('GA running time PyTorch vs C')
+new_group('GA running time PyTorch vs C++')
 NUM_Y_TICKS = 7
 POP_SIZES = [32,128,200,512,1024,2048,5000,10240,16384,32768]
 TO_MEASURE = 'total_real_time'
+LEG_LINES = [
+    mlines.Line2D([0],[0], linestyle='-', c='tab:blue'),
+    mlines.Line2D([0],[0], linestyle='-', c='tab:orange'),
+    mlines.Line2D([0], [0], linestyle='-', c='tab:green'),
+    mlines.Line2D([0], [0], linestyle='-', c='tab:red'),
+    mlines.Line2D([0], [0], linestyle='-', c='tab:gray'),
+]
+LEG_LABELS = [
+    'C++ with 1 core',
+    'C++ with 8 cores',
+    'PyTorch with 1 core',
+    'PyTorch with 8 cores',
+    'PyTorch on GPU',
+]
 plt.figure(figsize=FIGISZE_BIG)
 maxval, minval = -math.inf, math.inf
 # C 1 core
@@ -272,7 +287,7 @@ for _ in range(1):
         linestyle='-',
     )
 
-plt.title(f"PyTorch versus C implementation")
+plt.title(f"PyTorch versus C++ implementation")
 plt.xscale('log')
 plt.yscale('log')
 plt.xticks([32, 128, 512, 2048, 10240, 32768])
@@ -287,34 +302,25 @@ plt.yticks(plot_generatelogticks(minval, maxval, NUM_Y_TICKS))
 plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter(useOffset=False))
 plt.minorticks_off()
 plt.ylabel('Running time [s]')
+if SHOW_LEGEND:
+    plt.legend(LEG_LINES, LEG_LABELS, loc='upper left')
 plt.savefig(f"runs/time_ga_c.pdf")
 plt.close()
 
-fig2 = plt.figure()
-ax2 = fig2.add_subplot()
-ax2.axis('off')
-legend = ax2.legend([
-    mlines.Line2D([0],[0], linestyle='-', c='tab:blue'),
-    mlines.Line2D([0],[0], linestyle='-', c='tab:orange'),
-    mlines.Line2D([0], [0], linestyle='-', c='tab:green'),
-    mlines.Line2D([0], [0], linestyle='-', c='tab:red'),
-    mlines.Line2D([0], [0], linestyle='-', c='tab:gray'),
-], [
-    'C with 1 core',
-    'C with 8 cores',
-    'PyTorch with 1 core',
-    'PyTorch with 8 cores',
-    'PyTorch on GPU',
-], frameon=False, loc='lower center', ncol=10, )
-fig2 = legend.figure
-fig2.canvas.draw()
-bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
-fig2.savefig(
-    f"runs/time_ga_c_legend.pdf",
-    dpi="figure",
-    bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
-)
-plt.close(fig2)
+if not SHOW_LEGEND:
+    fig2 = plt.figure()
+    ax2 = fig2.add_subplot()
+    ax2.axis('off')
+    legend = ax2.legend(LEG_LINES, LEG_LABELS, frameon=False, loc='lower center', ncol=10, )
+    fig2 = legend.figure
+    fig2.canvas.draw()
+    bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+    fig2.savefig(
+        f"runs/time_ga_c_legend.pdf",
+        dpi="figure",
+        bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+    )
+    plt.close(fig2)
 #endregion
 
 #region GA selection times
@@ -328,6 +334,15 @@ SELECTIONS = [
     {'label': 'Rank selection', 'key': 'Sequence', 'c': 'tab:red'},
 ]
 TO_MEASURE = 'total_real_time'
+LEG_LINES = [
+    mlines.Line2D([0], [0], linestyle='-', c='k'),
+    mlines.Line2D([0], [0], linestyle='--', c='k'),
+    *(list(map(lambda s: mlines.Line2D([0], [0], linestyle='-', c=s['c']), SELECTIONS)))
+]
+LEG_LABELS = [
+    'CPU', 'CUDA',
+    *(list(map(lambda s: s['label'], SELECTIONS)))
+]
 plt.figure(figsize=FIGISZE_BIG)
 maxval, minval = -math.inf, math.inf
 for selection in progressbar(SELECTIONS):
@@ -409,29 +424,25 @@ plt.yticks(plot_generatelogticks(minval, maxval, NUM_Y_TICKS))
 plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter(useOffset=False))
 plt.minorticks_off()
 plt.ylabel('Running time [s]')
+if SHOW_LEGEND:
+    plt.legend(LEG_LINES, LEG_LABELS, loc='upper left')
 plt.savefig(f"runs/time_ga_selections.pdf")
 plt.close()
 
-fig2 = plt.figure()
-ax2 = fig2.add_subplot()
-ax2.axis('off')
-legend = ax2.legend([
-    mlines.Line2D([0],[0], linestyle='-', c='k'),
-    mlines.Line2D([0],[0], linestyle='-', c='k'),
-    *(list(map(lambda s: mlines.Line2D([0],[0], linestyle='-', c=s['c']), SELECTIONS)))
-], [
-    'CPU', 'CUDA',
-    *(list(map(lambda s: s['label'], SELECTIONS)))
-], frameon=False, loc='lower center', ncol=10, )
-fig2 = legend.figure
-fig2.canvas.draw()
-bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
-fig2.savefig(
-    f"runs/time_ga_selections_legend.pdf",
-    dpi="figure",
-    bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
-)
-plt.close(fig2)
+if not SHOW_LEGEND:
+    fig2 = plt.figure()
+    ax2 = fig2.add_subplot()
+    ax2.axis('off')
+    legend = ax2.legend(LEG_LINES, LEG_LABELS, frameon=False, loc='lower center', ncol=10, )
+    fig2 = legend.figure
+    fig2.canvas.draw()
+    bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+    fig2.savefig(
+        f"runs/time_ga_selections_legend.pdf",
+        dpi="figure",
+        bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+    )
+    plt.close(fig2)
 #endregion
 
 #region GA normal and elitism fitness
@@ -448,6 +459,16 @@ PSIZE_C = {
 }
 STYLES=['-','-',':']
 ELITISM=[False,True]
+LEG_LINES = [
+    # mlines.Line2D([0],[0], linestyle='-', c='black'),
+    # mlines.Line2D([0],[0], linestyle='--', c='black'),
+    # mlines.Line2D([0],[0], linestyle=':', c='black'),
+    *list(map(lambda x: mlines.Line2D([0], [0], c=x), PSIZE_C.values())),
+]
+LEG_LABELS = [
+    # 'Fitness median', 'Fitness 0.05 quantile', 'Best fitness',
+    *list(map(lambda x: f"Population size {x}", PSIZE_C.keys()))
+]
 for vars,elitism in progressbar(list(itertools.product(
     VARIABLES, ELITISM
 ))):
@@ -504,30 +525,25 @@ for vars,elitism in progressbar(list(itertools.product(
     plt.ylim(minval, maxval)
     plt.ylabel('Objective function')
     plt.title(f"3SAT with {vars} literals")
+    if SHOW_LEGEND:
+        plt.legend(LEG_LINES, LEG_LABELS, loc='upper right')
     plt.savefig(f'runs/fitness_ga{"_elitism" if elitism else ""}_3SAT_d{vars}.pdf')
     plt.close()
 
-fig2 = plt.figure()
-ax2 = fig2.add_subplot()
-ax2.axis('off')
-legend = ax2.legend([
-    #mlines.Line2D([0],[0], linestyle='-', c='black'),
-    #mlines.Line2D([0],[0], linestyle='--', c='black'),
-    #mlines.Line2D([0],[0], linestyle=':', c='black'),
-    *list(map(lambda x: mlines.Line2D([0],[0],c=x), PSIZE_C.values())),
-], [
-    #'Fitness median', 'Fitness 0.05 quantile', 'Best fitness',
-    *list(map(lambda x: f"Population size {x}", PSIZE_C.keys()))
-], frameon=False, loc='lower center', ncol=10, )
-fig2 = legend.figure
-fig2.canvas.draw()
-bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
-fig2.savefig(
-    f"runs/fitness_ga_3SAT_legend.pdf",
-    dpi="figure",
-    bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
-)
-plt.close(fig2)
+if not SHOW_LEGEND:
+    fig2 = plt.figure()
+    ax2 = fig2.add_subplot()
+    ax2.axis('off')
+    legend = ax2.legend(LEG_LINES, LEG_LABELS, frameon=False, loc='lower center', ncol=10, )
+    fig2 = legend.figure
+    fig2.canvas.draw()
+    bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+    fig2.savefig(
+        f"runs/fitness_ga_3SAT_legend.pdf",
+        dpi="figure",
+        bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+    )
+    plt.close(fig2)
 #endregion
 
 #region GA scale times
@@ -544,6 +560,15 @@ SCALES = [
     {'label': 'None', 'key': 'Pipe', 'c': 'tab:gray'},
 ]
 TO_MEASURE = 'total_real_time'
+LEG_LINES = [
+    mlines.Line2D([0], [0], linestyle='-', c='black'),
+    mlines.Line2D([0], [0], linestyle='--', c='black'),
+    *list(map(lambda x: mlines.Line2D([0], [0], c=x['c']), SCALES)),
+]
+LEG_LABELS = [
+    'CPU', 'CUDA',
+    *list(map(lambda x: f'{x["label"]} scale', SCALES))
+]
 for liters in LITERALS:
     plt.figure(figsize=FIGSIZE)
     maxval, minval = -math.inf, math.inf
@@ -642,29 +667,25 @@ for liters in LITERALS:
     plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter(useOffset=False))
     plt.minorticks_off()
     plt.ylabel('Running time [s]')
+    if SHOW_LEGEND:
+        plt.legend(LEG_LINES, LEG_LABELS, loc='upper left')
     plt.savefig(f"runs/time_ga_scale_{liters}l.pdf")
     plt.close()
 
-fig2 = plt.figure()
-ax2 = fig2.add_subplot()
-ax2.axis('off')
-legend = ax2.legend([
-    mlines.Line2D([0],[0], linestyle='-', c='black'),
-    mlines.Line2D([0],[0], linestyle='--', c='black'),
-    *list(map(lambda x: mlines.Line2D([0],[0],c=x['c']), SCALES)),
-], [
-    'CPU', 'CUDA',
-    *list(map(lambda x: f'{x["label"]} scale', SCALES))
-], frameon=False, loc='lower center', ncol=10, )
-fig2 = legend.figure
-fig2.canvas.draw()
-bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
-fig2.savefig(
-    f"runs/time_ga_scale_legend.pdf",
-    dpi="figure",
-    bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
-)
-plt.close(fig2)
+if not SHOW_LEGEND:
+    fig2 = plt.figure()
+    ax2 = fig2.add_subplot()
+    ax2.axis('off')
+    legend = ax2.legend(LEG_LINES, LEG_LABELS, frameon=False, loc='lower center', ncol=10, )
+    fig2 = legend.figure
+    fig2.canvas.draw()
+    bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+    fig2.savefig(
+        f"runs/time_ga_scale_legend.pdf",
+        dpi="figure",
+        bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+    )
+    plt.close(fig2)
 #endregion
 
 #region GA elitism and normal times
@@ -679,6 +700,15 @@ VAR_C = {
     '2000': 'tab:red',
 }
 TO_MEASURE = 'total_real_time'
+LEG_LINES = [
+    mlines.Line2D([0], [0], linestyle='-', c='black'),
+    mlines.Line2D([0], [0], linestyle='--', c='black'),
+    *list(map(lambda x: mlines.Line2D([0], [0], c=x), VAR_C.values())),
+]
+LEG_LABELS = [
+    'CPU', 'CUDA',
+    *list(map(lambda x: f'{x} literals', VAR_C.keys()))
+]
 plt.figure(figsize=FIGSIZE)
 maxval, minval = 2000.0, 0.6
 for vars, in progressbar(list(itertools.product(
@@ -767,6 +797,8 @@ plt.yticks(plot_generatelogticks(minval, maxval, NUM_Y_TICKS))
 plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter())
 plt.minorticks_off()
 plt.ylabel('Running time [s]')
+if SHOW_LEGEND:
+    plt.legend(LEG_LINES, LEG_LABELS, loc='upper left')
 plt.savefig(f"runs/time_ga_elitism.pdf")
 plt.close()
 
@@ -868,29 +900,25 @@ plt.yticks(plot_generatelogticks(minval, maxval, NUM_Y_TICKS))
 plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter())
 plt.minorticks_off()
 plt.ylabel('Running time [s]')
+if SHOW_LEGEND:
+    plt.legend(LEG_LINES, LEG_LABELS, loc='upper left')
 plt.savefig(f"runs/time_ga.pdf")
 plt.close()
 
-fig2 = plt.figure()
-ax2 = fig2.add_subplot()
-ax2.axis('off')
-legend = ax2.legend([
-    mlines.Line2D([0],[0], linestyle='-', c='black'),
-    mlines.Line2D([0],[0], linestyle='--', c='black'),
-    *list(map(lambda x: mlines.Line2D([0],[0],c=x), VAR_C.values())),
-], [
-    'CPU', 'CUDA',
-    *list(map(lambda x: f'{x} literals', VAR_C.keys()))
-], frameon=False, loc='lower center', ncol=10, )
-fig2 = legend.figure
-fig2.canvas.draw()
-bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
-fig2.savefig(
-    f"runs/time_ga_legend.pdf",
-    dpi="figure",
-    bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
-)
-plt.close(fig2)
+if not SHOW_LEGEND:
+    fig2 = plt.figure()
+    ax2 = fig2.add_subplot()
+    ax2.axis('off')
+    legend = ax2.legend(LEG_LINES, LEG_LABELS, frameon=False, loc='lower center', ncol=10, )
+    fig2 = legend.figure
+    fig2.canvas.draw()
+    bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+    fig2.savefig(
+        f"runs/time_ga_legend.pdf",
+        dpi="figure",
+        bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+    )
+    plt.close(fig2)
 #endregion
 
 #region GA clausecount times
@@ -898,6 +926,13 @@ new_group('GA clausecount time')
 NUM_Y_TICKS = 7
 CLAUSES = [32,128,200,512,1024,2048,5000,10240,16384,32768]
 TO_MEASURE = 'total_real_time'
+LEG_LINES = [
+    mlines.Line2D([0], [0], linestyle='-', c='tab:blue'),
+    mlines.Line2D([0], [0], linestyle='-', c='tab:orange'),
+]
+LEG_LABELS = [
+    'CPU', 'CUDA',
+]
 plt.figure(figsize=FIGSIZE)
 maxval, minval = -math.inf, math.inf
 runs = MyRun.load_and_cache({
@@ -973,27 +1008,25 @@ plt.yticks(plot_generatelogticks(minval, maxval, NUM_Y_TICKS))
 plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter(useOffset=False))
 plt.minorticks_off()
 plt.ylabel('Running time [s]')
+if SHOW_LEGEND:
+    plt.legend(LEG_LINES, LEG_LABELS, loc='upper left')
 plt.savefig(f"runs/time_ga_clausecount.pdf")
 plt.close()
 
-fig2 = plt.figure()
-ax2 = fig2.add_subplot()
-ax2.axis('off')
-legend = ax2.legend([
-    mlines.Line2D([0],[0], linestyle='-', c='tab:blue'),
-    mlines.Line2D([0],[0], linestyle='-', c='tab:orange'),
-], [
-    'CPU', 'CUDA',
-], frameon=False, loc='lower center', ncol=10, )
-fig2 = legend.figure
-fig2.canvas.draw()
-bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
-fig2.savefig(
-    f"runs/time_ga_clausecount_legend.pdf",
-    dpi="figure",
-    bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
-)
-plt.close(fig2)
+if not SHOW_LEGEND:
+    fig2 = plt.figure()
+    ax2 = fig2.add_subplot()
+    ax2.axis('off')
+    legend = ax2.legend(LEG_LINES, LEG_LABELS, frameon=False, loc='lower center', ncol=10, )
+    fig2 = legend.figure
+    fig2.canvas.draw()
+    bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+    fig2.savefig(
+        f"runs/time_ga_clausecount_legend.pdf",
+        dpi="figure",
+        bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+    )
+    plt.close(fig2)
 #endregion
 
 #region GA varcount times
@@ -1001,6 +1034,13 @@ new_group('GA varcount time')
 NUM_Y_TICKS = 7
 VARS = [32,128,200,512,1024,2048,5000,10240,16384,32768]
 TO_MEASURE = 'total_real_time'
+LEG_LINES = [
+    mlines.Line2D([0], [0], linestyle='-', c='tab:blue'),
+    mlines.Line2D([0], [0], linestyle='-', c='tab:orange'),
+]
+LEG_LABELS = [
+    'CPU', 'CUDA',
+]
 plt.figure(figsize=FIGSIZE)
 maxval, minval = -math.inf, math.inf
 runs = MyRun.load_and_cache({
@@ -1076,27 +1116,25 @@ plt.yticks(plot_generatelogticks(minval, maxval, NUM_Y_TICKS))
 plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter(useOffset=False))
 plt.minorticks_off()
 plt.ylabel('Running time [s]')
+if SHOW_LEGEND:
+    plt.legend(LEG_LINES, LEG_LABELS, loc='upper left')
 plt.savefig(f"runs/time_ga_varcount.pdf")
 plt.close()
 
-fig2 = plt.figure()
-ax2 = fig2.add_subplot()
-ax2.axis('off')
-legend = ax2.legend([
-    mlines.Line2D([0],[0], linestyle='-', c='tab:blue'),
-    mlines.Line2D([0],[0], linestyle='-', c='tab:orange'),
-], [
-    'CPU', 'CUDA',
-], frameon=False, loc='lower center', ncol=10, )
-fig2 = legend.figure
-fig2.canvas.draw()
-bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
-fig2.savefig(
-    f"runs/time_ga_varcount_legend.pdf",
-    dpi="figure",
-    bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
-)
-plt.close(fig2)
+if not SHOW_LEGEND:
+    fig2 = plt.figure()
+    ax2 = fig2.add_subplot()
+    ax2.axis('off')
+    legend = ax2.legend(LEG_LINES, LEG_LABELS, frameon=False, loc='lower center', ncol=10)
+    fig2 = legend.figure
+    fig2.canvas.draw()
+    bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+    fig2.savefig(
+        f"runs/time_ga_varcount_legend.pdf",
+        dpi="figure",
+        bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+    )
+    plt.close(fig2)
 #endregion
 
 #region ES crossover fitness
@@ -1119,6 +1157,16 @@ CROSSOVERS = [
     {'label': 'Uniform','crossover': 'Uniform'},
 ]
 STYLES=['-','--',':']
+LEG_LINES = [
+    mlines.Line2D([0], [0], linestyle='-', c='black'),
+    mlines.Line2D([0], [0], linestyle='--', c='black'),
+    mlines.Line2D([0], [0], linestyle=':', c='black'),
+    *list(map(lambda x: mlines.Line2D([0], [0], c=x), PSIZE_C.values())),
+]
+LEG_LABELS = [
+    'Fitness median', 'Fitness 0.05 quantile', 'Best fitness',
+    *list(map(lambda x: f"Population size {x}", PSIZE_C.keys()))
+]
 for fn, dim, crossover in progressbar(list(itertools.product(
     FNS,
     DIMS,
@@ -1176,30 +1224,25 @@ for fn, dim, crossover in progressbar(list(itertools.product(
     plt.minorticks_off()
     plt.ylabel('Objective function')
     plt.title(f"{crossover['label']} crossover of $f_{{{fn}}}$ with {dim} dimensions")
+    if SHOW_LEGEND:
+        plt.legend(LEG_LINES, LEG_LABELS, loc='upper right')
     plt.savefig(f'runs/fitness_es_crossover_f{fn}_dim{dim}_{crossover["crossover"]}.pdf')
     plt.close()
 
-fig2 = plt.figure()
-ax2 = fig2.add_subplot()
-ax2.axis('off')
-legend = ax2.legend([
-    mlines.Line2D([0],[0], linestyle='-', c='black'),
-    mlines.Line2D([0],[0], linestyle='--', c='black'),
-    mlines.Line2D([0],[0], linestyle=':', c='black'),
-    *list(map(lambda x: mlines.Line2D([0],[0],c=x), PSIZE_C.values())),
-], [
-    'Fitness median', 'Fitness 0.05 quantile', 'Best fitness',
-    *list(map(lambda x: f"Population size {x}", PSIZE_C.keys()))
-], frameon=False, loc='lower center', ncol=10, )
-fig2 = legend.figure
-fig2.canvas.draw()
-bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
-fig2.savefig(
-    f"runs/fitness_es_crossovers_legend.pdf",
-    dpi="figure",
-    bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
-)
-plt.close(fig2)
+if not SHOW_LEGEND:
+    fig2 = plt.figure()
+    ax2 = fig2.add_subplot()
+    ax2.axis('off')
+    legend = ax2.legend(LEG_LINES, LEG_LABELS, frameon=False, loc='lower center', ncol=10, )
+    fig2 = legend.figure
+    fig2.canvas.draw()
+    bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+    fig2.savefig(
+        f"runs/fitness_es_crossovers_legend.pdf",
+        dpi="figure",
+        bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+    )
+    plt.close(fig2)
 #endregion
 
 #region ES crossover times
@@ -1216,6 +1259,15 @@ CROSSOVERS = [
     {'label': 'Uniform','crossover': 'Uniform', 'c': 'tab:gray'},
 ]
 TO_MEASURE = 'total_real_time'
+LEG_LINES = [
+    mlines.Line2D([0], [0], linestyle='-', c='black'),
+    mlines.Line2D([0], [0], linestyle='--', c='black'),
+    *list(map(lambda x: mlines.Line2D([0], [0], c=x['c']), CROSSOVERS)),
+]
+LEG_LABELS = [
+    'CPU', 'CUDA',
+    *list(map(lambda x: f'{x["label"]} crossover', CROSSOVERS))
+]
 for fn, dim in progressbar(list(itertools.product(
     FNS,
     DIMS,
@@ -1307,29 +1359,25 @@ for fn, dim in progressbar(list(itertools.product(
     plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter(useOffset=False))
     plt.minorticks_off()
     plt.ylabel('Running time [s]')
+    if SHOW_LEGEND:
+        plt.legend(LEG_LINES, LEG_LABELS, loc='upper left')
     plt.savefig(f"runs/time_es_crossover_fn{fn}_{dim}d.pdf")
     plt.close()
 
-fig2 = plt.figure()
-ax2 = fig2.add_subplot()
-ax2.axis('off')
-legend = ax2.legend([
-    mlines.Line2D([0],[0], linestyle='-', c='black'),
-    mlines.Line2D([0],[0], linestyle='--', c='black'),
-    *list(map(lambda x: mlines.Line2D([0],[0],c=x['c']), CROSSOVERS)),
-], [
-    'CPU', 'CUDA',
-    *list(map(lambda x: f'{x["label"]} crossover', CROSSOVERS))
-], frameon=False, loc='lower center', ncol=10, )
-fig2 = legend.figure
-fig2.canvas.draw()
-bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
-fig2.savefig(
-    f"runs/time_es_crossover_legend.pdf",
-    dpi="figure",
-    bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
-)
-plt.close(fig2)
+if not SHOW_LEGEND:
+    fig2 = plt.figure()
+    ax2 = fig2.add_subplot()
+    ax2.axis('off')
+    legend = ax2.legend(LEG_LINES, LEG_LABELS, frameon=False, loc='lower center', ncol=10)
+    fig2 = legend.figure
+    fig2.canvas.draw()
+    bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+    fig2.savefig(
+        f"runs/time_es_crossover_legend.pdf",
+        dpi="figure",
+        bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+    )
+    plt.close(fig2)
 #endregion
 
 #region ES mutation fitness
@@ -1350,6 +1398,16 @@ PSIZE_C = {
     '32768': 'tab:red',
 }
 STYLES=['-','--',':']
+LEG_LINES = [
+    mlines.Line2D([0], [0], linestyle='-', c='black'),
+    mlines.Line2D([0], [0], linestyle='--', c='black'),
+    mlines.Line2D([0], [0], linestyle=':', c='black'),
+    *list(map(lambda x: mlines.Line2D([0], [0], c=x), PSIZE_C.values())),
+]
+LEG_LABELS = [
+    'Fitness median', 'Fitness 0.05 quantile', 'Best fitness',
+    *list(map(lambda x: f"Population size {x}", PSIZE_C.keys()))
+]
 for fn, dim, mut in progressbar(list(itertools.product(
     [19, 22],
     [24, 128, 384],
@@ -1406,30 +1464,25 @@ for fn, dim, mut in progressbar(list(itertools.product(
     plt.minorticks_off()
     plt.ylabel('Objective function')
     plt.title(f"{NAMES[mut]} mutation of $f_{{{fn}}}$ with {dim} dimensions")
+    if SHOW_LEGEND:
+        plt.legend(LEG_LINES, LEG_LABELS, loc='upper right')
     plt.savefig(f'runs/fitness_es_mutation_f{fn}_dim{dim}_{mut}.pdf')
     plt.close()
 
-fig2 = plt.figure()
-ax2 = fig2.add_subplot()
-ax2.axis('off')
-legend = ax2.legend([
-    mlines.Line2D([0],[0], linestyle='-', c='black'),
-    mlines.Line2D([0],[0], linestyle='--', c='black'),
-    mlines.Line2D([0],[0], linestyle=':', c='black'),
-    *list(map(lambda x: mlines.Line2D([0],[0],c=x), PSIZE_C.values())),
-], [
-    'Fitness median', 'Fitness 0.05 quantile', 'Best fitness',
-    *list(map(lambda x: f"Population size {x}", PSIZE_C.keys()))
-], frameon=False, loc='lower center', ncol=10, )
-fig2 = legend.figure
-fig2.canvas.draw()
-bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
-fig2.savefig(
-    f"runs/fitness_es_mutation_legend.pdf",
-    dpi="figure",
-    bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
-)
-plt.close(fig2)
+if not SHOW_LEGEND:
+    fig2 = plt.figure()
+    ax2 = fig2.add_subplot()
+    ax2.axis('off')
+    legend = ax2.legend(LEG_LINES, LEG_LABELS, frameon=False, loc='lower center', ncol=10)
+    fig2 = legend.figure
+    fig2.canvas.draw()
+    bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+    fig2.savefig(
+        f"runs/fitness_es_mutation_legend.pdf",
+        dpi="figure",
+        bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+    )
+    plt.close(fig2)
 #endregion
 
 #region ES schema fitness
@@ -1448,6 +1501,16 @@ PSIZE_C = {
     '32768': 'tab:red',
 }
 STYLES=['-','--',':']
+LEG_LINES = [
+    mlines.Line2D([0], [0], linestyle='-', c='black'),
+    mlines.Line2D([0], [0], linestyle='--', c='black'),
+    mlines.Line2D([0], [0], linestyle=':', c='black'),
+    *list(map(lambda x: mlines.Line2D([0], [0], c=x), PSIZE_C.values())),
+]
+LEG_LABELS = [
+    'Fitness median', 'Fitness 0.05 quantile', 'Best fitness',
+    *list(map(lambda x: f"Population size {x}", PSIZE_C.keys()))
+]
 for fn, dim, schema in progressbar(list(itertools.product(
     [19, 22],
     [24, 128, 384],
@@ -1504,31 +1567,26 @@ for fn, dim, schema in progressbar(list(itertools.product(
     plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter(useOffset=False))
     plt.minorticks_off()
     plt.ylabel('Objective function')
-    plt.title(f"{schema['name']} mutation of $f_{{{fn}}}$ with {dim} dimensions")
+    plt.title(f"{schema['name']} mutation schema of BBOB $f_{{{fn}}}$ with {dim} dimensions")
+    if SHOW_LEGEND:
+        plt.legend(LEG_LINES, LEG_LABELS, loc='upper right')
     plt.savefig(f'runs/fitness_es_schema_f{fn}_dim{dim}_{schema["name"]}.pdf')
     plt.close()
 
-fig2 = plt.figure()
-ax2 = fig2.add_subplot()
-ax2.axis('off')
-legend = ax2.legend([
-    mlines.Line2D([0],[0], linestyle='-', c='black'),
-    mlines.Line2D([0],[0], linestyle='--', c='black'),
-    mlines.Line2D([0],[0], linestyle=':', c='black'),
-    *list(map(lambda x: mlines.Line2D([0],[0],c=x), PSIZE_C.values())),
-], [
-    'Fitness median', 'Fitness 0.05 quantile', 'Best fitness',
-    *list(map(lambda x: f"Population size {x}", PSIZE_C.keys()))
-], frameon=False, loc='lower center', ncol=10, )
-fig2 = legend.figure
-fig2.canvas.draw()
-bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
-fig2.savefig(
-    f"runs/fitness_es_schema_legend.pdf",
-    dpi="figure",
-    bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
-)
-plt.close(fig2)
+if not SHOW_LEGEND:
+    fig2 = plt.figure()
+    ax2 = fig2.add_subplot()
+    ax2.axis('off')
+    legend = ax2.legend(LEG_LINES, LEG_LABELS, frameon=False, loc='lower center', ncol=10)
+    fig2 = legend.figure
+    fig2.canvas.draw()
+    bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+    fig2.savefig(
+        f"runs/fitness_es_schema_legend.pdf",
+        dpi="figure",
+        bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+    )
+    plt.close(fig2)
 #endregion
 
 #region ES schemas times
@@ -1543,6 +1601,15 @@ SCHEMAS = [
     {'name': 'plus', 'discard': False, 'replace': False, 'c': 'tab:green'},
 ]
 TO_MEASURE = 'total_real_time'
+LEG_LINES = [
+    mlines.Line2D([0], [0], linestyle='-', c='black'),
+    mlines.Line2D([0], [0], linestyle='--', c='black'),
+    *list(map(lambda x: mlines.Line2D([0], [0], c=x['c']), SCHEMAS)),
+]
+LEG_LABELS = [
+    'CPU', 'CUDA',
+    *list(map(lambda x: f'{x["name"]} schema', SCHEMAS))
+]
 for fn, dim in progressbar(list(itertools.product(
     FNS,
     DIMS,
@@ -1634,29 +1701,25 @@ for fn, dim in progressbar(list(itertools.product(
     plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter(useOffset=False))
     plt.minorticks_off()
     plt.ylabel('Running time [s]')
+    if SHOW_LEGEND:
+        plt.legend(LEG_LINES, LEG_LABELS, loc='upper left')
     plt.savefig(f"runs/time_es_schema_fn{fn}_{dim}d.pdf")
     plt.close()
 
-fig2 = plt.figure()
-ax2 = fig2.add_subplot()
-ax2.axis('off')
-legend = ax2.legend([
-    mlines.Line2D([0],[0], linestyle='-', c='black'),
-    mlines.Line2D([0],[0], linestyle='--', c='black'),
-    *list(map(lambda x: mlines.Line2D([0],[0],c=x['c']), SCHEMAS)),
-], [
-    'CPU', 'CUDA',
-    *list(map(lambda x: f'{x["name"]} schema', SCHEMAS))
-], frameon=False, loc='lower center', ncol=10, )
-fig2 = legend.figure
-fig2.canvas.draw()
-bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
-fig2.savefig(
-    f"runs/time_es_schema_legend.pdf",
-    dpi="figure",
-    bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
-)
-plt.close(fig2)
+if not SHOW_LEGEND:
+    fig2 = plt.figure()
+    ax2 = fig2.add_subplot()
+    ax2.axis('off')
+    legend = ax2.legend(LEG_LINES, LEG_LABELS, frameon=False, loc='lower center', ncol=10)
+    fig2 = legend.figure
+    fig2.canvas.draw()
+    bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+    fig2.savefig(
+        f"runs/time_es_schema_legend.pdf",
+        dpi="figure",
+        bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+    )
+    plt.close(fig2)
 #endregion
 
 #region ES mutation times
@@ -1679,6 +1742,15 @@ NAMES = {
     'AdaptiveStep': 'Adaptive mutation',
 }
 TO_MEASURE = 'total_real_time'
+LEG_LINES = [
+    mlines.Line2D([0], [0], linestyle='-', c='black'),
+    mlines.Line2D([0], [0], linestyle='--', c='black'),
+    *list(map(lambda x: mlines.Line2D([0], [0], c=MUT_COLORS[x]), MUTATIONS)),
+]
+LEG_LABELS = [
+    'CPU', 'CUDA',
+    *[NAMES[mut] for mut in MUTATIONS]
+]
 for fn, dim in progressbar(list(itertools.product(
     FNS,
     DIMS
@@ -1766,29 +1838,25 @@ for fn, dim in progressbar(list(itertools.product(
     plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter(useOffset=False))
     plt.minorticks_off()
     plt.ylabel('Running time [s]')
+    if SHOW_LEGEND:
+        plt.legend(LEG_LINES, LEG_LABELS, loc='upper left')
     plt.savefig(f"runs/time_es_mutation_fn{fn}_{dim}d.pdf")
     plt.close()
 
-fig2 = plt.figure()
-ax2 = fig2.add_subplot()
-ax2.axis('off')
-legend = ax2.legend([
-    mlines.Line2D([0],[0], linestyle='-', c='black'),
-    mlines.Line2D([0],[0], linestyle='--', c='black'),
-    *list(map(lambda x: mlines.Line2D([0],[0],c=MUT_COLORS[x]), MUTATIONS)),
-], [
-    'CPU', 'CUDA',
-    *[NAMES[mut] for mut in MUTATIONS]
-], frameon=False, loc='lower center', ncol=10, )
-fig2 = legend.figure
-fig2.canvas.draw()
-bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
-fig2.savefig(
-    f"runs/time_es_mutation_legend.pdf",
-    dpi="figure",
-    bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
-)
-plt.close(fig2)
+if not SHOW_LEGEND:
+    fig2 = plt.figure()
+    ax2 = fig2.add_subplot()
+    ax2.axis('off')
+    legend = ax2.legend(LEG_LINES, LEG_LABELS, frameon=False, loc='lower center', ncol=10)
+    fig2 = legend.figure
+    fig2.canvas.draw()
+    bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+    fig2.savefig(
+        f"runs/time_es_mutation_legend.pdf",
+        dpi="figure",
+        bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+    )
+    plt.close(fig2)
 #endregion
 
 #region PSO neighborhood fitness
@@ -1824,7 +1892,17 @@ NEIGHBORHOODS = [
         {'config.pso.neigh.subtype.value': 'diamond'},
     ], 'pop_sizes': POP_SIZES[1:]},
 ]
-STYLES=['-','--',':']
+STYLES = ['-', '--', ':']
+LEG_LINES = [
+    mlines.Line2D([0], [0], linestyle='-', c='black'),
+    mlines.Line2D([0], [0], linestyle='--', c='black'),
+    mlines.Line2D([0], [0], linestyle=':', c='black'),
+    *list(map(lambda x: mlines.Line2D([0], [0], c=x), PSIZE_C.values())),
+]
+LEG_LABELS = [
+    'Fitness median', 'Fitness 0.05 quantile', 'Best fitness',
+    *list(map(lambda x: f"{x} particles", PSIZE_C.keys()))
+]
 for fn, neig in progressbar(list(itertools.product(
     [1, 7, 15, 19, 22, 24],
     NEIGHBORHOODS
@@ -1884,30 +1962,25 @@ for fn, neig in progressbar(list(itertools.product(
     plt.minorticks_off()
     plt.ylabel('Objective function')
     plt.title(f"{neig['label']} neighborhood BBOB $f_{{{fn}}}$")
+    if SHOW_LEGEND:
+        plt.legend(LEG_LINES, LEG_LABELS, loc='upper right')
     plt.savefig(f'runs/fitness_pso_f{fn}_neigh{neig["label"].replace(" ","")}.pdf')
     plt.close()
 
-fig2 = plt.figure()
-ax2 = fig2.add_subplot()
-ax2.axis('off')
-legend = ax2.legend([
-    mlines.Line2D([0],[0], linestyle='-', c='black'),
-    mlines.Line2D([0],[0], linestyle='--', c='black'),
-    mlines.Line2D([0],[0], linestyle=':', c='black'),
-    *list(map(lambda x: mlines.Line2D([0],[0],c=x), PSIZE_C.values())),
-], [
-    'Fitness median', 'Fitness 0.05 quantile', 'Best fitness',
-    *list(map(lambda x: f"{x} particles", PSIZE_C.keys()))
-], frameon=False, loc='lower center', ncol=10, )
-fig2 = legend.figure
-fig2.canvas.draw()
-bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
-fig2.savefig(
-    f"runs/fitness_pso_neigh_legend.pdf",
-    dpi="figure",
-    bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
-)
-plt.close(fig2)
+if not SHOW_LEGEND:
+    fig2 = plt.figure()
+    ax2 = fig2.add_subplot()
+    ax2.axis('off')
+    legend = ax2.legend(LEG_LINES, LEG_LABELS, frameon=False, loc='lower center', ncol=10)
+    fig2 = legend.figure
+    fig2.canvas.draw()
+    bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+    fig2.savefig(
+        f"runs/fitness_pso_neigh_legend.pdf",
+        dpi="figure",
+        bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+    )
+    plt.close(fig2)
 #endregion
 
 #region PSO neighborhood times
@@ -1936,6 +2009,15 @@ NEIGHBORHOODS = [
         {'config.pso.neigh.value': 'Grid2D'},
         {'config.pso.neigh.subtype.value': 'diamond'},
     ], 'color': 'tab:red'},
+]
+LEG_LINES = [
+    mlines.Line2D([0], [0], linestyle='-', c='black'),
+    mlines.Line2D([0], [0], linestyle='--', c='black'),
+    *list(map(lambda x: mlines.Line2D([0], [0], c=x['color']), NEIGHBORHOODS)),
+]
+LEG_LABELS = [
+    'CPU', 'CUDA',
+    *list(map(lambda x: x['label'], NEIGHBORHOODS))
 ]
 for fn, in progressbar(list(itertools.product(
     [1, 7, 15, 19, 22, 24],
@@ -2029,29 +2111,25 @@ for fn, in progressbar(list(itertools.product(
     plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter(useOffset=False))
     plt.minorticks_off()
     plt.ylabel('Running time [s]')
+    if SHOW_LEGEND:
+        plt.legend(LEG_LINES, LEG_LABELS, loc='upper left')
     plt.savefig(f"runs/time_pso2006_fn{fn}_neigh.pdf")
     plt.close()
 
-fig2 = plt.figure()
-ax2 = fig2.add_subplot()
-ax2.axis('off')
-legend = ax2.legend([
-    mlines.Line2D([0],[0], linestyle='-', c='black'),
-    mlines.Line2D([0], [0], linestyle='--', c='black'),
-    *list(map(lambda x: mlines.Line2D([0],[0],c=x['color']), NEIGHBORHOODS)),
-], [
-    'CPU', 'CUDA',
-    *list(map(lambda x: x['label'], NEIGHBORHOODS))
-], frameon=False, loc='lower center', ncol=10, )
-fig2 = legend.figure
-fig2.canvas.draw()
-bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
-fig2.savefig(
-    f"runs/time_pso_neigh_legend.pdf",
-    dpi="figure",
-    bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
-)
-plt.close(fig2)
+if not SHOW_LEGEND:
+    fig2 = plt.figure()
+    ax2 = fig2.add_subplot()
+    ax2.axis('off')
+    legend = ax2.legend(LEG_LINES, LEG_LABELS, frameon=False, loc='lower center', ncol=10)
+    fig2 = legend.figure
+    fig2.canvas.draw()
+    bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+    fig2.savefig(
+        f"runs/time_pso_neigh_legend.pdf",
+        dpi="figure",
+        bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+    )
+    plt.close(fig2)
 #endregion
 
 #region PSO2011 performance
@@ -2059,6 +2137,20 @@ new_group('PSO2011 performance')
 COLORS = ['tab:blue', 'tab:orange', 'tab:green', 'tab:red']
 STYLES = ['-','--',':']
 NUM_Y_TICKS = 7
+LEG_LINES = [
+    mlines.Line2D([0], [0], linestyle='-', c='black'),
+    mlines.Line2D([0], [0], linestyle='--', c='black'),
+    mlines.Line2D([0], [0], linestyle=':', c='black'),
+    mlines.Line2D([0], [0], c='tab:blue'),
+    mlines.Line2D([0], [0], c='tab:orange'),
+    mlines.Line2D([0], [0], c='tab:green'),
+    mlines.Line2D([0], [0], c='tab:red'),
+]
+LEG_LABELS = [
+    'Fitness median', 'Fitness 0.05 quantile', 'Best fitness',
+    '32 particles', '512 particles',
+    '10240 particles', '32768 particles',
+]
 for fn, in progressbar(list(itertools.product(
         [1, 7, 15, 19, 22, 24],
 ))):
@@ -2102,38 +2194,46 @@ for fn, in progressbar(list(itertools.product(
     plt.minorticks_off()
     plt.ylabel('Objective function')
     plt.title(f"BBOB function $f_{{{fn}}}$")
+    if SHOW_LEGEND:
+        plt.legend(LEG_LINES, LEG_LABELS, loc='upper right')
     plt.savefig(f'runs/fitness_pso2011_f{fn}.pdf')
     plt.close()
 
-fig2 = plt.figure()
-ax2 = fig2.add_subplot()
-ax2.axis('off')
-legend = ax2.legend([
-    mlines.Line2D([0],[0], linestyle='-', c='black'),
+if not SHOW_LEGEND:
+    fig2 = plt.figure()
+    ax2 = fig2.add_subplot()
+    ax2.axis('off')
+    legend = ax2.legend(LEG_LINES, LEG_LABELS, frameon=False, loc='lower center', ncol=10)
+    fig2 = legend.figure
+    fig2.canvas.draw()
+    bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+    fig2.savefig(
+        f"runs/fitness_pso2011_legend.pdf",
+        dpi="figure",
+        bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+    )
+    plt.close(fig2)
+#endregion
+
+#region PSO2006 performance
+new_group('PSO2006 performance')
+COLORS = ['tab:blue', 'tab:orange', 'tab:green', 'tab:red']
+STYLES = ['-','--',':']
+NUM_Y_TICKS = 7
+LEG_LINES = [
+    mlines.Line2D([0], [0], linestyle='-', c='black'),
     mlines.Line2D([0], [0], linestyle='--', c='black'),
     mlines.Line2D([0], [0], linestyle=':', c='black'),
     mlines.Line2D([0], [0], c='tab:blue'),
     mlines.Line2D([0], [0], c='tab:orange'),
     mlines.Line2D([0], [0], c='tab:green'),
     mlines.Line2D([0], [0], c='tab:red'),
-], [
+]
+LEG_LABELS = [
     'Fitness median', 'Fitness 0.05 quantile', 'Best fitness',
     '32 particles', '512 particles',
     '10240 particles', '32768 particles',
-], frameon=False, loc='lower center', ncol=10, )
-fig2 = legend.figure
-fig2.canvas.draw()
-bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
-fig2.savefig(
-    f"runs/fitness_pso2011_legend.pdf",
-    dpi="figure",
-    bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
-)
-plt.close(fig2)
-#endregion
-
-#region PSO2006 performance
-new_group('PSO2006 performance')
+]
 for fn, in progressbar(list(itertools.product(
         [1, 7, 15, 19, 22, 24],
 ))):
@@ -2177,8 +2277,25 @@ for fn, in progressbar(list(itertools.product(
     plt.minorticks_off()
     plt.ylabel('Objective function')
     plt.title(f"BBOB function $f_{{{fn}}}$")
+    if SHOW_LEGEND:
+        plt.legend(LEG_LINES, LEG_LABELS, loc='upper right')
     plt.savefig(f'runs/fitness_pso2006_f{fn}.pdf')
     plt.close()
+
+if not SHOW_LEGEND:
+    fig2 = plt.figure()
+    ax2 = fig2.add_subplot()
+    ax2.axis('off')
+    legend = ax2.legend(LEG_LINES, LEG_LABELS, frameon=False, loc='lower center', ncol=10)
+    fig2 = legend.figure
+    fig2.canvas.draw()
+    bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+    fig2.savefig(
+        f"runs/fitness_pso2006_legend.pdf",
+        dpi="figure",
+        bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+    )
+    plt.close(fig2)
 #endregion
 
 #region PSO2006 run times
@@ -2192,6 +2309,15 @@ DIM_COLORS = {
     '128': 'tab:green',
     '384': 'tab:red',
 }
+LEG_LINES = [
+    mlines.Line2D([0], [0], linestyle='-', c='black'),
+    mlines.Line2D([0], [0], linestyle='--', c='black'),
+    *[mlines.Line2D([0], [0], c=col) for col in DIM_COLORS.values()]
+]
+LEG_LABELS = [
+    'CPU', 'CUDA',
+    *[f'Problem dimension {dom}' for dom in DIM_COLORS.keys()]
+]
 for fn, in progressbar(list(itertools.product(
         [1, 7, 15, 19, 22, 24],
 ))):
@@ -2272,28 +2398,24 @@ for fn, in progressbar(list(itertools.product(
     plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter(useOffset=False))
     plt.minorticks_off()
     plt.ylabel('Running time [s]')
+    if SHOW_LEGEND:
+        plt.legend(LEG_LINES, LEG_LABELS, loc='upper left')
     plt.savefig(f"runs/time_pso2006_fn{fn}_alldim.pdf")
     plt.close()
 
-fig2 = plt.figure()
-ax2 = fig2.add_subplot()
-ax2.axis('off')
-legend = ax2.legend([
-    mlines.Line2D([0], [0], linestyle='-', c='black'),
-    mlines.Line2D([0], [0], linestyle='--', c='black'),
-    *[mlines.Line2D([0],[0],c=col) for col in DIM_COLORS.values()]
-], [
-    'CPU','CUDA',
-    *[f'Problem dimension {dom}' for dom in DIM_COLORS.keys()]
-], frameon=False, loc='lower center', ncol=10, )
-fig2 = legend.figure
-fig2.canvas.draw()
-bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
-fig2.savefig(
-    f"runs/time_pso2006_alldim_legend.pdf",
-    dpi="figure",
-    bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
-)
+if not SHOW_LEGEND:
+    fig2 = plt.figure()
+    ax2 = fig2.add_subplot()
+    ax2.axis('off')
+    legend = ax2.legend(LEG_LINES, LEG_LABELS, frameon=False, loc='lower center', ncol=10)
+    fig2 = legend.figure
+    fig2.canvas.draw()
+    bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+    fig2.savefig(
+        f"runs/time_pso2006_alldim_legend.pdf",
+        dpi="figure",
+        bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+    )
 #endregion
 
 # region PSO2011 run times
@@ -2305,6 +2427,15 @@ DIM_COLORS = {
     '128': 'tab:green',
     '384': 'tab:red',
 }
+LEG_LINES = [
+    mlines.Line2D([0], [0], linestyle='-', c='black'),
+    mlines.Line2D([0], [0], linestyle='--', c='black'),
+    *[mlines.Line2D([0], [0], c=col) for col in DIM_COLORS.values()]
+]
+LEG_LABELS = [
+    'CPU', 'CUDA',
+    *[f'Problem dimension {dom}' for dom in DIM_COLORS.keys()]
+]
 for fn, in progressbar(list(itertools.product(
         [1, 7, 15, 19, 22, 24],
 ))):
@@ -2385,26 +2516,22 @@ for fn, in progressbar(list(itertools.product(
     plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter(useOffset=False))
     plt.minorticks_off()
     plt.ylabel('Running time [s]')
+    if SHOW_LEGEND:
+        plt.legend(LEG_LINES, LEG_LABELS, loc='upper left')
     plt.savefig(f"runs/time_pso2011_fn{fn}_alldim.pdf")
     plt.close()
 
-fig2 = plt.figure()
-ax2 = fig2.add_subplot()
-ax2.axis('off')
-legend = ax2.legend([
-    mlines.Line2D([0], [0], linestyle='-', c='black'),
-    mlines.Line2D([0], [0], linestyle='--', c='black'),
-    *[mlines.Line2D([0],[0],c=col) for col in DIM_COLORS.values()]
-], [
-    'CPU','CUDA',
-    *[f'Problem dimension {dom}' for dom in DIM_COLORS.keys()]
-], frameon=False, loc='lower center', ncol=10, )
-fig2 = legend.figure
-fig2.canvas.draw()
-bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
-fig2.savefig(
-    f"runs/time_pso2011_alldim_legend.pdf",
-    dpi="figure",
-    bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
-)
+if not SHOW_LEGEND:
+    fig2 = plt.figure()
+    ax2 = fig2.add_subplot()
+    ax2.axis('off')
+    legend = ax2.legend(LEG_LINES, LEG_LABELS, frameon=False, loc='lower center', ncol=10)
+    fig2 = legend.figure
+    fig2.canvas.draw()
+    bbox = legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+    fig2.savefig(
+        f"runs/time_pso2011_alldim_legend.pdf",
+        dpi="figure",
+        bbox_inches=legend.get_window_extent().transformed(fig2.dpi_scale_trans.inverted())
+    )
 #endregion
