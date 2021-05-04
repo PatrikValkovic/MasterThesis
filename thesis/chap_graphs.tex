@@ -521,6 +521,7 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
     \end{minipage}
 
     \caption[Running time of PSO2006]{Running time of \acrlong{acc:spso2006} algorithm using problems of dimension $6$, $32$, $128$, and $384$. The algorithm run for $1000$ generations. Populations with over $1000$ particles takes advantage of \gpu and are clearly faster to evaluate.}
+    \label{meas:spso2006time}
 \end{figure}
 
 \begin{figure}[ht!]
@@ -560,6 +561,7 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
     \end{minipage}
 
     \caption[Fitness of PSO2006 algorithm]{Median, $0.05$ quantile, and best fitness of \acrlong{acc:spso2006} algorithm using random neighborhood on problem with $128$ dimensions. I measured populations consisting of $32$, $512$, $10240$, and $32768$ particles. All the problem functions take advantage of more particles, except of function $f_7$. Given hyperparameters in table \ref{tab:psohyperparameters}, \acrshort{acc:spso2006} seems to have better convergence properties in comparison to \acrshort{acc:spso2011}.}
+    \label{meas:spso2006fitness}
 \end{figure}
 
 
@@ -607,6 +609,7 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
     \end{minipage}
 
     \caption[PSO2006 neighborhood running time]{Running time of \acrlong{acc:spso2006} algorithm with different neighborhood types. The algorithm run for 1000 generations on problem with 128 dimensions. Neighborhood sizes are at table \ref{tab:psohyperparameters}. The nearest neighborhood topology was run only to population of size 4900, as it compares all pairs of individuals and the device does not have enough memory. The minimum population size for grid topologies were 225, because topologies size were specified as a fraction of population size and for smaller populations neighborhood could not be constructed. The grid topologies were always assembled into square. Running times of circle, linear grid, compact grid, and diamond grid were almost identical (depending only on the size of neighborhood, see chapter \ref{chap:impl}), so I plot only measurements for circle and diamond grid.}
+    \label{meas:psoneigtime}
 \end{figure}
 
 
@@ -650,6 +653,7 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
     \caption[Fitness of PSO neighborhoods]{Fitness of neighborhoods using $121$, $529$, $4900$, and $22500$ particles and \acrshort{acc:spso2006} update algorithm. Nearest neighborhood for $22500$ particles is not present, because of the memory demands. Grid neighborhoods for $121$ particles is not present, because there was not enough particles to build it. 
     All the neighborhoods clearly benefit from greater number of particles with the exception of compact grid and diamond grid. This is probably caused by premature convergence rather than degredation of the performance.
     Measurements for \acrshort{acc:bbob} functions $f_1$, $f_7$, $f_{15}$, and $f_{22}$ report similar properties.}
+    \label{meas:psoneigfitness}
 \end{figure}
 
 
@@ -697,6 +701,7 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
     \end{minipage}
 
     \caption[Running time of PSO2011]{Running time of \acrlong{acc:spso2011} algorithm using problems of dimension $6$, $32$, $128$, and $384$. The algorithm run for $1000$ generations. Populations with over $1000$ particles takes clear advantage of \gpu.}
+    \label{meas:spso2011time}
 \end{figure}
 
 \begin{figure}[ht!]
@@ -736,4 +741,5 @@ All the algorithms were run with hyperparameters from chpater \ref{chap:hyperpar
     \end{minipage}
 
     \caption[Fitness of PSO2011 algorithm]{Median, $0.05$ quantile, and best fitness of \acrlong{acc:spso2011} algorithm using random neighborhood on problem with $128$ dimensions. I measured populations consisting of $32$, $512$, $10240$, and $32768$ particles. All the problem functions take advantage of more particles.}
+    \label{meas:spso2011fitness}
 \end{figure}
