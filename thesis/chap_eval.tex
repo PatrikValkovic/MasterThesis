@@ -215,3 +215,29 @@ Lastly, the crossover schema experiments are depicted in figure \ref{meas:schema
 Finally, the running time of \acrshort{acc:spso2006} and \acrshort{acc:spso2011} algorithms are shown in the figure \ref{meas:spso2006time} and \ref{meas:spso2011time}. The \acrshort{acc:pso} algorithms show bigger speedup than \acrshort{acc:ga} and real--coded evolutionary algorithms, even for problems with $384$ dimensions. The running times for problem with $6$, $32$, and $128$ dimensions is almost identical except the \acrshort{acc:bbob} function $f_{22}$. This function has the most complicated evaluation and takes great portion of the running time. The graphs showing average fitness are in figures \ref{meas:spso2006fitness} (for \acrshort{acc:spso2006}) and \ref{meas:spso2011fitness} (for \acrshort{acc:spso2011}). Unlike in previous experiments, all the problems take advantage of the larger population, as is clearly visible in the figures. I would say the \acrshort{acc:pso} algorithms has the biggest potential to run on \gpuns.
 
 The \acrshort{acc:pso} neighborhoods experiments are depicted in figure \ref{meas:psoneigtime}, and their fitness in figure \ref{meas:psoneigfitness}. The random and circle neighborhoods are the fastest to evaluate on \gpuns, where the circle one is a bit faster for small populations. The circle neighborhood is static and generated only once, while the random neighborhood changes with every iteration. On the other hand, the random neighborhood is the slowest on the \cpu (except the nearest one). The grid--based neighborhoods are as fast as circle neighborhood for smaller populations, but for bigger populations the evaluation takes as long as random neighborhood. The cause is their substantial size in contrast to the circle one. The nearest neighborhood is extensively slower than any other. This is expected because it needs to measure the distance between every pair of particles, which is very costly even on \gpuns. The neighborhood evaluation is still more than six times faster on the \gpu than on the \cpu for swarms larger than $500$ particles.
+
+The overall statistics about the experiments is given in table \ref{tab:totaltime}, including number of experiments and the total running time.
+
+\begin{table}
+    \centering
+    \begin{tabular}{|l|r|r|}
+        \cline{2-3}
+        \multicolumn{1}{l|}{} & \textbf{\makecell{Number of\\experiments}} & \textbf{\makecell{Running\\time}} \\
+        \hline
+        \acrlong*{acc:ga} & $63\;109$ & $955.7$h \\
+        Real--coded evolutionary algorithms & $142\;866$ & $1136.8$h \\
+        \acrlong*{acc:pso} & $197\;378$ & $1264.7$h \\
+        Hyperparameter search & $7\;396$ & $48.7$h \\
+        Testing runs & $5\;147$ & $53.5$h \\
+        Failed runs & $30\;576$ & $136.6$h \\
+        \hline
+        CPU runs & $230\;413$ & $2569.1$h \\
+        GPU runs & $216\;059$ & $1026.9$h \\
+        CPUdays according to MetaCentrum & & $2144.7$h \\
+        \hline
+        Total & $446\;472$ & $3596.0$h \\
+        \hline
+    \end{tabular}
+    \caption{Experiments running times}
+    \label{tab:totaltime}
+\end{table}
