@@ -19,10 +19,13 @@ def generate_cnf(literals: int, clauses: List[int], f: str = 'tmp.cnf'):
         print(f'p cnf {literals} {len(clauses)}', file=f)
         for clause_c in clauses:
             selected = np.random.choice(literals, clause_c, replace=False)
-            values = sample[selected]
-            selected += 1
-            selected[np.logical_not(values)] *= -1
-            print(str.join(" ", map(str, selected)), file=f)
+            positive = np.random.rand(clause_c) < 0.5
+            in_formula = selected + 1
+            in_formula[np.logical_not(positive)] *= -1
+            if np.all(sample[selected] != positive):
+                to_change_index = np.random.randint(clause_c)
+                in_formula[to_change_index] = abs(in_formula[to_change_index]) * (1 if sample[selected[to_change_index]] else -1)
+            print(str.join(" ", map(str, in_formula)), file=f)
 
 
 def generate_cnf_norm(literals: int, mclauses, sclauses, mperclause, sperclause, f: str = 'tmp.cnf'):
