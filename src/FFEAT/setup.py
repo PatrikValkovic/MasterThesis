@@ -4,8 +4,7 @@
 # 3/9/2021
 #
 ###############################
-
-from setuptools import setup
+from setuptools import setup, find_packages
 
 v = '1.0.0'
 # read the contents of your README file
@@ -24,12 +23,9 @@ setup(
     long_description_content_type="text/markdown",
     author="Patrik Valkovic",
     license="GNU LGPLv3",
-    packages=[
-        "ffeat",
-        "ffeat/flow"
-    ],
+    packages=find_packages(include=('ffeat*',), exclude=('ffeat.cma')),
     install_requires=[
-        "numpy",
         "torch",
+        "numpy",
     ],
 )
