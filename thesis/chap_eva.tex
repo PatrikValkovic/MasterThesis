@@ -112,7 +112,6 @@ The typical crossover operator is \emph{one--point crossover}\index{crossover \a
     \end{subfigure}
     \caption{Genetic algorithm operators}
 \end{figure}
-% TODO sjednotit barvy
 
 The mutation\index{mutation \acrshort*{acc:ga}} operator for \acrshort{acc:ga} is in the most cases bit--flip mutation\index{mutation \acrshort*{acc:ga}!bit--flip}. During this mutation, each gene in the genotype mutates with probability $p_m$. One example of mutation is in figure \ref{fig:bitflipmutation}. Mutation has two objectives -- it makes sure the algorithm is not trapped in local optima and sustains genetic disparity in the population. As a side effect, mutation serves as a secondary search operator \citep{IntroToGA}.
 
@@ -164,7 +163,6 @@ The simple genetic algorithm used one point crossover. It is straightforward to 
     \end{subfigure}
     \caption{Advanced crossover operators}
 \end{figure}
-% TODO sjednotit barvy
 
 Sometimes, the crossover operator is generalized even more and forms $k$--point crossover. The genotype partitions into $k$ parts, and these parts are interleaved in the offsprings. A special case is \emph{uniform crossover}\index{crossover \acrshort*{acc:ga}!uniform} -- the offsprings are constructed in such a way that they are a uniform combination of their parents. Each gene in the offspring has an equal probability of whether it will be received from the first or second parent. The second offspring will follow the same pattern, except with parents swapped. Example of uniform crossover is in figure \ref{fig:uniformcrossover}.
 % Introduction into GA presents few more types - three parents crossover, crossover with a reduced surrogate, and shuffle crossover. These are irrelevant for my implementation, but I can potentially describe them here.
@@ -252,13 +250,10 @@ Selection operators may use traditional approaches from search algorithms -- for
 One example of simulated annealing is the Boltzmann selection operator. It draws the individuals with probability 
 $P\propto exp\left(-\frac{f_{max} - \fitnessfn(\individual)}{\tau}\right)$
 where $f_{max}$ is the best fitness in the population and $\tau$ is the current temperature (known as Boltzmann probability). Note that Boltzmann selection is once again proportional--based selection operator and may suffer from the same problems as roulette wheel selection.
-% TODO Boltzmann selection not implemented
 
 The last selection operator, I would like to discuss, is \emph{elitism}\index{elitism}. For some problems may be beneficial to preserve the best individuals from the population. This is especially helpful for problems where the algorithm can find the optimal solution using small local steps. Mutation and crossover may destroy the best individual in the population, and it may be difficult for the algorithm to find it once again if its genetic material has not been propagated yet.
 
 The elitism mechanism is operator, which makes sure the best individuals endure in the population. It is usually implemented in a way it copies the $k$ best individuals from the population before all other operators execute, and copy them back afterward. Alternatively it prohibit their change, or append them to the population afterwards. Note that elitism is not truly a selection operator, but rather an insure mechanism not to lose the population's best individuals. Traditional selection operator still needs to be present in order for the algorithm to work. 
-
-% TODO I did not discuss the schemata; it may be worth mentioning them
 
 
 
@@ -339,7 +334,7 @@ These functions are shown in figure \ref{fig:separationfucntions}. Running simpl
 
 The problem of crossover operators from \acrshort{acc:ga} is precisely the same as I have just shown. These operators work on the genes independently and do not use knowledge about the correlation of the genotype space within the population. It is therefore necessary to use different crossover operators tailored for the real--coded \acrshort{acc:ea}.
 
-One of the simplest real--coded \acrshort{acc:ea} crossover is \emph{arithmetic crossover}\index{crossover real--coded!arithmetic}. For parents $\mathbf{p_1}$ and $\mathbf{p_2}$, the offspring $o$ is created using following formula.
+One of the simplest real--coded \acrshort{acc:ea} crossover is \emph{arithmetic crossover}\index{crossover real--coded!arithmetic}. For parents $\mathbf{p_1}$ and $\mathbf{p_2}$, the offspring $\mathbf{o}$ is created using following formula.
 $$
 \mathbf{o} = \alpha\mathbf{p_1}+\left(1-\alpha\right)\mathbf{p_2}
 $$
@@ -394,8 +389,6 @@ $$
 \unboldmath
 The algorithm then samples the offspring from this simplex. Example of simplex crossover in two dimensional space is in the figure \ref{fig:simplexcrossoverexample} with $\varepsilon=1.5$.
 I would argue that the hypersphere sample space can be used as well, as is shown in figure \ref{fig:simplexcrossoverexample} with $\varepsilon=1.2$.
-% TODO not implemented
-% In the Introduction to Evolutionary Algorithms, other types of crossovers like Simulated Binary Crossover and Unimodal Normal Distribution Crossover are described as well. I can discuss them when they become relevant.
 
 %%%%%%%%%%%%%%%%%%%%
 %%%%  MUTATION  %%%%
@@ -476,7 +469,6 @@ where $s$ is starting value and $p$ is adjustable parameter. Examples of decays 
         \includegraphics[width=\textwidth]{img/render_differential.pdf}
         \caption[Differential evolution crossover]{Differential evolution crossover with $F=0.7$}
         \label{fig:differentialevolution}
-        % TODO dodělat potomka, zatím je jen v
     \end{minipage}
 \end{figure}
 

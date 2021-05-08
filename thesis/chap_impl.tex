@@ -51,7 +51,6 @@ Before I describe particular operators, I would like to discuss the limitations 
 A further limitation is the \gpu memory, which is a scarcer resource in comparison to the servers. Modern graphical cards have up to small dozens of GB of memory (the latest NVIDIA V100 has 32GB \citep{nvidiav100spec}), whereas modern servers have hundreds of GB of memory. Because the library may use vast populations, even memory reallocation may be problematic, as the whole population must fit into the memory at least twice. I decided to implement the operators in--place, that is, all the operators are applied on the same memory. Not only it uses less memory, but it is also more efficient. For some operators (typically crossovers) is still possible to opt--out of in--place mode (for example, in the case of plus or comma crossover schema).
 
 Some operators, for example crossovers and differential evolution, should receive distinct parents in order for the operator to do something useful. Unfortunately, this requirement is hard to satisfy, especially for \gpuns, because the parent indices are generated independently. It is, nevertheless, still possible using PyTorch's \incode{torch.multinomial} function. The problem is, this function is significantly costly and takes in order of magnitude more time than generating a random integer in a given range. I decide to allow specification of the parent sampling strategy for all these algorithms.
-\todo{Pravděpodobně změřit čas a fitness hodnoty pro obě strategie. Předpokládal bych, že s větší populací je pravděpodobnost duplicity menší a nebude to takový problém. Sem dát stručný popis, že to nevadí, a detailnější rozbor udělat v další kapitole.}
 
 
 
@@ -72,59 +71,52 @@ The \acrlongpl{acc:ga} are in the \incode{ffeat.genetic} module. This module is 
     \item \incode{ffeat.genetic.selection} submodule.
 \end{itemize}
 
-I implemented uniform, one--point, and two--point crossovers for \acrshort{acc:ga} (classes \incode{Uniform}, \incode{OnePoint1D}, and \incode{TwoPoint1D}). The uniform crossover may handle individuals with an arbitrary number of dimensions because it simply generates a random mask of genes to inherit from the first parent. For one--, and two--point crossovers would be the position of the crossover point ambiguous; they, therefore, expect individuals to be one--dimensional.
-\todo{Rozhodnout jestli psát o implementaci point crossover operátorů na základě měření.}
+I implemented uniform, one--point, and two--point crossovers for \acrshort{acc:ga} (classes \incode{Uniform}, \incode{OnePoint1D}, and \incode{TwoPoint1D}). The uniform crossover may handle individuals with an arbitrary number of dimensions because it simply generates a random mask of genes to inherit from the first parent. For one--, and two--point crossovers would be the position of the crossover point ambiguous; they, therefore, expect individuals to be one--dimensional. The implementation of one-- and two--point crossovers use similar mask, but it is created based on the split point. That is a bit costly, especially for the two--point crossover, because each point must be add separately. The implementation of one--point crossover is in algorithm \ref{alg:implonepoint}.
 
 All the crossover operators implement three distinct schemes of how to handle the offsprings. The default scheme is the in--place version and the offsprings replace their parents. For this to work, the crossover must produce the same number of offsprings as there are parents. Moreover, the crossover operator should not process the whole population, as it may destroy it or shift the whole population into an undesirable region of the search space. Still, I decide to use it as the default version because of the \gpu limitations mentioned above.
 The second and third schemes are the comma and plus schemas mentioned on the page \pageref{enum:steadystate}. The plus scheme concatenates the offsprings with the parents and is specified by the \incode{replace_parents=False} argument. The comma scheme returns just the offsprings and is specified by the \incode{discard_parents=True} argument passed to the crossover constructor.
 
 \begin{algorithm}[b!]
-    \begin{lstlisting}[language=Python, xrightmargin=18pt]
-    import ffeat.genetic as GA
-    
-    
-    fn = create_problem_function()
-    
-    alg = GA.GeneticAlgorithm(
-        # Randomly initialize 100 individuals 
-        # with gene of length 40
-        GA.initialization.Uniform(100, 40),
-        # Evaluate the population
-        GA.evaluation.Evaluation(fn),
-        # Sample 100 individuals into new generation
-        GA.selection.Tournament(100),
-        # Crossover 40% of them
-        GA.crossover.OnePoint1D(0.4),
-        # Mutate 60 of them with 1% mutation chance
-        GA.mutation.FlipBit(60, mutate_prob=0.01),
-        # repeat for 100 generations
-        iterations=100
-    )
-    alg() # run the evolution
-    \end{lstlisting}
-    \caption{Simple \acrshort*{acc:ga} in \acrshort*{acc:ffeat}}
-    \label{alg:gaffeat}
-    \end{algorithm}
+\begin{lstlisting}[language=Python, xrightmargin=18pt]
+import ffeat.genetic as GA
+
+
+fn = create_problem_function()
+
+alg = GA.GeneticAlgorithm(
+    # Randomly initialize 100 individuals 
+    # with gene of length 40
+    GA.initialization.Uniform(100, 40),
+    # Evaluate the population
+    GA.evaluation.Evaluation(fn),
+    # Sample 100 individuals into new generation
+    GA.selection.Tournament(100),
+    # Crossover 40% of them
+    GA.crossover.OnePoint1D(0.4),
+    # Mutate 60 of them with 1% mutation chance
+    GA.mutation.FlipBit(60, mutate_prob=0.01),
+    # repeat for 100 generations
+    iterations=100
+)
+alg() # run the evolution
+\end{lstlisting}
+\caption{Simple \acrshort*{acc:ga} in \acrshort*{acc:ffeat}}
+\label{alg:gaffeat}
+\end{algorithm}
 
 In the \incode{ffeat.genetic.selection} module the library keeps implementations of the 
 tournament (\incode{Tournament} class)
 roulette (\incode{Roulette} class), 
 and \acrlong{acc:sus} (\incode{StochasticUniversalSampling} class)
-selection operators. The tournament selection allows to specify whether is it maximization or minimization problem and a number of parents, as I discussed in chapter \ref{chap:eva}. The rank--based selection operator is in fact roulette or \acrshort{acc:sus} selection with preprocessing of fitness values. I will get to fitness transformation later.
+selection operators. The tournament selection allows to specify whether is it maximization or minimization problem and a number of parents, as I discussed in chapter \ref{chap:eva}. Its implementation is in algorithm \ref{alg:impltournament}. The rank--based selection operator is in fact roulette or \acrshort{acc:sus} selection with preprocessing of fitness values. I will get to fitness transformation later.
 
 I also implement elitism in the \incode{ffeat.genetic.selection.Elitism} class. It copies the $n$ best individuals from the population and temporarily stores them aside. After all the \acrshort{acc:ga} operators execute, it copies them back into the population. The implementation does not follow the exact description found in books \citep{IntroductionToEA}, because it may replace better individuals (when the elite improve). The standard implementations of elitism prohibit elites change by the following operators, or append the elites to the population after all the operators are executed. 
 Because the operators following the elitism may be arbitrarily complicated, or the user of the library may decide to implement their own set of operators, ensuring the elites would not change would be thorough and delicate work. % TODO jsou would spravne?
-From the \gpu programming point of view, copying small amount of memory between already allocated memory space is more efficient than appending the elites to the population, because that would require reallocation of the whole population.
-\todo{Možná zmínit, že je malá pravděpodobnost, že se to stane (zdroj?) a nebo že nám to nevadí (měření?) -- to že elita přepíše lepšího jedince. Popřípadě že to zjednodušuje implementaci.}
-\todo{Na základě měření diskuze o implementaci.}
+From the \gpu programming point of view, copying small amount of memory between already allocated memory space is more efficient than appending the elites to the population, because that would require reallocation of the whole population. The implementation of the elitism operator is in algorithm \ref{alg:implelitism}.
 
 For convenience, the parameters dealing with population size, typically the number of individuals to sample during selection, or the number of offsprings in crossovers, can be specified using an absolute number or a fraction of population size. Moreover, some operators' parameters may change between the generations, for example mutation probability of Flip--Bit mutation. These parameters accept callable object evaluated each iteration, allowing them to adjust. Finally, there is no need to use \incode{ffeat.flow} module directly, but the flow is wrap in the \incode{ffeat.genetic.GeneticAlgorithm} class, into which the user just needs to plug the operators.
 
 Example of genetic algorithm in the \acrshort{acc:ffeat} library is in the algorithm \ref{alg:gaffeat}.
-
-\todo{Někam vrazit problémy GPU programování a jak jsme je řešil. Může být spojeno s parental sampling.}
-
-\todo{Přidat ukázky nějakých operátorů.}
 
 
 
@@ -145,7 +137,6 @@ In the \incode{ffeat.strategies.crossover} submodule is uniform, one--point, and
     \item Blend crossover in the \incode{Blend} class, as described in the chapter \ref{chap:eva}.
     \item Differential evolution implemented by the \incode{Differential} class. Although this operator may be used alone, I decide to keep it among the crossover operators. It is possible to alter the $F$ and $C$ constants over generations and replace the parent only if the offspring is better than its parent. In this case, the operator needs to know the fitness values of the parents.
 \end{itemize}
-\todo{Možná něco o implementaci podle toho, jak dopadne měření.}
 
 \begin{algorithm}[b!]
 \begin{lstlisting}[language=Python, xrightmargin=18pt]
@@ -204,7 +195,6 @@ The decay rates presented in section \ref{chap:adaptiveoperators} are implemente
 Last submodule is \incode{ffeat.utils.scaling}, allowing to rescale the fitness for the purposes of roulette--based selection operators. The fitness may be scaled linearly, exponentially, or using a logarithmic scale. Special transformation is in the \incode{MultiplicativeInverse} class, transforming minimization problem into maximization one by changing fitness by the $f(x)=1/x$ formula.
 
 Earlier in this work, I mentioned that rank--based selection operators are just roulette-based selection operators with modified fitness values. Class \incode{RankScale} conduct that by sorting the population by the old fitness values and giving each individual a new fitness value based on its order. The given fitness values are linearly distributed among the population, but may be transformed into different scale using one of the above--mentioned classes.
-\todo{Diskuze nad efektivitou po provedení měření, možná až v další kapitole.}
 
 
 

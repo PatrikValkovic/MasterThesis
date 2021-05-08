@@ -16,8 +16,8 @@ import math
 
 CACHE_DIR = 'D:\\runscache'
 api = wandb.Api()
-FIGISZE_BIG=(12,8)
-FIGSIZE=(6, 4)
+FIGISZE_BIG=(12,8)  #(15,10)
+FIGSIZE=(6, 4)  #(15,10)
 SHOW_LEGEND = False
 
 #region support
@@ -663,13 +663,13 @@ PSIZE_C = {
 STYLES=['-','-',':']
 ELITISM=[False,True]
 LEG_LINES = [
-    # mlines.Line2D([0],[0], linestyle='-', c='black'),
-    # mlines.Line2D([0],[0], linestyle='--', c='black'),
-    # mlines.Line2D([0],[0], linestyle=':', c='black'),
+    mlines.Line2D([0],[0], linestyle='-', c='black'),
+    mlines.Line2D([0],[0], linestyle='--', c='black'),
+    mlines.Line2D([0],[0], linestyle=':', c='black'),
     *list(map(lambda x: mlines.Line2D([0], [0], c=x), PSIZE_C.values())),
 ]
 LEG_LABELS = [
-    # 'Fitness median', 'Fitness 0.05 quantile', 'Best fitness',
+    'Fitness median', 'Fitness 0.05 quantile', 'Best fitness',
     *list(map(lambda x: f"Population size {x}", PSIZE_C.keys()))
 ]
 for vars,elitism in progressbar(list(itertools.product(
@@ -678,7 +678,7 @@ for vars,elitism in progressbar(list(itertools.product(
     plt.figure(figsize=FIGSIZE)
     maxval = -math.inf
     minval = 0
-    iters_render = -1
+    iters_render = 1000
     for psize in POP_SIZES:
         runs = MyRun.load_and_cache({
             "$and": [
@@ -688,7 +688,8 @@ for vars,elitism in progressbar(list(itertools.product(
                 {'config.alg_group.value': 'ga_1'},
                 {'config.run_type.value': 'fitness'},
                 {'config.ga.elitism.value': elitism},
-                {'config.sat.literals.value': vars}
+                {'config.sat.literals.value': vars},
+                {'createdAt': {'$gte': '2021-05-07T12:00:00'}},
             ]
         }, keep_history=True)
         if len(runs) < 10:
@@ -709,22 +710,20 @@ for vars,elitism in progressbar(list(itertools.product(
             medians.append(np.mean(cmedians))
             q05.append(np.mean(cq05))
             best.append(np.mean(cbest))
-        maxval = max(maxval, np.max(q05))
-        q05 = np.array(q05)
-        if np.any(q05 == 0):
-            iters_render = max(iters_render, np.where(q05 == 0)[0].min())
-        else:
-            iters_render = 1000
+        #for r in runs:
+        #    h = r.scan_history()
+        #    tmp = []
+        #    for s in h:
+        #        tmp.append(s['fitness_q05'])
+        #    plt.plot(range(len(tmp)), tmp, c=PSIZE_C[str(psize)], linestyle=STYLES[1], alpha=0.02)
+        maxval = max(maxval, np.max(medians))
+        minval = min(minval, np.max(best))
         #plt.plot(range(len(medians)), medians, c=PSIZE_C[str(psize)], linestyle=STYLES[0])
         plt.plot(range(len(q05)), q05,         c=PSIZE_C[str(psize)], linestyle=STYLES[1])
         #plt.plot(range(len(best)), best,       c=PSIZE_C[str(psize)], linestyle=STYLES[2])
-    if minval == math.inf:
-        print(f"\nWARNING GA fitness with {vars} literals has no measurements")
-        continue
     plt.xlim(0, iters_render)
     plt.xlabel('Generation')
-    minval = round_plotdown(minval)
-    maxval = round_plotup(maxval,pos=1 if vars==2000 else 0)
+    maxval = round_plotup(maxval, pos=1 if vars==2000 else 0)
     plt.ylim(minval, maxval)
     plt.ylabel('Objective function')
     plt.title(f"3SAT with {vars} literals")
@@ -846,8 +845,6 @@ for liters in LITERALS:
                 traceback.print_exc()
                 print(run)
         measure = measure[run_count > 0] / run_count[run_count > 0]
-        print(scale['label'])
-        print(measure)
         minval, maxval = min(measure.min(), minval), max(measure.max(), maxval)
         if np.any(run_count == 0):
             print(f"\nWARNING, missing measurements for GPU GA SCALING with {liters} literals and {scale['label']} for pop sizes {list(map(lambda x: POP_SIZES[x], np.where(run_count == 0)[0].tolist()))}")
