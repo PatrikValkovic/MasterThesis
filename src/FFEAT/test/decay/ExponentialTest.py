@@ -5,7 +5,7 @@
 #
 ###############################
 import unittest
-import ffeat.decay as decay
+import ffeat.utils.decay as decay
 
 
 class ExponentialTest(unittest.TestCase):
@@ -40,6 +40,11 @@ class ExponentialTest(unittest.TestCase):
     def test_no_step_provided(self):
         with self.assertRaises(ValueError):
             decay.Exponential(1.0)
+
+    def test_no_max_steps(self):
+        d = decay.Exponential(10.0, 2.0)
+        with self.assertRaises(ValueError):
+            d(iteration=5)
 
 
 if __name__ == '__main__':

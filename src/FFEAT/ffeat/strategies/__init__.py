@@ -4,8 +4,10 @@
 # 3/11/2021
 #
 ###############################
-
+"""
+Module implementing Real-Coded Evolutionary ALgorithms.
+"""
 from .Initialization import Initialization as initialization
 from . import selection, crossover, mutation
-from .Evaluation import EvaluationWrapper as evaluation
-from .Strategy import Strategy
+from ffeat._common.Evaluation import EvalWrapper as evaluation
+from ffeat._common.AlgorithmSkeleton import AlgorithmSkeleton as EvolutionStrategy
