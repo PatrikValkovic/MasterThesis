@@ -176,37 +176,89 @@ I run all the experiments on the hardware specified above, and because the \acrl
 
 The experiments run in the most cases for the population of sizes $32$, $128$, $200$, $512$, $1024$, $2048$, $5000$, $10240$, $16384$, and $32768$. These values play a role in all the experiments and, most of the time, are the quantity shown on the $x$ axis.
 
-Based on the experiments, the \cuda implementation seems to perform better from medium to big--sized problems and populations. That is not surprising, as the \gpu is intended for vast computation and memory demands. For small problems and populations, the runtime stays constant up to a certain threshold, where the runtime starts to increase linearly with the problem size. This is clearly visible in figure \ref{meas:garuntime} for \acrshort{acc:3sat} problem with $100$, $300$, and $800$ literals. In the case of $2000$ literals, I would already classify the problem as medium-sized. The time for even the smallest population of $32$ individuals is the same for both \cpu and \gpu implementation. Measurement of \acrshort{acc:3sat} problem with varying number of literals and clauses is depicted in figures \ref{meas:garuntimeproblemsize} and the \gpu implementation clearly outperform the \cpu one over the whole domain. Note that I used a population size of $1000$ individuals, which is advantageous for the \gpu implementation.
+Based on the experiments, the \cuda implementation seems to perform better from medium to big--sized problems and populations. That is not surprising, as the \gpu is intended for vast computation and memory demands. For small problems and populations, the runtime stays constant up to a certain threshold, where the runtime starts to increase linearly with the problem size. This is clearly visible in figure \ref{fig:garunningtime} for \acrshort{acc:3sat} problem with $100$, $300$, and $800$ literals. In the case of $2000$ literals, I would already classify the problem as medium-sized. The time for even the smallest population of $32$ individuals is the same for both \cpu and \gpu implementation. Measurement of \acrshort{acc:3sat} problem with varying number of literals and clauses is depicted in figures \ref{meas:garuntimeproblemsize} and the \gpu implementation clearly outperform the \cpu one over the whole domain. Note that I used a population size of $1000$ individuals, which is advantageous for the \gpu implementation.
 
-\begin{figure}
-    \begin{subfigure}[t]{0.45\textwidth}
+\begin{figure}[t]
+    \begin{subfigure}[t]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{img/runs/time_ga_with_legend.pdf}
+        \caption{Running time of \acrshort*{acc:ga}}
+        \label{fig:garunningtime}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.48\textwidth}
         \includegraphics[width=\textwidth]{img/runs/speedup_ga.pdf}
         \caption{Speed up of \acrshort*{acc:ga} on \acrshort*{acc:gpu}}
         \label{fig:gpugaspeedup}
     \end{subfigure}
-    \hfill
-    \begin{subfigure}[t]{0.45\textwidth}
-        \includegraphics[width=\textwidth]{img/runs/time_ga_selection_slowdown.pdf}
-        \caption[Slowdown of GA selection operators]{Slowdown of \acrshort*{acc:ga} on \gpu with various selection operators in constrast to tournament selection}
-        \label{fig:gpugaselectionslowdown}
-    \end{subfigure}
-
+    
     \caption{\acrlong*{acc:ga} evaluation}
 \end{figure}
 
 The interesting observation is the constant run time of the \gpu implementation for small populations and problems. In these cases, the \gpu is not fully utilized, and the whole population can be processed truly in parallel. As the \cuda cores are less performant than \cpu cores, the total running time is higher than of \cpuns. Moreover, the communication overhead between \cpu and \gpu plays a relevant role in the running time. The speedup of the algorithm running on the \gpu is depicted in figure \ref{fig:gpugaspeedup}.
 
-I compared the PyTorch implementation to \cpp one in figure \ref{meas:cimpl}. You can find the \cpp implementation in the attachment. It used master--worker architecture, where the fitness evaluation is done in parallel using multiple cores, whereas the rest of the algorithm is sequential. Both implementations use the same hyperparameters specified in chapter \ref{chap:hyperparameters}. I compared the implementation using one and eight cores, along with the \gpu implementation. You may notice that \cpp implementation using one core outperforms PyTorch implementation by around $80\%$. Python is an inherently slow language, and the additional overhead of calling native code from Python underlines it. Moreover, the PyTorch implementation is a bit complicated compared to simple \cpp implementation, which may also influence the running time. When I compared the implementations using eight cores, the difference is almost negligible (around $20\%$). The PyTorch implementation took advantage of the parallelization of all the operators, and I believe an increased number of cores would further favor PyTorch implementation. The \gpu implementation still outperforms the \cpp implementation in order of magnitude on populations larger than two thousand individuals.
+I compared the PyTorch implementation to \cpp one in figure \ref{fig:gapytorchvsc}. You can find the \cpp implementation in the attachment. It used master--worker architecture, where the fitness evaluation is done in parallel using multiple cores, whereas the rest of the algorithm is sequential. Both implementations use the same hyperparameters specified in chapter \ref{chap:hyperparameters}. I compared the implementation using one and eight cores, along with the \gpu implementation. You may notice that \cpp implementation using one core outperforms PyTorch implementation by around $80\%$. Python is an inherently slow language, and the additional overhead of calling native code from Python underlines it. Moreover, the PyTorch implementation is a bit complicated compared to simple \cpp implementation, which may also influence the running time. When I compared the implementations using eight cores, the difference is almost negligible (around $20\%$). The PyTorch implementation took advantage of the parallelization of all the operators, and I believe an increased number of cores would further favor PyTorch implementation. The \gpu implementation still outperforms the \cpp implementation in order of magnitude on populations larger than two thousand individuals.
 
-Of course, one would use a larger population only if it is advantageous. I measured the progress of fitness value over the generation, and these experiments are depicted in figure \ref{meas:gafitness} and \ref{meas:gafitnesselite} (with elitism). I measured the $0.05$ quantile of the fitness function, and the algorithm converges increasingly faster for populations of size $32$, $512$, and $5000$. The big populations with $10240$ and $32768$ individuals do not make an impact until solving big enough \acrshort{acc:3sat} problem with $2000$ and $5000$ literals. Unfortunately, the improvement is not as significant as between the populations of size $512$ and $5000$. In my opinion, using that big population for this kind of problem is not worth it.
+\begin{figure}
+    \begin{minipage}[t]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{img/runs/time_ga_c_with_legend.pdf}
+        \caption{Running time of C and PyTorch implementation}
+        \label{fig:gapytorchvsc}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{img/runs/fitness_ga_with_legend.pdf}
+        \caption[Fitness of GA on 3SAT problem]{0.05 quantile of fitness on 3SAT problem with 2000 literals}
+        \label{fig:gafitness}
+    \end{minipage}
 
-Running time of various selection operators in \acrshort{acc:sat} problem is in figure \ref{meas:selection}. Note that this is one of the more noisy experiments, although I repeat the experiment multiple times. For the \cpu implementation, the fitness evaluation is the operator taking most of the time, and the impact of the selection operator is scant. On the \gpu is the situation different, and the selection operators seem to have an order of magnitude difference. The fastest one is the tournament selection, which is not surprising, as it does not require sorting or search in the fitness array in any way. On the other hand, the \acrshort{acc:sus} seems to be the slowest of them, especially for smaller populations. For bigger populations of the size greater than $5000$ the performance of roulette, \acrshort{acc:sus} and rank selection look very similar. You can see the slowdown of these operators in comparison to tournament selection in figure \ref{fig:gpugaselectionslowdown}. As you may notice, the measurements are unfortunately very noisy.
+    \begin{minipage}[t]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{img/runs/time_ga_selections_with_legend.pdf}
+        \caption{Running time of selection operators}
+        \label{fig:selectiontime}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{img/runs/time_ga_scale_100l_with_legend.pdf}
+        \caption[Running time of fitness scale operators]{Running time of fitness scale operators for problem with $100$ literals.}
+        \label{fig:gafitnessscaletime}
+    \end{minipage}
+\end{figure}
 
-Lastly, I measured the impact of fitness scaling operators on the run time of the \acrshort{acc:ga}, and these results are in figure \ref{meas:scale}. The algorithm used tournament selection, and the different scale operators did not influence the algorithm's performance. Similarly to the selection, the fitness evaluation took the longest time, and the execution of the scale function does not make any impact when executed on \cpu (including the rank scale operator). The situation with \gpu was very similar except for a small problem ($100$ literals and $450$ clauses), where logarithmic, exponential, and rank scaling took slightly more time.
 
-I tested mutation operators on real--coded evolutionary algorithm with uniform crossover and tournament selection; the results are in figure \ref{meas:muttime} and their fitness in figure \ref{meas:mutfitness}. Both \cpu and \gpu implementation were slowest using Cauchy mutation. This reason is that the sampling from the Cauchy distribution lacks efficient implementation. The fastest was normal mutation with replacement mutation in some \gpu cases (on \cpu the replacement mutation was always a bit slower than the normal mutation). The adaptive step mutation was somewhere in between because of the extra overhead of comparing new fitness values to the old ones. The replacement mutation is interesting, as it outperformed normal mutation on some cases on \gpuns but is steadily slower on \cpuns. I believe sampling random value within an interval would be faster than sampling from the normal distribution, and I cannot fully explain this.
+Of course, one would use a larger population only if it is advantageous. I measured the progress of fitness value over the generation, and these experiments are depicted in figure \ref{meas:gafitness} (in figure \ref{fig:gafitness} for $2000$ literals) and \ref{meas:gafitnesselite} (with elitism). I measured the $0.05$ quantile of the fitness function, and the algorithm converges increasingly faster for populations of size $32$, $512$, and $5000$. The big populations with $10240$ and $32768$ individuals do not make an impact until solving big enough \acrshort{acc:3sat} problem with $2000$ and $5000$ literals. Unfortunately, the improvement is not as significant as between the populations of size $512$ and $5000$. In my opinion, using that big population for this kind of problem is not worth it.
 
-From a convergence point of view, the experiments are shown in figure \ref{meas:mutfitness}. The best performant mutation is the normal mutation, and as it is the fastest one, I would recommend it. Unfortunately, the various mutation operators do not take advantage of a bigger population, and except for population size $32$, the performance of populations with sizes $10240$ and $32768$ is the same. The algorithm converged a little faster with $10240$ individuals instead of $512$, but only for a problem with $384$ dimensions, and the difference is negligible. The only exception worth mentioning is the normal and Cauchy mutation for a problem with $24$ dimensions, where a larger population helped find better optima. Lastly, you may notice better convergence properties of adaptive step mutation in contrast to normal or Cauchy mutation.
+Running time of various selection operators in \acrshort{acc:sat} problem is in figure \ref{fig:selectiontime}. Note that this is one of the more noisy experiments, although I repeat the experiment multiple times. For the \cpu implementation, the fitness evaluation is the operator taking most of the time, and the impact of the selection operator is scant. On the \gpu is the situation different, and the selection operators seem to have an order of magnitude difference. The fastest one is the tournament selection, which is not surprising, as it does not require sorting or search in the fitness array in any way. On the other hand, the \acrshort{acc:sus} seems to be the slowest of them, especially for smaller populations. For bigger populations of the size greater than $5000$ the performance of roulette, \acrshort{acc:sus} and rank selection look very similar.
+
+Lastly, I measured the impact of fitness scaling operators on the run time of the \acrshort{acc:ga}, and these results are in figure \ref{fig:gafitnessscaletime} (experiments for $1000$ literals are in figure \ref{meas:scale}). The algorithm used tournament selection, and the different scale operators did not influence the algorithm's performance. Similarly to the selection, the fitness evaluation took the longest time, and the execution of the scale function does not make any impact when executed on \cpu (including the rank scale operator). The situation with \gpu was very similar except for a small problem ($100$ literals and $450$ clauses), where logarithmic, exponential, and rank scaling took slightly more time.
+
+I tested mutation operators on real--coded evolutionary algorithm with uniform crossover and tournament selection; the results for \acrshort{acc:bbob} function $f_{19}$ with $384$ dimensions is in figure \ref{fig:esmuttime} (see figure \ref{meas:muttime} for all the experiments) and fitness of normal and adaptive step mutations is in figure \ref{fig:esmutfitness} (all the experiments in figure \ref{meas:mutfitness}) . Both \cpu and \gpu implementation were slowest using Cauchy mutation. This reason is that the sampling from the Cauchy distribution lacks efficient implementation. The fastest was normal mutation with replacement mutation in some \gpu cases (on \cpu the replacement mutation was always a bit slower than the normal mutation). The adaptive step mutation was somewhere in between because of the extra overhead of comparing new fitness values to the old ones. The replacement mutation is interesting, as it outperformed normal mutation on some cases on \gpu but is steadily slower on \cpuns. I believe sampling random value within an interval would be faster than sampling from the normal distribution, and I cannot fully explain this.
+
+\begin{figure}
+    \begin{minipage}[t]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{img/runs/time_es_mutation_with_legend.pdf}
+        \caption[Running time of mutation operators]{Running time of mutation operators for \acrshort{acc:bbob} function $f_{19}$ with $384$ dimensions}
+        \label{fig:esmuttime}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{img/runs/time_es_crossover_with_legend.pdf}
+        \caption[Running time of crossover operators]{Running time of crossover operators for \acrshort{acc:bbob} function $f_{19}$ with $128$ dimensions}
+    \end{minipage}
+\end{figure}
+
+\begin{figure}
+    \begin{subfigure}[t]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{img/runs/fitness_es_mutation_AddFromNormal_with_legend.pdf}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{img/runs/fitness_es_mutation_AdaptiveStep_with_legend.pdf}
+    \end{subfigure}
+    \caption[Fitness of mutation operators]{Fitness of normal and adaptive step mutation operators for \acrshort*{acc:bbob} function $f_{19}$ with $384$ dimensions}
+    \label{fig:esmutfitness}
+\end{figure}
+
+From a convergence point of view, the complete experiments are shown in figure \ref{meas:mutfitness}. The best performant mutation is the normal mutation, and as it is the fastest one, I would recommend it. Unfortunately, the various mutation operators do not take advantage of a bigger population, and except for population size $32$, the performance of populations with sizes $10240$ and $32768$ is the same. The algorithm converged a little faster with $10240$ individuals instead of $512$, but only for a problem with $384$ dimensions (see adaptive step mutation in figure \ref{fig:esmutfitness}), and the difference is negligible. The only exceptions worth mentioning is the normal and Cauchy mutation for a problem with $24$ dimensions, where a larger population helped find better optima. Bigger population also helped normal mutation in $384$ dimensions (see \ref{fig:esmutfitness}), but this trend does not hold for population with $32768$ individuals. Lastly, you may notice better convergence properties of adaptive step mutation in contrast to normal or Cauchy mutation.
 
 The crossover operators were tested on real--coded evolutionary algorithm, and the running times are in figure \ref{meas:crosstime} along with their fitness values in figure \ref{meas:crossfitness}. The running times were of the same order for all of them. The slowest on the \cpu was the blend crossover, while the arithmetic crossover was the fastest one. The slowest on the \cpu was the two--points crossover because of the complicated creation of the mask, as discussed in the chapter \ref{chap:impl}. The fastest operator for small populations was the arithmetic crossover with the blend crossover. The running time for big populations on \gpu was almost identical for all the operators. Unlike mutation operators, some of the crossover operators take advantage of the larger population, as shown in figure \ref{meas:crossfitness} -- for example the one--point and two--point crossovers. On the other hand, blend crossover performed best using $512$ individuals, and a bigger population decreased its performance.
 
