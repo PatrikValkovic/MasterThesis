@@ -14,7 +14,7 @@ import gzip
 import traceback
 import math
 
-CACHE_DIR = '/media/kowalsky/381388F755D76FCA'
+CACHE_DIR = 'D:\\runscache'
 api = wandb.Api()
 FIGISZE_BIG=(12,8)  #(15,10)
 FIGSIZE=(6, 4)  #(15,10)
@@ -77,9 +77,571 @@ def plot_generatelogticks(minval, maxval, ticks):
 #endregion
 
 
-#region ES crossover times
+#region PSO neighborhood times with legend
 if not SHOW_LEGEND:
-    new_group('ES crossover time')
+    new_group('PSO neighborhood times with legend')
+    NUM_Y_TICKS = 7
+    POP_RENDER = [36,121,225,529,1225,2500,4900,10000,16900,22500]
+    NEIGHBORHOODS = [
+        {'label': 'Random', 'selection': [
+            {'config.pso.neigh.value': 'Random'},
+        ], 'color': 'tab:blue'},
+        {'label': 'Nearest', 'selection': [
+            {'config.pso.neigh.value': 'Nearest'},
+        ], 'color': 'tab:green'},
+        {'label': 'Circle', 'selection': [
+            {'config.pso.neigh.value': 'Circle'},
+        ], 'color': 'tab:orange'},
+        {'label': 'Linear Grid', 'selection': [
+            {'config.pso.neigh.value': 'Grid2D'},
+            {'config.pso.neigh.subtype.value': 'linear'},
+        ], 'color': 'tab:red'},
+        #{'label': 'Compact Grid', 'selection': [
+        #    {'config.pso.neigh.value': 'Grid2D'},
+        #    {'config.pso.neigh.subtype.value': 'compact'},
+        #], 'color': 'tab:purple'},
+        {'label': 'Diamond Grid', 'selection': [
+            {'config.pso.neigh.value': 'Grid2D'},
+            {'config.pso.neigh.subtype.value': 'diamond'},
+        ], 'color': 'tab:gray'},
+    ]
+    LEG_LINES = [
+        mlines.Line2D([0], [0], linestyle='-', c='black'),
+        mlines.Line2D([0], [0], linestyle='--', c='black'),
+        *list(map(lambda x: mlines.Line2D([0], [0], c=x['color']), NEIGHBORHOODS)),
+    ]
+    LEG_LABELS = [
+        'CPU', 'CUDA',
+        *list(map(lambda x: x['label'], NEIGHBORHOODS))
+    ]
+    for fn, in progressbar(list(itertools.product(
+        [19],
+    ))):
+        plt.figure(figsize=FIGSIZE)
+        maxval = -math.inf
+        minval = math.inf
+        for neig in NEIGHBORHOODS:
+            runs = MyRun.load_and_cache({
+                "$and": [
+                    {'state': 'finished'},
+                    {'config.run_type.value': 'time'},
+                    {'config.device.value': 'cpu'},
+                    {'config.bbob_fn.value': fn},
+                    {'config.bbob_dim.value': 128},
+                    {'config.alg_group.value': 'pso'},
+                    {'config.pso.update.value': 'PSO2006'},
+                    {'config.pop_size.value': {'$in': POP_RENDER}},
+                    {'createdAt': {'$gte': '2021-04-09T22:04:00'}},
+                    {'config.run_failed.value': False},
+                    *neig['selection'],
+                ]
+            })
+            measure = np.zeros(len(POP_RENDER))
+            run_count = np.zeros(len(POP_RENDER))
+            for run in runs:
+                try:
+                    s, c = run.summary, run.config
+                    progress = s['iteration'] / s['max_iteration']
+                    i = POP_RENDER.index(c['pop_size'])
+                    measure[i] += s['total_perf_time'] / progress
+                    run_count[i] += 1
+                except:
+                    traceback.print_exc()
+                    print(run)
+            measure = measure[run_count > 0] / run_count[run_count > 0]
+            minval, maxval = min(measure.min(), minval), max(measure.max(), maxval)
+            plt.plot(
+                np.array(POP_RENDER)[run_count > 0],
+                measure,
+                c=neig['color'],
+                linestyle='-',
+            )
+            runs = MyRun.load_and_cache({
+                "$and": [
+                    {'config.run_type.value': 'time,fitness'},
+                    {'config.device.value': 'cuda'},
+                    {'config.bbob_fn.value': fn},
+                    {'config.bbob_dim.value': 128},
+                    {'config.alg_group.value': 'pso'},
+                    {'config.pso.update.value': 'PSO2006'},
+                    {'config.pop_size.value': {'$in': POP_RENDER}},
+                    {'createdAt': {'$gte': '2021-04-09T22:04:00'}},
+                    {'config.run_failed.value': False},
+                    *neig['selection'],
+                ]
+            })
+            measure = np.zeros(len(POP_RENDER))
+            run_count = np.zeros(len(POP_RENDER))
+            for run in runs:
+                try:
+                    s, c = run.summary, run.config
+                    progress = s['iteration'] / s['max_iteration']
+                    psize = c['pop_size']
+                    i = POP_RENDER.index(c['pop_size'])
+                    measure[i] += s['total_perf_time'] / progress
+                    run_count[i] += 1
+                except:
+                    traceback.print_exc()
+                    print(run)
+            measure = measure[run_count > 0] / run_count[run_count > 0]
+            minval, maxval = min(measure.min(), minval), max(measure.max(), maxval)
+            plt.plot(
+                np.array(POP_RENDER)[run_count > 0],
+                measure,
+                c=neig['color'],
+                linestyle='--',
+            )
+        plt.title(f"Running time of PSO neighborhoods")
+        plt.xscale('log')
+        plt.yscale('log')
+        plt.xticks([36, 121, 529, 2500, 10000, 22500])
+        plt.gca().get_xaxis().set_major_formatter(mticker.ScalarFormatter())
+        plt.gca().get_xaxis().set_tick_params(which='minor', size=0)
+        plt.xlim(36, 22500)
+        plt.xlabel('Population size')
+        minval = round_plotdown(minval)
+        maxval = round_plotup(maxval)
+        plt.ylim(minval, maxval)
+        plt.yticks(plot_generatelogticks(minval, maxval, NUM_Y_TICKS))
+        plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter(useOffset=False))
+        plt.minorticks_off()
+        plt.ylabel('Running time [s]')
+        plt.legend(LEG_LINES, LEG_LABELS, loc='upper left')
+        plt.savefig(f"runs/time_pso_neigh_with_legend.pdf")
+        plt.close()
+#endregion
+
+#region PSO2006 performance with legend
+if not SHOW_LEGEND:
+    new_group('PSO2006 performance with legend')
+    COLORS = ['tab:blue', 'tab:orange', 'tab:green', 'tab:red']
+    STYLES = ['-','--',':']
+    NUM_Y_TICKS = 7
+    LEG_LINES = [
+        mlines.Line2D([0], [0], linestyle='-', c='black'),
+        mlines.Line2D([0], [0], linestyle='--', c='black'),
+        mlines.Line2D([0], [0], linestyle=':', c='black'),
+        mlines.Line2D([0], [0], c='tab:blue'),
+        mlines.Line2D([0], [0], c='tab:orange'),
+        mlines.Line2D([0], [0], c='tab:green'),
+        mlines.Line2D([0], [0], c='tab:red'),
+    ]
+    LEG_LABELS = [
+        'Fitness median', 'Fitness 0.05 quantile', 'Best fitness',
+        '32 particles', '512 particles',
+        '10240 particles', '32768 particles',
+    ]
+    fn = 19
+    plt.figure(figsize=FIGSIZE)
+    minval = math.inf
+    maxval = -math.inf
+    for ips, popsize in enumerate([32, 512, 10240, 32768]):
+        runs = MyRun.load_and_cache({
+            "$and": [
+                {'config.run_type.value': 'fitness'},
+                {'config.device.value': 'cuda'},
+                {'config.bbob_fn.value': fn},
+                {'config.bbob_dim.value': 128},
+                {'config.alg_group.value': 'pso'},
+                {'config.pso.update.value': 'PSO2006'},
+                {'config.pso.neigh.value': 'Random'},
+                {'config.pop_size.value': popsize},
+                {'config.run_failed.value': False},
+            ]
+        }, keep_history=True)
+        medians = np.array(list(map(lambda r: list(map(lambda h: h['fitness_median'], r.scan_history())), runs)))
+        medians = np.mean(medians, axis=0)
+        q05 = np.array(list(map(lambda r: list(map(lambda h: h['fitness_q05'], r.scan_history())), runs)))
+        q05 = np.mean(q05, axis=0)
+        best = np.array(list(map(lambda r: list(map(lambda h: h['fitness_lowest'], r.scan_history())), runs)))
+        best = np.mean(best, axis=0)
+        minval = min(minval, best.min())
+        maxval = max(maxval, medians.max())
+        plt.plot(range(len(medians)), medians, c=COLORS[ips], linestyle=STYLES[0])
+        plt.plot(range(len(q05)), q05, c=COLORS[ips], linestyle=STYLES[1])
+        plt.plot(range(len(best)), best, c=COLORS[ips], linestyle=STYLES[2])
+    plt.yscale('log')
+    plt.gca().get_yaxis().clear()
+    plt.xlim(0, 1000)
+    plt.xlabel('Generation')
+    minval = round_plotdown(minval)
+    maxval = round_plotup(maxval)
+    plt.ylim(minval, maxval)
+    plt.yticks(plot_generatelogticks(minval, maxval, NUM_Y_TICKS))
+    plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter(useOffset=False))
+    plt.minorticks_off()
+    plt.ylabel('Objective function')
+    plt.title(f"Fitness of PSO2006 algorithm$")
+    plt.legend(LEG_LINES, LEG_LABELS, loc='upper right')
+    plt.savefig(f'runs/fitness_pso2006_with_legend.pdf')
+    plt.close()
+#endregion
+
+#region PSO2006 run times with legend
+if not SHOW_LEGEND:
+    new_group('PSO run times with legend')
+    NUM_Y_TICKS = 7
+    POP_RENDER = [32, 128, 512, 2048, 10240, 32768]
+    pop_list = [32, 128, 200, 512, 1024, 2048, 5000, 10240, 16384, 32768]
+    LEG_LINES = [
+        mlines.Line2D([0], [0], linestyle='-', c='black'),
+        mlines.Line2D([0], [0], linestyle='--', c='black'),
+        mlines.Line2D([0], [0], linestyle='-', c='tab:blue'),
+        mlines.Line2D([0], [0], linestyle='-', c='tab:orange'),
+    ]
+    LEG_LABELS = [
+        'CPU', 'CUDA',
+        'PSO2006', 'PSO2011',
+    ]
+    fn = 19
+    dim = 384
+    plt.figure(figsize=FIGSIZE)
+    maxval = -math.inf
+    minval = math.inf
+    runs = MyRun.load_and_cache({
+        "$and": [
+            {'config.run_type.value': 'time'},
+            {'config.device.value': 'cpu'},
+            {'config.bbob_fn.value': fn},
+            {'config.bbob_dim.value': dim},
+            {'config.alg_group.value': 'pso'},
+            {'config.pso.update.value': 'PSO2006'},
+            {'config.pso.neigh.value': 'Random'},
+            {'config.pop_size.value': {'$in': pop_list}},
+            {'createdAt': {'$gte': '2021-04-09T22:04:00'}}
+        ]
+    })
+    measure = np.zeros(len(pop_list))
+    run_count = np.zeros(len(pop_list))
+    for run in runs:
+        try:
+            s, c = run.summary, run.config
+            progress = s['iteration'] / s['max_iteration']
+            i = pop_list.index(c['pop_size'])
+            measure[i] += s['total_perf_time'] / progress
+            run_count[i] += 1
+        except:
+            traceback.print_exc()
+            print(run)
+    minval = min(minval, np.min(measure / run_count))
+    maxval = max(maxval, np.max(measure / run_count))
+    plt.plot(pop_list, measure / run_count, linestyle='-', c='tab:blue')
+    runs = MyRun.load_and_cache({
+        "$and": [
+            {'config.run_type.value': 'time'},
+            {'config.device.value': 'cuda'},
+            {'config.bbob_fn.value': fn},
+            {'config.bbob_dim.value': dim},
+            {'config.alg_group.value': 'pso'},
+            {'config.pso.update.value': 'PSO2006'},
+            {'config.pso.neigh.value': 'Random'},
+            {'config.pop_size.value': {'$in': pop_list}},
+        ]
+    })
+    measure = np.zeros(len(pop_list))
+    run_count = np.zeros(len(pop_list))
+    for run in runs:
+        try:
+            s, c = run.summary, run.config
+            progress = s['iteration'] / s['max_iteration']
+            psize = c['pop_size']
+            i = pop_list.index(c['pop_size'])
+            measure[i] += s['total_perf_time'] / progress
+            run_count[i] += 1
+        except:
+            traceback.print_exc()
+            print(run)
+    minval = min(minval, np.min(measure / run_count))
+    maxval = max(maxval, np.max(measure / run_count))
+    plt.plot(pop_list, measure / run_count, linestyle='--', c='tab:blue')
+    runs = MyRun.load_and_cache({
+        "$and": [
+            {'config.run_type.value': 'time'},
+            {'config.device.value': 'cpu'},
+            {'config.bbob_fn.value': fn},
+            {'config.bbob_dim.value': dim},
+            {'config.alg_group.value': 'pso'},
+            {'config.pso.update.value': 'PSO2011'},
+            {'config.pso.neigh.value': 'Random'},
+            {'config.pop_size': {'$neq': None}},
+            {'config.pop_size.value': {'$in': pop_list}},
+        ]
+    })
+    measure = np.zeros(len(pop_list))
+    run_count = np.zeros(len(pop_list))
+    for run in runs:
+        try:
+            s, c = run.summary, run.config
+            progress = s['iteration'] / s['max_iteration']
+            i = pop_list.index(c['pop_size'])
+            measure[i] += s['total_perf_time'] / progress
+            run_count[i] += 1
+        except:
+            traceback.print_exc()
+            print(run)
+    minval = min(minval, np.min(measure / run_count))
+    maxval = max(maxval, np.max(measure / run_count))
+    plt.plot(pop_list, measure / run_count, linestyle='-', c='tab:orange')
+    runs = MyRun.load_and_cache({
+        "$and": [
+            {'config.run_type.value': 'time,fitness'},
+            {'config.device.value': 'cuda'},
+            {'config.bbob_fn.value': fn},
+            {'config.bbob_dim.value': dim},
+            {'config.alg_group.value': 'pso'},
+            {'config.pso.update.value': 'PSO2011'},
+            {'config.pso.neigh.value': 'Random'},
+            {'config.pop_size.value': {'$in': pop_list}},
+        ]
+    })
+    measure = np.zeros(len(pop_list))
+    run_count = np.zeros(len(pop_list))
+    for run in runs:
+        try:
+            s, c = run.summary, run.config
+            progress = s['iteration'] / s['max_iteration']
+            psize = c['pop_size']
+            i = pop_list.index(c['pop_size'])
+            measure[i] += s['total_perf_time'] / progress
+            run_count[i] += 1
+        except:
+            traceback.print_exc()
+            print(run)
+    minval = min(minval, np.min(measure / run_count))
+    maxval = max(maxval, np.max(measure / run_count))
+    plt.plot(pop_list, measure / run_count, linestyle='--', c='tab:orange')
+
+    plt.title(f"Running time of PSO algorithm")
+    plt.xscale('log')
+    plt.yscale('log')
+    plt.xticks(POP_RENDER)
+    plt.gca().get_xaxis().set_major_formatter(mticker.ScalarFormatter())
+    plt.gca().get_xaxis().set_tick_params(which='minor', size=0)
+    plt.xlim(32, 32768)
+    plt.xlabel('Population size')
+    minval = round_plotdown(minval)
+    maxval = round_plotup(maxval)
+    plt.ylim(minval, maxval)
+    plt.yticks(plot_generatelogticks(minval, maxval, NUM_Y_TICKS))
+    plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter(useOffset=False))
+    plt.minorticks_off()
+    plt.ylabel('Running time [s]')
+    plt.legend(LEG_LINES, LEG_LABELS, loc='upper left')
+    plt.savefig(f"runs/time_pso_with_legend.pdf")
+    plt.close()
+#endregion
+
+#region ES schemas times with legend
+if not SHOW_LEGEND:
+    new_group('ES mutations schemas time with legend')
+    NUM_Y_TICKS = 7
+    POP_SIZES = [32,128,200,512,1024,2048,5000,10240,16384,32768]
+    FNS= [19]
+    DIMS= [128]
+    SCHEMAS = [
+        {'name': 'default', 'discard': False, 'replace': True, 'c': 'tab:blue'},
+        {'name': 'comma', 'discard': True, 'replace': True, 'c': 'tab:orange'},
+        {'name': 'plus', 'discard': False, 'replace': False, 'c': 'tab:green'},
+    ]
+    TO_MEASURE = 'total_real_time'
+    LEG_LINES = [
+        mlines.Line2D([0], [0], linestyle='-', c='black'),
+        mlines.Line2D([0], [0], linestyle='--', c='black'),
+        *list(map(lambda x: mlines.Line2D([0], [0], c=x['c']), SCHEMAS)),
+    ]
+    LEG_LABELS = [
+        'CPU', 'CUDA',
+        *list(map(lambda x: f'{x["name"]} schema', SCHEMAS))
+    ]
+    for fn, dim in progressbar(list(itertools.product(
+        FNS,
+        DIMS,
+    ))):
+        plt.figure(figsize=FIGSIZE)
+        maxval, minval = -math.inf, math.inf
+        for schema in SCHEMAS:
+            runs = MyRun.load_and_cache({
+                "$and": [
+                    {'state': 'finished'},
+                    {'config.run_failed.value': False},
+                    {'config.pop_size.value': {'$in': POP_SIZES}},
+                    {'config.alg_group.value': 'es_schema'},
+                    {'config.device.value': 'cpu'},
+                    {'config.bbob_fn.value': fn},
+                    {'config.bbob_dim.value': dim},
+                    {'config.es.crossover.discard_parents.value': schema['discard']},
+                    {'config.es.crossover.replace_parents.value': schema['replace']},
+                ]
+            })
+            #print(f"SCHEMA for {fn} fn with {dim} dim, schema {schema['name']} has {len(runs)} runs")
+            measure = np.zeros(len(POP_SIZES))
+            run_count = np.zeros(len(POP_SIZES))
+            for run in runs:
+                try:
+                    s, c = run.summary, run.config
+                    progress = s['iteration'] / s['max_iteration']
+                    i = POP_SIZES.index(c['pop_size'])
+                    measure[i] += s[TO_MEASURE] / progress
+                    run_count[i] += 1
+                except:
+                    traceback.print_exc()
+                    print(run)
+            measure = measure[run_count > 0] / run_count[run_count > 0]
+            minval, maxval = min(measure.min(), minval), max(measure.max(), maxval)
+            plt.plot(
+                np.array(POP_SIZES)[run_count > 0],
+                measure,
+                c=schema['c'],
+                linestyle='-',
+            )
+
+            runs = MyRun.load_and_cache({
+                "$and": [
+                    {'state': 'finished'},
+                    {'config.run_failed.value': False},
+                    {'config.pop_size.value': {'$in': POP_SIZES}},
+                    {'config.alg_group.value': 'es_schema'},
+                    {'config.device.value': 'cuda'},
+                    {'config.bbob_fn.value': fn},
+                    {'config.bbob_dim.value': dim},
+                    {'config.es.crossover.discard_parents.value': schema['discard']},
+                    {'config.es.crossover.replace_parents.value': schema['replace']},
+                ]
+            })
+            #print(f"SCHEMA for {fn} fn with {dim} dim, schema {schema['name']} has {len(runs)} runs")
+            measure = np.zeros(len(POP_SIZES))
+            run_count = np.zeros(len(POP_SIZES))
+            for run in runs:
+                try:
+                    s, c = run.summary, run.config
+                    progress = s['iteration'] / s['max_iteration']
+                    i = POP_SIZES.index(c['pop_size'])
+                    measure[i] += s[TO_MEASURE] / progress
+                    run_count[i] += 1
+                except:
+                    traceback.print_exc()
+                    print(run)
+            measure = measure[run_count > 0] / run_count[run_count > 0]
+            minval, maxval = min(measure.min(), minval), max(measure.max(), maxval)
+            plt.plot(
+                np.array(POP_SIZES)[run_count > 0],
+                measure,
+                c=schema['c'],
+                linestyle='--',
+            )
+        plt.title(f"Running time of crossover schemes")
+        plt.xscale('log')
+        plt.yscale('log')
+        plt.xticks([32, 128, 512, 2048, 10240, 32768])
+        plt.gca().get_xaxis().set_major_formatter(mticker.ScalarFormatter())
+        plt.gca().get_xaxis().set_tick_params(which='minor', size=0)
+        plt.xlim(32, 32768)
+        plt.xlabel('Population size')
+        minval = round_plotdown(minval)
+        maxval = round_plotup(maxval)
+        plt.ylim(minval, maxval)
+        plt.yticks(plot_generatelogticks(minval, maxval, NUM_Y_TICKS))
+        plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter(useOffset=False))
+        plt.minorticks_off()
+        plt.ylabel('Running time [s]')
+        plt.legend(LEG_LINES, LEG_LABELS, loc='upper left')
+        plt.savefig(f"runs/time_es_schema_with_legend.pdf")
+        plt.close()
+#endregion
+
+#region ES crossover fitness with legend
+if not SHOW_LEGEND:
+    new_group('ES crossover fitness with legend')
+    NUM_Y_TICKS = 7
+    POP_SIZES=[32,512,10240,32768]
+    FNS= [19]
+    DIMS= [128]
+    PSIZE_C = {
+        '32': 'tab:blue',
+        '512': 'tab:orange',
+        '10240': 'tab:green',
+        '32768': 'tab:red',
+    }
+    CROSSOVERS = [
+        {'label': 'blend','crossover': 'Blend'},
+        {'label': 'one-point','crossover': 'OnePoint1D'},
+    ]
+    STYLES=['-','--',':']
+    LEG_LINES = [
+        mlines.Line2D([0], [0], linestyle='-', c='black'),
+        mlines.Line2D([0], [0], linestyle='--', c='black'),
+        mlines.Line2D([0], [0], linestyle=':', c='black'),
+        *list(map(lambda x: mlines.Line2D([0], [0], c=x), PSIZE_C.values())),
+    ]
+    LEG_LABELS = [
+        'Fitness median', 'Fitness 0.05 quantile', 'Best fitness',
+        *list(map(lambda x: f"Population size {x}", PSIZE_C.keys()))
+    ]
+    for fn, dim, crossover in progressbar(list(itertools.product(
+        FNS,
+        DIMS,
+        CROSSOVERS,
+    ))):
+        plt.figure(figsize=FIGSIZE)
+        maxval = -math.inf
+        minval = math.inf
+        for psize in POP_SIZES:
+            runs = MyRun.load_and_cache({
+                "$and": [
+                    {'state': 'finished'},
+                    {'config.run_failed.value': False},
+                    {'config.pop_size.value': psize},
+                    {'config.alg_group.value': 'es_crossover'},
+                    {'config.device.value': 'cuda'},
+                    {'config.run_type.value': 'time,fitness'},
+                    {'config.bbob_fn.value': fn},
+                    {'config.bbob_dim.value': dim},
+                    {'config.es.crossover.value': crossover['crossover']},
+                ]
+            }, keep_history=True)
+            #print(f"fn {fn}:{dim} for {crossover['label']}, runs: {len(runs)} for pop size {psize}")
+            max_iter = max(map(lambda r: r.summary['iteration'], runs))
+            medians, q05, best = [], [], []
+            for step in range(max_iter+1):
+                cmedians, cq05, cbest = [], [], []
+                for r in runs:
+                    h = r.scan_history()
+                    if len(h) <= step:
+                        continue
+                    h = h[step]
+                    cmedians.append(h['fitness_median'])
+                    cq05.append(h['fitness_q05'])
+                    cbest.append(h['fitness_lowest'])
+                if len(cmedians) <= 20:
+                    break
+                medians.append(np.mean(cmedians))
+                q05.append(np.mean(cq05))
+                best.append(np.mean(cbest))
+            minval = min(minval, np.min(best))
+            maxval = max(maxval, np.max(medians))
+            plt.plot(range(len(medians)), medians, c=PSIZE_C[str(psize)], linestyle=STYLES[0])
+            plt.plot(range(len(q05)), q05,         c=PSIZE_C[str(psize)], linestyle=STYLES[1])
+            plt.plot(range(len(best)), best,       c=PSIZE_C[str(psize)], linestyle=STYLES[2])
+        plt.yscale('log')
+        plt.gca().get_yaxis().clear()
+        plt.xlim(0, 1000)
+        plt.xlabel('Generation')
+        minval = round_plotdown(minval)
+        maxval = round_plotup(maxval)
+        plt.ylim(minval, maxval)
+        plt.yticks(plot_generatelogticks(minval, maxval, NUM_Y_TICKS))
+        plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter(useOffset=False))
+        plt.minorticks_off()
+        plt.ylabel('Objective function')
+        plt.title(f"Fitness of {crossover['label']} crossover")
+        plt.legend(LEG_LINES, LEG_LABELS, loc='upper right')
+        plt.savefig(f'runs/fitness_es_crossover_{crossover["crossover"]}_with_legend.pdf')
+        plt.close()
+#endregion
+
+#region ES crossover times with legend
+if not SHOW_LEGEND:
+    new_group('ES crossover time with legend')
     NUM_Y_TICKS = 7
     POP_SIZES = [32,128,200,512,1024,2048,5000,10240,16384,32768]
     FNS= [19]
@@ -196,7 +758,6 @@ if not SHOW_LEGEND:
         plt.savefig(f"runs/time_es_crossover_with_legend.pdf")
         plt.close()
 #endregion
-exit()
 
 #region ES mutation fitness with legend
 if not SHOW_LEGEND:
@@ -412,7 +973,7 @@ if not SHOW_LEGEND:
 
 #region GA scale times with legend
 if not SHOW_LEGEND:
-    new_group('GA scale time')
+    new_group('GA scale time with legend')
     NUM_Y_TICKS = 7
     POP_SIZES = [32,128,200,512,1024,2048,5000,10240,16384,32768]
     LITERALS = [100]
@@ -1064,99 +1625,6 @@ if not SHOW_LEGEND:
     plt.legend(LEG_LINES, LEG_LABELS, loc='upper left')
     plt.savefig(f"runs/time_ga_with_legend.pdf")
     plt.close()
-#endregion
-
-#region GA selection slowdown
-new_group('GA selection slowdown')
-NUM_Y_TICKS = 7
-POP_SIZES = [32,128,200,512,1024,2048,5000,10240,16384]
-SELECTIONS = [
-    {'label': 'Tournament selection', 'key': 'Tournament', 'c': 'tab:blue'},
-    {'label': 'Roulette selection', 'key': 'Roulette', 'c': 'tab:orange'},
-    {'label': 'SUS', 'key': 'StochasticUniversalSampling', 'c': 'tab:green'},
-    {'label': 'Rank selection', 'key': 'Sequence', 'c': 'tab:red'},
-]
-TO_MEASURE = 'total_real_time'
-plt.figure(figsize=FIGSIZE)
-for selection in progressbar(SELECTIONS[:1]):
-    runs = MyRun.load_and_cache({
-        "$and": [
-            {'state': 'finished'},
-            {'config.run_failed.value': False},
-            {'config.alg_group.value': 'ga_selection'},
-            {'config.device.value': 'cuda'},
-            {'config.run_type.value': 'time'},
-            {'config.pop_size.value': {'$in': POP_SIZES}},
-            {'config.ga.selection.value': selection['key']},
-        ]
-    })
-    measure = np.zeros(len(POP_SIZES))
-    run_count = np.zeros(len(POP_SIZES))
-    for run in runs:
-        try:
-            s, c = run.summary, run.config
-            progress = s['iteration'] / s['max_iteration']
-            i = POP_SIZES.index(c['pop_size'])
-            measure[i] += s[TO_MEASURE] / progress
-            run_count[i] += 1
-        except:
-            traceback.print_exc()
-            print(run)
-    measure = measure[run_count > 0] / run_count[run_count > 0]
-tournamentmeasure = measure
-maxval, minval = -math.inf, math.inf
-for selection in progressbar(SELECTIONS[1:]):
-    runs = MyRun.load_and_cache({
-        "$and": [
-            {'state': 'finished'},
-            {'config.run_failed.value': False},
-            {'config.alg_group.value': 'ga_selection'},
-            {'config.device.value': 'cuda'},
-            {'config.run_type.value': 'time'},
-            {'config.pop_size.value': {'$in': POP_SIZES}},
-            {'config.ga.selection.value': selection['key']},
-        ]
-    })
-    measure = np.zeros(len(POP_SIZES))
-    run_count = np.zeros(len(POP_SIZES))
-    for run in runs:
-        try:
-            s, c = run.summary, run.config
-            progress = s['iteration'] / s['max_iteration']
-            i = POP_SIZES.index(c['pop_size'])
-            measure[i] += s[TO_MEASURE] / progress
-            run_count[i] += 1
-        except:
-            traceback.print_exc()
-            print(run)
-    measure = measure[run_count > 0] / run_count[run_count > 0]
-    measure = measure / tournamentmeasure
-    minval, maxval = min(measure.min(), minval), max(measure.max(), maxval)
-    plt.plot(
-        POP_SIZES,
-        measure,
-        c=selection['c'],
-        linestyle='-',
-        label=selection['label']
-    )
-plt.title(f"Selection operators slowdown")
-plt.xscale('log')
-plt.yscale('log')
-plt.xticks([32,128,512,2048,5000,16384])
-plt.gca().get_xaxis().set_major_formatter(mticker.ScalarFormatter())
-plt.gca().get_xaxis().set_tick_params(which='minor', size=0)
-plt.xlim(32, 16384)
-plt.xlabel('Literals')
-minval = round_plotdown(minval)
-maxval = round_plotup(maxval)
-plt.ylim(minval, maxval)
-plt.yticks(plot_generatelogticks(minval, maxval, NUM_Y_TICKS))
-plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter(useOffset=False))
-plt.minorticks_off()
-plt.ylabel('Slowdown')
-plt.legend()
-plt.savefig(f"runs/time_ga_selection_slowdown.pdf")
-plt.close()
 #endregion
 
 #region GA speedup

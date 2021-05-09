@@ -243,10 +243,11 @@ I tested mutation operators on real--coded evolutionary algorithm with uniform c
     \begin{minipage}[t]{0.48\textwidth}
         \includegraphics[width=\textwidth]{img/runs/time_es_crossover_with_legend.pdf}
         \caption[Running time of crossover operators]{Running time of crossover operators for \acrshort{acc:bbob} function $f_{19}$ with $128$ dimensions}
+        \label{ref:escrosstime}
     \end{minipage}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[ht!]
     \begin{subfigure}[t]{0.48\textwidth}
         \includegraphics[width=\textwidth]{img/runs/fitness_es_mutation_AddFromNormal_with_legend.pdf}
     \end{subfigure}
@@ -258,17 +259,57 @@ I tested mutation operators on real--coded evolutionary algorithm with uniform c
     \label{fig:esmutfitness}
 \end{figure}
 
+\begin{figure}[ht!]
+    \begin{subfigure}[t]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{img/runs/fitness_es_crossover_OnePoint1D_with_legend.pdf}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{img/runs/fitness_es_crossover_Blend_with_legend.pdf}
+    \end{subfigure}
+    \caption[Fitness of crossover operators]{Fitness of one--step and blend crossover operators for \acrshort*{acc:bbob} function $f_{19}$ with $128$ dimensions}
+    \label{fig:escrossfitness}
+\end{figure}
+
 From a convergence point of view, the complete experiments are shown in figure \ref{meas:mutfitness}. The best performant mutation is the normal mutation, and as it is the fastest one, I would recommend it. Unfortunately, the various mutation operators do not take advantage of a bigger population, and except for population size $32$, the performance of populations with sizes $10240$ and $32768$ is the same. The algorithm converged a little faster with $10240$ individuals instead of $512$, but only for a problem with $384$ dimensions (see adaptive step mutation in figure \ref{fig:esmutfitness}), and the difference is negligible. The only exceptions worth mentioning is the normal and Cauchy mutation for a problem with $24$ dimensions, where a larger population helped find better optima. Bigger population also helped normal mutation in $384$ dimensions (see \ref{fig:esmutfitness}), but this trend does not hold for population with $32768$ individuals. Lastly, you may notice better convergence properties of adaptive step mutation in contrast to normal or Cauchy mutation.
 
-The crossover operators were tested on real--coded evolutionary algorithm, and the running times are in figure \ref{meas:crosstime} along with their fitness values in figure \ref{meas:crossfitness}. The running times were of the same order for all of them. The slowest on the \cpu was the blend crossover, while the arithmetic crossover was the fastest one. The slowest on the \cpu was the two--points crossover because of the complicated creation of the mask, as discussed in the chapter \ref{chap:impl}. The fastest operator for small populations was the arithmetic crossover with the blend crossover. The running time for big populations on \gpu was almost identical for all the operators. Unlike mutation operators, some of the crossover operators take advantage of the larger population, as shown in figure \ref{meas:crossfitness} -- for example the one--point and two--point crossovers. On the other hand, blend crossover performed best using $512$ individuals, and a bigger population decreased its performance.
+The crossover operators were tested on real--coded evolutionary algorithm, and the running times are in figure \ref{ref:escrosstime} (in figure \ref{meas:crosstime} are all the experiments) along with their fitness values in figure \ref{fig:escrossfitness} (complete experiments in figure \ref{meas:crossfitness}). The running times were of the same order for all of them. The slowest on the \cpu was the blend crossover, while the arithmetic crossover was the fastest one. The slowest on the \cpu was the two--points crossover because of the complicated creation of the mask, as discussed in the chapter \ref{chap:impl}. The fastest operator for small populations was the arithmetic crossover with the blend crossover. The running time for big populations on \gpu was almost identical for all the operators. Unlike mutation operators, some of the crossover operators take advantage of the larger population, as shown in figure \ref{fig:escrossfitness} and \ref{meas:crossfitness} -- for example the one--point and two--point crossovers. On the other hand, blend crossover performed best using $512$ individuals, and a bigger population decreased its performance.
 
-Lastly, the crossover schema experiments are depicted in figure \ref{meas:schema}. There is no surprise that the default schema (that is, the offsprings replace their parents in the population) is the fastest one because it does not require extra memory allocation, as discussed in section \ref{chap:gaimpl}. It is followed by comma schema, which is almost two times slower. The plus schema is the slowest and runs around $2.3\times$ slower than the default schema.
+Lastly, the crossover schema experiments are depicted in figure \ref{fig:esscemetime} (all experiments are in figure \ref{meas:schema}). There is no surprise that the default schema (that is, the offsprings replace their parents in the population) is the fastest one because it does not require extra memory allocation, as discussed in section \ref{chap:gaimpl}. It is followed by comma schema, which is almost two times slower. The plus schema is the slowest and runs around $2.3\times$ slower than the default schema.
 
-Finally, the running time of \acrshort{acc:spso2006} and \acrshort{acc:spso2011} algorithms are shown in the figure \ref{meas:spso2006time} and \ref{meas:spso2011time}. The \acrshort{acc:pso} algorithms show bigger speedup than \acrshort{acc:ga} and real--coded evolutionary algorithms, even for problems with $384$ dimensions. The running times for problem with $6$, $32$, and $128$ dimensions is almost identical except the \acrshort{acc:bbob} function $f_{22}$. This function has the most complicated evaluation and takes great portion of the running time. The graphs showing average fitness are in figures \ref{meas:spso2006fitness} (for \acrshort{acc:spso2006}) and \ref{meas:spso2011fitness} (for \acrshort{acc:spso2011}). Unlike in previous experiments, all the problems take advantage of the larger population, as is clearly visible in the figures. I would say the \acrshort{acc:pso} algorithms has the biggest potential to run on \gpuns.
+Finally, the running time of \acrshort{acc:spso2006} and \acrshort{acc:spso2011} algorithms are shown in the figure \ref{fig:psotime} (see figures \ref{meas:spso2006time} and \ref{meas:spso2011time} for more details). The \acrshort{acc:pso} algorithms show bigger speedup than \acrshort{acc:ga} and real--coded evolutionary algorithms, even for problems with $384$ dimensions. The running times for problem with $6$, $32$, and $128$ dimensions is almost identical except the \acrshort{acc:bbob} function $f_{22}$. This function has the most complicated evaluation and takes great portion of the running time. The graphs showing algorithm fitness for \acrshort{acc:bbob} function with $128$ dimensions is in figure \ref{fig:psofitness} (more detailed experiments are in figure \ref{meas:spso2006fitness} for \acrshort{acc:spso2006}, and in figure \ref{meas:spso2011fitness} for \acrshort{acc:spso2011}). Unlike in previous experiments, all the problems take advantage of the larger population, as is clearly visible in the figures. I would say the \acrshort{acc:pso} algorithms has the biggest potential to run on \gpuns.
 
-The \acrshort{acc:pso} neighborhoods experiments are depicted in figure \ref{meas:psoneigtime}, and their fitness in figure \ref{meas:psoneigfitness}. The random and circle neighborhoods are the fastest to evaluate on \gpuns, where the circle one is a bit faster for small populations. The circle neighborhood is static and generated only once, while the random neighborhood changes with every iteration. On the other hand, the random neighborhood is the slowest on the \cpu (except the nearest one). The grid--based neighborhoods are as fast as circle neighborhood for smaller populations, but for bigger populations the evaluation takes as long as random neighborhood. The cause is their substantial size in contrast to the circle one. The nearest neighborhood is extensively slower than any other. This is expected because it needs to measure the distance between every pair of particles, which is very costly even on \gpuns. The neighborhood evaluation is still more than six times faster on the \gpu than on the \cpu for swarms larger than $500$ particles.
+\begin{figure}
+    \begin{minipage}[t]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{img/runs/time_es_schema_with_legend.pdf}
+        \caption[Running time of crossover schemes]{Running time of crossover schemes for \acrshort{acc:bbob} function $f_{19}$ with $128$ dimensions}
+        \label{fig:esscemetime}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{img/runs/time_pso_with_legend.pdf}
+        \caption[Running time of \acrshort*{acc:pso}]{Running time of \acrshort{acc:pso} algorithm for \acrshort{acc:bbob} function $f_{19}$ with $384$ dimensions.}
+        \label{fig:psotime}
+    \end{minipage}
 
-The overall statistics about the experiments is given in table \ref{tab:totaltime}, including number of experiments and the total running time.
+    \begin{minipage}[t]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{img/runs/fitness_pso2006_with_legend.pdf}
+        \caption[Fitness of \acrshort*{acc:pso}]{Fitness of \acrshort{acc:pso} algorithm for \acrshort{acc:bbob} function $f_{19}$ with $128$ dimensions}
+        \label{fig:psofitness}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{img/runs/time_pso_neigh_with_legend.pdf}
+        \caption[Running time of \acrshort*{acc:pso} neighborhoods]{Running time of \acrshort{acc:pso} algorithm with  various neighborhood types for \acrshort{acc:bbob} function $f_{19}$ with $128$ dimensions.}
+        \label{fig:psoneigtime}
+    \end{minipage}
+\end{figure}
+
+The \acrshort{acc:pso} neighborhoods experiments are depicted in figure \ref{fig:psoneigtime} (experiments for other \acrshort{acc:bbob} problems are in figure \ref{meas:psoneigtime}), and the fitness in figure \ref{meas:psoneigfitness}. The random and circle neighborhoods are the fastest to evaluate on \gpuns, where the circle one is a bit faster for small populations. The circle neighborhood is static and generated only once, while the random neighborhood changes with every iteration. The random neighborhood is the slowest on the \cpu (except the nearest one), precisely for this reason. The grid--based neighborhoods are as fast as circle neighborhood for smaller populations, but for bigger populations the evaluation takes as long as random neighborhood. The cause is their substantial size in contrast to the circle one. The exception is the linear grid, which is the smallest of all the grid--based neighborhoods. 
+Note that as circle and grid--based neighborhoods are static neighborhoods, their running time for the same neighborhood size should be equal.
+The nearest neighborhood is extensively slower than any other. This is expected because it needs to measure the distance between every pair of particles, which is very costly even on \gpuns. The neighborhood evaluation is still more than six times faster on the \gpu than on the \cpu for swarms larger than $500$ particles.
+
+The overall statistics about the experiments are given in table \ref{tab:totaltime}, including the number of experiments and the total running time. Note that some experiments failed, and I repeated some experiments to get more accurate measurements. The numbers, therefore, do not align to hundreds.
 
 \begin{table}
     \centering
@@ -276,18 +317,18 @@ The overall statistics about the experiments is given in table \ref{tab:totaltim
         \cline{2-3}
         \multicolumn{1}{l|}{} & \textbf{\makecell{Number of\\experiments}} & \textbf{\makecell{Running\\time}} \\
         \hline
-        \acrlong*{acc:ga} & $63\;109$ & $955.7$h \\
+        \acrlong*{acc:ga} & $71\;068$ & $999.9$h \\
         Real--coded evolutionary algorithms & $142\;866$ & $1136.8$h \\
-        \acrlong*{acc:pso} & $197\;378$ & $1264.7$h \\
-        Hyperparameter search & $7\;396$ & $48.7$h \\
+        \acrlong*{acc:pso} & $195\;419$ & $1264.7$h \\
+        Hyperparameter search & $7\;476$ & $49.5$h \\
         Testing runs & $5\;147$ & $53.5$h \\
-        Failed runs & $30\;576$ & $136.6$h \\
+        Failed runs & $30\;578$ & $136.6$h \\
         \hline
-        CPU runs & $230\;413$ & $2569.1$h \\
-        GPU runs & $216\;059$ & $1026.9$h \\
-        CPUdays according to MetaCentrum & & $2144.7$h \\
+        CPU runs & $231\;352$ & $2567.6$h \\
+        GPU runs & $221\;202$ & $1073.4$h \\
+        CPUdays according to MetaCentrum & & $2149.2$h \\
         \hline
-        Total & $446\;472$ & $3596.0$h \\
+        Total & $452\;554$ & $3641.0$h \\
         \hline
     \end{tabular}
     \caption{Experiments running times}
