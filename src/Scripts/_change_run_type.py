@@ -5,19 +5,18 @@
 #
 ###############################
 import wandb
-import progressbar
-
+from progressbar import progressbar
 
 api = wandb.Api()
 runs = api.runs(f'kowalsky/thesis', filters={
-    "$or": [
-        {"config.run_type": 'testing'},
-        {"config.run_type": None},
+    "$and": [
+        {'state': 'finished'},
+        {'config.run_failed.value': False},
     ]
 })
+runs = list(filter(lambda x: 'iteration' not in x.summary, runs))
 print(f"Going to change {len(runs)} runs")
 
-for run in progressbar.progressbar(runs):
-    run.config['run_type'] = 'test'
-    run.update()
+for run in progressbar(runs):
+    run.config['run_failed'] = True
 

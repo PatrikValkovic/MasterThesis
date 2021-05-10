@@ -3,4 +3,6 @@ __pycache__
 .ipynb_checkpoints
 build
 dist
-FEAT.egg-info
+FFEAT.egg-info
+*.pyc
+.coverage

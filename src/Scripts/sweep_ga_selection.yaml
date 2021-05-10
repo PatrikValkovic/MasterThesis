@@ -1,0 +1,26 @@
+program: time_ga_3SAT_scale.py
+name: GA_selection
+method: grid
+project: "thesis"
+
+parameters:
+  aarepeat:
+    values: [1,2]
+  repeat:
+    value: 1
+  iterations:
+    value: 1000
+  device:
+    values: [cpu,cuda]
+  cpu_count:
+    value: 2
+  popsize:
+    values: [32,128,200,512,1024,2048,5000,10240,16384]
+  scaling:
+    values: [linear,logarithmic,exponential,rank,inverse,none]
+  literals:
+    value: 10
+  mean_literals_in_clause:
+    value: 3
+  std_literals_in_clause:
+    value: 0

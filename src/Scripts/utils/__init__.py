@@ -8,3 +8,4 @@
 from .MaxTimeMinItersTerminate import MaxTimeMinItersTerminate
 from .WandbReporter import WandbReporter, WandbExecutionTime
 from .SpecialPipes import *
+from .generate_cnf import generate_cnf, generate_cnf_norm

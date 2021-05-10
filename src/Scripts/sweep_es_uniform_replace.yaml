@@ -1,0 +1,37 @@
+program: sweep_es.py
+name: ES_UniformCrossover_ReplaceMut
+method: grid
+project: "thesis"
+
+parameters:
+  dim:
+    value: 32
+  aarepeat:
+    values: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
+  iterations:
+    value: 500
+  device:
+    value: cpu
+  popsize:
+    value: 1000
+  function:
+    value: 15
+  selection:
+    value: Tournament
+  crossover:
+    value: Uniform
+  crossover_offsprings:
+    values: [0.8]
+  replace_parents:
+    value: true
+  discard_parents:
+    value: false
+  crossover_params:
+    values:
+    - "change_prob-0.4"
+  mutation:
+    value: ReplaceUniform
+  mutation_params:
+    values:
+    - 'min--5,max-5,mutation_rate-0.2'
+

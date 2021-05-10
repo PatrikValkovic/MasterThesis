@@ -5,7 +5,12 @@
 #
 ###############################
 
-from .Pipe import Pipe
-from .Normalize import Normalize
+from .Pipe import Pipe, STANDARD_REPRESENTATION
+from .NormalizedPipe import NormalizedPipe
 from . import flow
+from . import measure
+from . import utils
 from . import strategies
+from . import genetic
+from . import pso
+from . import cma

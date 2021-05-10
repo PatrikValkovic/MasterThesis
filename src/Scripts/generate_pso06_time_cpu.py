@@ -56,4 +56,3 @@ for job_id, (fdim, fn) in combinations:
         print(f"python time_pso2006_random.py --function {fn} --dim {fdim} --popsize \"32,128,200,512,1024,2048,5000,10240,16384,32768\" --device \"cpu\" --repeat 100 --cpu_count {args.cores_per_job}", file=f)
         print(file=f)
         print("rm -rf \"$SCRATCHDIR\"", file=f)
-        combinations = combinations[jobs_per_machine:]
