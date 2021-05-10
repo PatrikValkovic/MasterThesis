@@ -7,7 +7,7 @@ Even though there were already known industrial applications of AI at the beginn
 image recognition \citep{pham2021meta}\citep{ZawadzkaGosk2019},
 object detection \citep{ghiasi2020simple}\citep{lehner2019patch},
 video editing \citep{lu2020layered},
-question answering \citep{yamada2020luke}\citep{yamada2020luke},
+question answering \citep{zhang2020pushing}\citep{yamada2020luke},
 natural language processing \citep{gpt3},
 and many more. Thanks to the rise of generative models, results in the field of
 super-resolution \citep{Sun_2020}\allowbreak\citep{Chadha_2020},
@@ -31,13 +31,13 @@ robotics \citep{EvolutionaryRobotics}\allowbreak\citep{RoboticsInPhysX}\allowbre
 design of neural networks \citep{NEAT}\allowbreak\citep{Floreano2008NeuroevolutionFA},
 and many more.
 
-There has been attempts to implement and run evolutionary algorithms on \acrshort{acc:gpu} \citep{CHENG2019514} and use the computation power available. However, most of these methods focus on \acrfull{acc:cuda} or similar technology. \acrshort{acc:cuda} and alike technologies have drawbacks -- they use low-end languages like C or \cpp, require deep knowledge of the underlying hardware and algorithms are harder to modify.
+There have been attempts to implement and run evolutionary algorithms on \acrshort{acc:gpu} \citep{CHENG2019514} and use the computation power available. However, most of these methods focus on \acrfull{acc:cuda} or similar technology. \acrshort{acc:cuda} and similar technologies have drawbacks -- they use low-end languages like C or \cpp, require deep knowledge of the underlying hardware and algorithms are harder to modify.
 
-Goal of this work is therefore to analyze existing implementations of evolutionary algorithms and propose their implementations on \acrshort{acc:gpu}. The implementation needs to be easy to understand, extendable, and easily to modify. In order to meet the given criteria, implementation should reuse existing frameworks available for neural networks if possible.
+The goal of this work is therefore to analyze existing implementations of evolutionary algorithms and propose their implementations on \acrshort{acc:gpu}. The implementation needs to be easy to understand, extendable, and easily to modify. In order to meet the given criteria, implementation should reuse existing frameworks available for neural networks if possible.
 
-The rest of this thesis is organized as follows. 
-In the next Section, the evolutionary algorithms and their variants are introduced. 
-Section 3 describes \acrshort{acc:cuda} programming in order to  design efficient implementation.
-Proposed implementation and design decisions are given in Section 4. 
-In Section 5, set of problems is presented for the purpose of test, comparison and benchmark of the implementation. Follows evaluation of the proposed implementation and its comparison to the standard methods.
-Finally, conclusion and main ideas are given in section 6.
+The rest of this work is organized as follows. 
+In the next Chapter, the evolutionary algorithms and their variants are introduced. 
+Chapter~\ref{chap:gpu} describes \acrshort{acc:cuda} programming in order to  design efficient implementation.
+Proposed implementation and design decisions are given in Chapter~\ref{chap:impl}. 
+In Chapter~\ref{chap:problems}, set of problems is presented for the purpose of test, comparison and benchmark of the implementation. Follows evaluation of the proposed implementation and its comparison to the standard methods.
+Finally, conclusion and main ideas are given in Chapter~\ref{chap:conclusion}.
