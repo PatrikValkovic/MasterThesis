@@ -39,8 +39,8 @@ class SAT:
                     vars, nclauses = line.split('cnf')[1].strip().split()
                     vars, nclauses = int(vars), int(nclauses)
                     print(f"Problem with {vars} variables and {nclauses} clauses")
-                if line.endswith('0'):
-                    clause = list(map(int, line.split()[:-1]))
+                else:
+                    clause = list(map(int, line.split()))
                     if len(clause) == 0:
                         continue
                     clauses.append(clause)

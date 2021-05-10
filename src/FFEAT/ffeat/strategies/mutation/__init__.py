@@ -4,5 +4,9 @@
 # 3/11/2021
 #
 ###############################
-
-from .DistAdd import AddFromDistribution, AddFromNormal
+"""
+Module implementing mutation operators Real-Coded Evolutionary ALgorithms.
+"""
+from .DistAdd import AddFromDistribution, AddFromNormal, AddFromCauchy
+from .AdaptiveStep import AdaptiveStep
+from .Replace import Replace, ReplaceUniform
