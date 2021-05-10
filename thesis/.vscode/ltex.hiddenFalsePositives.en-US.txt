@@ -1,0 +1,11 @@
+{"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\QHistorically, acc:gpu come from needs of game industry for real–time rendering.\\E$"}
+{"rule":"POSSESSIVE_APOSTROPHE","sentence":"^\\QThe stages acc:gpu performs is usually referred as rendering pipeline\\E$"}
+{"rule":"POSSESSIVE_APOSTROPHE","sentence":"^\\QThe stages acc:gpu performs is usually referred as rendering pipeline and may slightly differ.\\E$"}
+{"rule":"ALLOW_TO","sentence":"^\\QEach kernel receives threadIdx variable, which allows to identify individuals threads in the block.\\E$"}
+{"rule":"A_INFINITIVE","sentence":"^\\QAll the compute capabilities up today have 32 banks for shared memory.\\E$"}
+{"rule":"ALLOW_TO","sentence":"^\\QWhen necessary, PyTorch allows to implement part of the algorithm in\\E$"}
+{"rule":"STARS_AND_STEPS","sentence":"^\\Qacc:ea are simple to split, as one step may be one evolutionary operator.\\E$"}
+{"rule":"ALLOW_TO","sentence":"^\\QPython allows to call function with variable number of arguments, and variable number of keyword arguments.\\E$"}
+{"rule":"ALLOW_TO","sentence":"^\\QThe tournament selection allows to specify whether is it maximization or minimization problem and a number of parents, as I discussed in chapter \\E(?:Dummy|Ina|Jimmy-)[0-9]+\\Q.\\E$"}
+{"rule":"EN_DASH_RULE","sentence":"^\\QIn most cases, it is enough to represent the population using single, two–dimensional tensor.\\E$"}
+{"rule":"MORFOLOGIK_RULE_EN_US","sentence":"^\\QThe groups vary in separability, conditioning, unimodality, and global structure.\\E$"}

@@ -17,7 +17,7 @@
 \usepackage{bm}             % boldface symbols (\bm)
 \usepackage{graphicx}       % embedding of pictures
 \usepackage{fancyvrb}       % improved verbatim environment
-%\usepackage{natbib}         % citation style AUTHOR (YEAR), or AUTHOR [NUMBER]
+\usepackage[sort,square,nonamebreak]{natbib}
 \usepackage[nottoc]{tocbibind} % makes sure that bibliography and the lists
 			    % of figures/tables are included in the table
 			    % of contents
@@ -26,4 +26,21 @@
 \usepackage{paralist}       % improved enumerate and itemize
 \usepackage{xcolor}         % typesetting in color
 
-\usepackage[toc,acronym]{glossaries}
+\usepackage[toc,acronym,nogroupskip]{glossaries}
+\usepackage[ruled,vlined,dotocloa,algochapter]{algorithm2e}
+\usepackage{csquotes}
+\usepackage{imakeidx}
+\indexsetup{level=\chapter,toclevel=chapter}
+\makeindex
+\usepackage{subcaption}
+\usepackage{makecell}
+\usepackage{textcomp}
+
+\usepackage{listings}
+\lstset{
+    showstringspaces=false,
+    basicstyle=\ttfamily,
+}
+
+\usepackage{dirtree} %directory tree visualisation
+\usepackage{soul} %color boxes

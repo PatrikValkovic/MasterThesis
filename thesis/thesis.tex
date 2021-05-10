@@ -30,6 +30,7 @@
 \input{definitions}
 \input{dedication}
 \input{macros}
+\makeglossaries
 \input{acronyms}
 
 %% The hyperref package for clickable links in PDF and also for storing
@@ -43,10 +44,16 @@
 \include{title}
 
 %%% A page with automatically generated table of contents of the master thesis
+\setcounter{tocdepth}{1}
 \tableofcontents
+% TODO fix document outline to generate subsection and table of content as well
 
 %%% Each chapter is kept in a separate file
 \include{chap_intro}
+\include{chap_eva}
+\include{chap_gpu}
+\include{chap_impl}
+\include{chap_eval}
 \include{chap_conclusion}
 
 %%% Bibliography
@@ -59,11 +66,13 @@
 %%% In mathematical theses, it could be better to move the list of tables to the beginning of the thesis.
 \listoftables
 
+\listofalgorithms
+
 %%% Abbreviations used in the thesis, if any, including their explanation
 %%% In mathematical theses, it could be better to move the list of abbreviations to the beginning of the thesis.
 %\chapwithtoc{List of Abbreviations}
 \printglossary
-\printglossary[type=\acronymtype, nonumberlist]
+\printglossary[type=\acronymtype, nonumberlist,title={List of Abbreviations}]
 
 %%% Attachments to the master thesis, if any. Each attachment must be
 %%% referred to at least once from the text of the thesis. Attachments
@@ -77,10 +86,15 @@
 %%% should be uploaded to SIS and optionally also included in the thesis on a~CD/DVD.
 %%% Allowed file formats are specified in provision of the rector no. 72/2017.
 \appendix
-\chapter{Attachments}
 
-\section{First Attachment} 
-//TODO make sure attachments check
+\printindex
+% TODO přidat vše do indexu
+
+\include{chap_operators_examples}
+\include{chap_hyperparameters}
+\include{chap_graphs}
+
+\include{chap_cd}
 
 \openright
 \end{document}

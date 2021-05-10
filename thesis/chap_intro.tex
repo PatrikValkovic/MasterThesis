@@ -1,7 +1,43 @@
 \chapter{Introduction}
+\label{chap:intro}
 
-\acrfull{acc:ai} has become phenomenon of these days. Latest advances in this field achieved magnificent results and allowed creation of systems and tools, we though would be possible thirty years back. The biggest credit goes to the \acrfull{acc:ann}, which allowed this rapid and astonishing growth of the field. More precisely, the \acrfull{acc:dann} sparkled this process in 2011, when they started to exceed human performance in German traffic sign recognition benchmark \cite{CIRESAN2012333}.
+\acrfull{acc:ai} has become phenomenon of these days. Latest advances in this field achieved magnificent results and allowed creation of systems and tools, which we would not think were possible thirty years back. The biggest credit goes to the \acrfull{acc:ann}, which allowed this rapid and astonishing growth of the field in the last years. More precisely, the \acrfull{acc:dann} sparkled this process in 2011, when they started to exceed human performance on German traffic sign recognition benchmark \citep{CIRESAN2012333}.
 
-Although industrial applications has been known before, like checks processing at the beginning of 2020s \cite{ChecksDocumentRecognition}, and speaker recognition \cite{HECK2000181}, it were successes in 2011 and 2012 that get closer attention of academia and broader community. The progress is getting at pace since then and we can see new results on a daily basis. Current state-of-the-art system already exceed human performance and traditional methods in number of various tasks -- like image recognition \cite{pham2021meta}\cite{ZawadzkaGosk2019}, object detection \cite{ghiasi2020simple}\cite{lehner2019patch}, natural language processing \cite{gpt3}, video editing \cite{lu2020layered}, question answering \cite{yamada2020luke}\cite{yamada2020luke}, and many more. Thanks to the rise of generative models, results in the field of image synthesis \cite{StateOfTheArtImageSythesis} \cite{esser2020taming}\cite{dalle}, super-resolution \cite{Sun_2020}\linebreak\cite{Chadha_2020}, text generation \cite{gpt3}\cite{malmi2019encode},\linebreak and countless more amaze scientists with accuracy and attention to details.
+Even though there were already known industrial applications of AI at the beginning of the 2000s, such as automatic check processing \citep{ChecksDocumentRecognition} or speaker recognition \citep{HECK2000181}, it were mainly achievements in 2011 and 2012 which acquired attention from academia and the broader community. The progress in \acrshort{acc:ai} move forward each day and we can see new results almost on a daily basis. Current state-of-the-art system already exceed human performance and traditional methods in number of various tasks -- like 
+image recognition \citep{pham2021meta}\citep{ZawadzkaGosk2019},
+object detection \citep{ghiasi2020simple}\citep{lehner2019patch},
+video editing \citep{lu2020layered},
+question answering \citep{zhang2020pushing}\citep{yamada2020luke},
+natural language processing \citep{gpt3},
+and many more. Thanks to the rise of generative models, results in the field of
+super-resolution \citep{Sun_2020}\allowbreak\citep{Chadha_2020},
+image synthesis \citep{StateOfTheArtImageSythesis}\allowbreak\citep{esser2020taming}\allowbreak\citep{dalle},
+text generation \citep{gpt3}\allowbreak\citep{malmi2019encode},
+and countless more amaze scientists with accuracy and attention to details.
 
-\acrshort{acc:ann} find their way into fields, that traditional machine learning methods have not consider -- fluid simulation \cite{um2018liquid}\cite{Kim_2019}, cloth simulation \cite{lee2019efficient}\cite{SRBO20}, or even whole physics \cite{PhysicsSimulation}\cite{sanchezgonzalez2020learning} and movement of virtual entities \cite{PhysicsBasedCharaterSImulation}\cite{zhang2020vid2player}. Because of that, \acrshort{acc:ann} are used in robotics \cite{pierson2017deep}\cite{Lee_2020},Hollywood \cite{aiinhollywood},  healthcare \cite{fakoor2013using}\cite{BreastCancerAISystem}, and learning computer games \cite{openai2019dota}\cite{alphastar}.
+\acrshort{acc:ann} also found their way into fields which traditional machine learning methods have not consider -- fluid simulation \citep{um2018liquid}\citep{Kim_2019}, cloth simulation \citep{lee2019efficient}\citep{SRBO20}, or even whole physics \citep{PhysicsSimulation}\citep{sanchezgonzalez2020learning} and movement of virtual entities \citep{PhysicsBasedCharaterSImulation}\citep{zhang2020vid2player}. Because of that, \acrshort{acc:ann} are used in 
+healthcare \citep{fakoor2013using}\allowbreak\citep{BreastCancerAISystem},
+Hollywood \citep{aiinhollywood},
+robotics \citep{pierson2017deep}\allowbreak\citep{Lee_2020},
+and can even learn computer games \citep{openai2019dota}\allowbreak\citep{alphastar}.
+
+This long and incomplete list of successes would not be possible without the computation power of computers and data centers nowadays. In fact, the achievements of \acrshort{acc:dann} in 2011 and 2012 were driven mainly by the effective implementation of \acrfull{acc:cnn} in kernels and running them inside the \acrfull{acc:gpu} \citep{CIRESAN2012333}. Since then, the \acrshort{acc:gpu} and more recently the \acrfull{acc:tpu} have overcome traditional processors in the terms of speed and performance for \acrshort{acc:ann}, and allowed these advancements in the field we can see now.
+
+Another interesting field of \acrlong{acc:ai} is evolutionary computation. Similarly to \acrshort{acc:ann}, it performs parameters search in order to best solve the task in hand. Evolutionary algorithms and their variations have been successfully applied in variety of fields -- for example 
+electronic circuits design \citep{NASAantenaDesign}\allowbreak\citep{circuitdesignoptimizationea},
+real-parameter optimization \citep{IntroNaturalEvolutionStrategies}, 
+combinatorial problems \citep{GeneticAssambleLineBalancingProblem}\allowbreak\citep{ALBAYRAK20111313},\linebreak
+robotics \citep{EvolutionaryRobotics}\allowbreak\citep{RoboticsInPhysX}\allowbreak\citep{nygaard2018realworld},
+design of neural networks \citep{NEAT}\allowbreak\citep{Floreano2008NeuroevolutionFA},
+and many more.
+
+There have been attempts to implement and run evolutionary algorithms on \acrshort{acc:gpu} \citep{CHENG2019514} and use the computation power available. However, most of these methods focus on \acrfull{acc:cuda} or similar technology. \acrshort{acc:cuda} and similar technologies have drawbacks -- they use low-end languages like C or \cpp, require deep knowledge of the underlying hardware and algorithms are harder to modify.
+
+The goal of this work is therefore to analyze existing implementations of evolutionary algorithms and propose their implementations on \acrshort{acc:gpu}. The implementation needs to be easy to understand, extendable, and easily to modify. In order to meet the given criteria, implementation should reuse existing frameworks available for neural networks if possible.
+
+The rest of this work is organized as follows. 
+In the next Chapter, the evolutionary algorithms and their variants are introduced. 
+Chapter~\ref{chap:gpu} describes \acrshort{acc:cuda} programming in order to  design efficient implementation.
+Proposed implementation and design decisions are given in Chapter~\ref{chap:impl}. 
+In Chapter~\ref{chap:problems}, set of problems is presented for the purpose of test, comparison and benchmark of the implementation. Follows evaluation of the proposed implementation and its comparison to the standard methods.
+Finally, conclusion and main ideas are given in Chapter~\ref{chap:conclusion}.
