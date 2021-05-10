@@ -5,7 +5,7 @@ Optimization. What better word would describe the ultimate goal of all the peopl
 
 One of the most extraordinary optimization processes is, without a doubt, evolution. Evolution is nothing less than Nature's way of improving species to better adapt to their environment. The father of the evolution idea is undoubtedly Charles Darwin, who first come up with an idea of evolution in his work \enquote{On the origin of species: A facsimile of the first edition} \citep{darwinOriginal}. According to him, the individuals better adapted to the environment have a higher potential to reproduce and pass their genetic material --- including the predisposition to survive in the environment --- to their offspring. Sometimes referred to as \enquote{Survival of the fittest}.
 
-This exact ideas inspired scientists and formed the field of \acrfull{acc:ea}\index{evolutionary algorithm}\footnote{I will refer to all the population-based algorithms in this work as \acrlong*{acc:ea}. These includes, among others, \acrlong*{acc:ga}, \acrlong*{acc:es}, and \acrlong*{acc:pso}.}.
+This exact ideas inspired scientists and formed the field of \acrfull{acc:ea}\index{evolutionary algorithm}\footnote{I will refer to all the population-based algorithms in this work as \acrlong*{acc:ea}. These include, among others, \acrlong*{acc:ga}, \acrlong*{acc:es}, and \acrlong*{acc:pso}.}.
 \acrshort{acc:ea} are stochastic, population-based optimization algorithms inspired by biological evolution. In general, a set of individuals called the population compete with each other for a place in the next generation. Each individual represents one possible solution to the problem at hand. The quality of the individual is proportional to the quality of solution it represents. This quality is usually expressed using the fitness (or sometimes called objective) function. As with natural evolution, the probability of survival is proportional to the solution quality -- the better the solution is, the higher the probability of survival \citep{IntroductionToEA}. In the \acrshort{acc:ea}, the process of producing new generation is usually called selection.
 
 Evolution is not only about survival but also about reproduction. Evolutionary algorithms took inspiration here as well and uses special operators for each generation -- usually called evolution operators or variation operators\index{variation operator}. As the name suggests, these operators make sure the population explores new solutions. The two most common operators are crossover and mutation. During crossover\index{crossover}, individuals from the current population (usually called parents) produce new individuals (usually called offspring) by combining their genetic information. In some way, crossover mimics reproduction in Nature, during which the \acrshort{acc:dna} of offspring is by majority determined by its parents \acrshort{acc:dna}. Mutation\index{mutation}, on the other hand, causes random minor alteration of the individual genetic material and is able to introduce novel patterns that did not previously occur in the population \citep{HowToSolveItModernHeuristics}.
@@ -40,7 +40,7 @@ This section will introduce the necessary terminology that I am going to use thr
 
 \defterm{Problem} is the function we want to solve. It can be both a satisfactory as well optimization problem.
 
-\defterm{Genotype}\index{genotype} is encoding of the solution. It is equivalent of the \acrshort{acc:dna} -- it compress all the data needed to produce solution.
+\defterm{Genotype}\index{genotype} is encoding of the solution. It is equivalent of the \acrshort{acc:dna} -- it compresses all the data needed to produce solution.
 
 \defterm{Gene} is one part of the genotype. It may be one bit if the genotype is encoded as a binary string or scalar if the genotype is a vector or tensor. 
 
@@ -180,7 +180,7 @@ Selection operators are equivalent to Darwin's selection process in Nature. It a
 
 The degree into which operators endorse better individuals is called \emph{selection pressure}\index{selection pressure}. Selection pressure is a primary indicator of the algorithm and needs to be balanced with other variation operators. Too immense selection pressure may cause the algorithm to converge prematurely. On the other hand, too weak selection pressure may prolong the convergence, and the algorithm may need unfeasible amount of steps before convergence.
 
-\emph{Tournament selection}\index{selection!tournament} is one of the most popular selection operators because it is easy to implement, and the absolute values of fitness are not relevant (rather relative order of the individuals is what matter). Tournament selection, therefore, keeps the selection pressure constant. Tournament selection can extend naturally to $k$ parents -- it increases the probability of being drawn for better individuals and thus increases the operator's selection pressure.
+\emph{Tournament selection}\index{selection!tournament} is one of the most popular selection operators because it is easy to implement, and the absolute values of fitness are not relevant (rather relative order of the individuals is what matter). Tournament selection, therefore, keeps the selection pressure constant. We may extend it naturally to $k$ parents -- it increases the probability of being drawn for better individuals and thus increases the operator's selection pressure.
 
 Another popular operator is \emph{Roulette Wheel selection}\index{selection!roulette}. In this operator, the probability of selection is equal to the absolute value of the fitness.
 $$ P\left[\individual_i\right] = \frac{\fitnessfn(\individual_i)}{\sum_{j=0}^{l}\fitnessfn(\individual_j)} $$
@@ -299,7 +299,7 @@ Both plus and comma selection schemas generate $\mu$ offsprings and therefore re
     \item\label{enum:steadystateparentpickup} Choose an individual from the population that the new one can replace.
     \item\label{enum:steadystatereplacement} Decide whether the new individual should replace the old one.
 \end{enumerate}
-The step \ref{enum:steadystateparentpickup} is known as the replacement strategy, and some of the common variants are to replace the oldest, worst, or random individual. The step \ref{enum:steadystatereplacement} is known as the replacement condition. The most common variant is to replace the old individual only if the new one is better; however, it is as well possible to use simulated annealing.
+The step \ref{enum:steadystateparentpickup} is known as the replacement strategy, and some common variants are to replace the oldest, worst, or random individual. The step \ref{enum:steadystatereplacement} is known as the replacement condition. The most common variant is to replace the old individual only if the new one is better; however, it is as well possible to use simulated annealing.
 The steady--state expresses the idea that the population undergoes only a tiny change in each generation \citep{SteadyStateEvolutionStrategy}.
 
 %%%%%%%%%%%%%%%%%%%%%%
@@ -377,7 +377,7 @@ Here, the $\alpha$ is user specified parameter and algorithms is sometimes calle
     \caption{Real--coded crossover operators}
 \end{figure}
 
-Another type of crossover operator is \emph{simplex crossover}\index{crossover real--coded!simplex}. It uses simplex to sample offsprings. Simplex is a generalization of triangle into more dimensions. It is defined in $n$-dimensional space using $n+1$ points. For two-dimensional space the simplex is a triangle, for three-dimensional space the simplex is a tetrahydron and so on. From the definition, the simplex crossover require $n+1$ parents $\mathbf{p_1}, \mathbf{p_2}, \dots, \mathbf{p_n}, \mathbf{p_{n+1}}$. It calculates their centroid
+Another type of crossover operator is \emph{simplex crossover}\index{crossover real--coded!simplex}. It uses simplex to sample offsprings. Simplex is a generalization of triangle into more dimensions. It is defined in $n$-dimensional space using $n+1$ points. For two-dimensional space the simplex is a triangle, for three-dimensional space the simplex is a tetrahedron and so on. From the definition, the simplex crossover require $n+1$ parents $\mathbf{p_1}, \mathbf{p_2}, \dots, \mathbf{p_n}, \mathbf{p_{n+1}}$. It calculates their centroid
 $$
 \mathbf{k}=\frac{\sum_{i=1}^{n+1} \mathbf{p_i}}{n+1}
 $$
@@ -601,7 +601,7 @@ Neighborhood\index{particle swarm optimization!neighborhood}, or also called top
 
 Some of the popular neighborhood topologies are ring (Figure \ref{fig:topologyring}), dense ring (Figure \ref{fig:topologydensering}), and star (Figure \ref{fig:topologystar}). Moreover, particles can be organized in the grid and communicate only with the nearest particles. Some popular grid topologies are linear (Figure \ref{fig:topologygridlinear}), diamond (Figure \ref{fig:topologygriddiamond}), and compact (Figure \ref{fig:topologygridcompact}) \citep{PSOtopologies}.
 
-Notice that all these topologies are static and do not change during the run of the algorithm. Dynamic topologies were proposed, such as random topology and closest neighbors topology. In the random topology, each particle informs $k$ random particles from the swarm. The $k$ is usually kept small, for example $k=3$ \citep{SPSObenchmark}. Note that different neighborhood is generated after each step. In the closest neighbors topology, each particle informs $k$ closest particles -- except this topology is very computation--intensive, it usually leads to premature convergence because particles begin to create clusters and share their position only with thier cluster. On the other hand, it has prerequisites to find multiple local minima in a single run.
+Notice that all these topologies are static and do not change during the run of the algorithm. Dynamic topologies were proposed, such as random topology and closest neighbors topology. In the random topology, each particle informs $k$ random particles from the swarm. The $k$ is usually kept small, for example $k=3$ \citep{SPSObenchmark}. Note that different neighborhood is generated after each step. In the closest neighbors topology, each particle informs $k$ closest particles -- except this topology is very computation--intensive, it usually leads to premature convergence because particles begin to create clusters and share their position only with their cluster. On the other hand, it has prerequisites to find multiple local minima in a single run.
 
 %%%%%%%%%%%%%%%%%%%%
 %%%%  VELOCITY  %%%%
