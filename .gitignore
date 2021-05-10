@@ -23,3 +23,6 @@ thesis/**/*.ilg
 thesis/**/*.ind
 thesis/**/*.loa
 .idea
+__pycache__
+.idea
+wandb

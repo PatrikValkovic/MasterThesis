@@ -1,0 +1,25 @@
+program: sweep_pso2006_circle.py
+method: grid
+project: "thesis"
+
+parameters:
+  dim:
+    value: 32
+  aarepeat:
+    values: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
+  iterations:
+    value: 500
+  device:
+    value: cpu
+  popsize:
+    value: 100
+  inertia:
+    values: [0.8]
+  global_c:
+    values: [1.5]
+  local_c:
+    values: [1.5]
+  velocity_clip:
+    values: [2.0]
+  neigh_size:
+    values: [0.13]
