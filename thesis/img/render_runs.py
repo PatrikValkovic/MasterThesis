@@ -1206,7 +1206,7 @@ if not SHOW_LEGEND:
 
 #region GA fitness with legend
 if not SHOW_LEGEND:
-    new_group('GA fitness')
+    new_group('GA fitness with legend')
     NUM_Y_TICKS = 7
     POP_SIZES=[32,512,5000,10240,32768]
     VARIABLES=[2000]
