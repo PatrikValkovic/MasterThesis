@@ -2652,7 +2652,7 @@ plt.plot(
     c='tab:orange',
     linestyle='-',
 )
-plt.title(f"In respect to number of clauses")
+plt.title(f"With respect to number of clauses")
 plt.xscale('log')
 plt.yscale('log')
 plt.xticks([32, 128, 512, 2048, 10240, 32768])
@@ -2760,7 +2760,7 @@ plt.plot(
     c='tab:orange',
     linestyle='-',
 )
-plt.title(f"In respect to number of literals")
+plt.title(f"With respect to number of literals")
 plt.xscale('log')
 plt.yscale('log')
 plt.xticks([32, 128, 512, 2048, 10240, 32768])

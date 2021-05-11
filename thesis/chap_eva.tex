@@ -1,14 +1,14 @@
 \chapter{\texorpdfstring{\acrlong*{acc:ea}}{Evolutionary algorithms}}
 \label{chap:eva}
 
-Optimization. What better word would describe the ultimate goal of all the people, our civilization, and maybe even the Universe. With a bit of exaggeration, optimization is the cause of all the ramifications we can see around. What else are physics laws than minimization processes, our pursuit of knowledge and self--improvement rather than maximization of self-worth, industrial revolutions than minimization of human labor, maximization of goods production, and standard of living at the same time. In my opinion, optimization is the reason what drives us forward, makes us better, and guides our decisions.
+Optimization. What better word would describe the ultimate goal of the people, our civilization, and maybe even the Universe. With a bit of exaggeration, optimization is the cause of all the ramifications we can see around. What else are physics laws than minimization processes, our pursuit of knowledge and self--improvement rather than maximization of self-worth, industrial revolutions than minimization of human labor, maximization of goods production and standard of living at the same time. In my opinion, optimization is the reason what drives us forward, makes us better, and guides our decisions.
 
-One of the most extraordinary optimization processes is, without a doubt, evolution. Evolution is nothing less than Nature's way of improving species to better adapt to their environment. The father of the evolution idea is undoubtedly Charles Darwin, who first come up with an idea of evolution in his work \enquote{On the origin of species: A facsimile of the first edition} \citep{darwinOriginal}. According to him, the individuals better adapted to the environment have a higher potential to reproduce and pass their genetic material --- including the predisposition to survive in the environment --- to their offspring. Sometimes referred to as \enquote{Survival of the fittest}.
+One of the most extraordinary optimization processes is, without a doubt, evolution. Evolution is nothing less than Nature's way of improving species to better adapt to their environment. The father of the evolution idea is undoubtedly Charles Darwin, who first come up with an idea of evolution in his work \enquote{On the origin of species} \citep{darwinOriginal}. According to him, the individuals better adapted to the environment have a higher potential to reproduce and pass their genetic material --- including the predisposition to survive in the environment --- to their offspring. Sometimes referred to as \enquote{Survival of the fittest}.
 
 This exact ideas inspired scientists and formed the field of \acrfull{acc:ea}\index{evolutionary algorithm}\footnote{I will refer to all the population-based algorithms in this work as \acrlong*{acc:ea}. These include, among others, \acrlong*{acc:ga}, \acrlong*{acc:es}, and \acrlong*{acc:pso}.}.
 \acrshort{acc:ea} are stochastic, population-based optimization algorithms inspired by biological evolution. In general, a set of individuals called the population compete with each other for a place in the next generation. Each individual represents one possible solution to the problem at hand. The quality of the individual is proportional to the quality of solution it represents. This quality is usually expressed using the fitness (or sometimes called objective) function. As with natural evolution, the probability of survival is proportional to the solution quality -- the better the solution is, the higher the probability of survival \citep{IntroductionToEA}. In the \acrshort{acc:ea}, the process of producing new generation is usually called selection.
 
-Evolution is not only about survival but also about reproduction. Evolutionary algorithms took inspiration here as well and uses special operators for each generation -- usually called evolution operators or variation operators\index{variation operator}. As the name suggests, these operators make sure the population explores new solutions. The two most common operators are crossover and mutation. During crossover\index{crossover}, individuals from the current population (usually called parents) produce new individuals (usually called offspring) by combining their genetic information. In some way, crossover mimics reproduction in Nature, during which the \acrshort{acc:dna} of offspring is by majority determined by its parents \acrshort{acc:dna}. Mutation\index{mutation}, on the other hand, causes random minor alteration of the individual genetic material and is able to introduce novel patterns that did not previously occur in the population \citep{HowToSolveItModernHeuristics}.
+Evolution is not only about survival but also about reproduction. Evolutionary algorithms took inspiration here as well and use special operators for each generation -- usually called evolution operators or variation operators\index{variation operator}. As the name suggests, these operators make sure the population explores new solutions. The two most common operators are crossover and mutation. During crossover\index{crossover}, individuals from the current population (usually called parents) produce new individuals (usually called offspring) by combining their genetic information. In some way, crossover mimics reproduction in the Nature, during which the \acrshort{acc:dna} of offspring is by majority determined by its parents \acrshort{acc:dna}. Mutation\index{mutation}, on the other hand, causes random minor alteration of the individual genetic material and is able to introduce novel patterns that did not previously occur in the population \citep{HowToSolveItModernHeuristics}.
 
 In general, \acrshort{acc:ea} repeat steps above until a sufficiently good solution is found or until a maximum number of generations is reached. The general pseudocode of the \acrshort{acc:ea} algorithm is in Algorithm \ref{alg:SEA}. I will present more accurate implementations of various algorithms through this chapter.
 
@@ -38,11 +38,11 @@ In general, \acrshort{acc:ea} repeat steps above until a sufficiently good solut
 
 This section will introduce the necessary terminology that I am going to use throughout this work. I took most of the terminology from \citet{IntroductionToEA}.
 
-\defterm{Problem} is the function we want to solve. It can be both a satisfactory as well optimization problem.
+\defterm{Problem} is the function we want to solve. It can be both a satisfactory or optimization problem.
 
 \defterm{Genotype}\index{genotype} is encoding of the solution. It is equivalent of the \acrshort{acc:dna} -- it compresses all the data needed to produce solution.
 
-\defterm{Gene} is one part of the genotype. It may be one bit if the genotype is encoded as a binary string or scalar if the genotype is a vector or tensor. 
+\defterm{Gene} is one part of the genotype. It may be one bit if the genotype is encoded as a binary string, or scalar if the genotype is a vector or tensor. 
 
 \defterm{Representation or genotype space} is the space of genotype.
 
@@ -52,15 +52,15 @@ This section will introduce the necessary terminology that I am going to use thr
 
 \defterm{Objective function} is the function the algorithm optimizes. For the previous example of real function optimization, the function itself can be the objective function. I will denote objective function $\objectivefn$.
 
-\defterm{Fitness function}\index{fitness function} is the measure of the quality of the solution. Note that the domain of the function is the search space. Unlike the objective function, the fitness function should guide the algorithm during the optimization. It can use the objective function directly, but other options are possible as well. For example, if the goal is to maximize objective function $\objectivefn(x)$, but the algorithm is written such that it minimize the fitness function, one may specify the fitness function as $\fitnessfn(x)=\frac{1}{\objectivefn(x)}$. I will denote fitness function $\fitnessfn$.
+\defterm{Fitness function}\index{fitness function} is the measure of the quality of the solution. Note that the domain of the function is the search space. Unlike the objective function, the fitness function should guide the algorithm during the optimization. It can use the objective function directly, but there are other options available. For example, if the goal is to maximize objective function $\objectivefn(x)$, but the algorithm is written such that it minimize the fitness function, one may specify the fitness function as $\fitnessfn(x)=\frac{1}{\objectivefn(x)}$. I will denote fitness function $\fitnessfn$.
 
-\defterm{Evaluation} is the process of obtaining fitness value for the genotype.
+\defterm{Evaluation} is the process of obtaining fitness value for a given genotype.
 
 \defterm{Individual} is a genotype with its fitness value. I will denote individual by $\individual$ and his fitness $\fitnessfn(\individual)$.
 
 \defterm{Fitness value} of the individual is its evaluation. 
 
-\defterm{Population} is a multiset of individuals -- it is possible to have the identical genotype in the population multiple times. However, I will still distinguish different individuals with the same genotype. I will denote the whole population as $\population$.
+\defterm{Population} is a multiset of individuals -- it is possible to have the identical genotype in the population multiple times. I will still distinguish different individuals with the same genotype. I will denote the whole population as $\population$.
 
 \defterm{Initialization} is the process of creating the first population.
 
@@ -72,9 +72,9 @@ This section will introduce the necessary terminology that I am going to use thr
 
 \defterm{Selection}\index{selection} is an evolution operator that draws individuals from the current population to the next one. The selection should consider the fitness value of each individual in the population and pick them proportionally. Selection, therefore, implements the \enquote{Survival of the fittest} law. From the mathematical point of view, selection task is to move the population into the more promising area of the search space and possibly to reduce the variance of the population \citep{SelfAdaptiveFeaturesInRealParameterEvolutionaryAlgorithms}. In other words, selection is the exploitation step in the algorithm.
 
-\defterm{Crossover}\index{crossover} is evolution operator, that combines some individuals (usually called \textbf{parents}) in order to create one or more new individuals (usually called \textbf{offspring}). Offspring are usually a combination of their parents, similarly to how \acrshort{acc:dna} of the child is a combination of \acrshort{acc:dna} of her parents.
+\defterm{Crossover}\index{crossover} is evolution operator, that combines some individuals (usually called \textbf{parents}) in order to create one or more new individuals (usually called \textbf{offspring}). Offspring are in most cases a combination of their parents, similarly to how \acrshort{acc:dna} of the child is a combination of \acrshort{acc:dna} of her parents.
 
-\defterm{Mutation}\index{mutation} is an evolution operator that modifies one individual. Mutation can be based on randomness (for example replacement of value in genotype by different value) or specialized for the problem in hand. This time the example can be \acrlong{acc:tsp}, where one possible mutation operator can \enquote{untwist} paths that cross each other. This mutation is, in fact, a local optimization technique, as the mutated way is shorter than the previous one \citep{TSPArticle}.
+\defterm{Mutation}\index{mutation} is an evolution operator that modifies one individual. Mutation can be based on randomness (for example replacement of value in genotype by different value) or specialized for the problem at hand. This time the example can be \acrlong{acc:tsp}, where one possible mutation operator can \enquote{untwist} paths that cross each other. This mutation is, in fact, a local optimization technique, as the mutated way is shorter than the previous one \citep{TSPArticle}.
 
 \defterm{Variation operators}\index{variation operator} are operators that change the variation of the population, but not the mean. Variation operators are the exploration steps in the algorithm and should balance the exploitation strength of the selection. Both crossover and mutation are variation operators \citep{SelfAdaptiveFeaturesInRealParameterEvolutionaryAlgorithms}.
 
@@ -96,12 +96,12 @@ $$ \individual \in \left\{0,1\right\}^{n} $$
 Fitness function maps genotype into real values
 $$ \fitnessfn:\left\{0,1\right\}^{n}\rightarrow\mathbb{R} $$
 
-The typical crossover operator is \emph{one--point crossover}\index{crossover \acrshort*{acc:ga}!one--point}. This type of crossover requires two parents and produces two offsprings. As the first step, the algorithm uniformly sample random integer $s$ in the range $\left[ 1, n-1 \right]$. The first offspring will receive genetic material up to index $s$ from the first parent and the rest from the second one. The second offspring is created the same way, except the roles of parents are exchanged. Example for $n=10$ is in Figure \ref{fig:gaonepointcrossover}. In order not to modify all the individuals in the population, only $p_c\in\left[0,1\right]$ percent of individuals undergo the crossover, and the children replace their parents \citep{IntroductionToEA}.
+The typical crossover operator is \emph{one--point crossover}\index{crossover \acrshort*{acc:ga}!one--point}. This type of crossover requires two parents and produces two offsprings. As the first step, the algorithm uniformly samples random integer $s$ in the range $\left[ 1, n-1 \right]$. The first offspring will receive genetic material up to index $s$ from the first parent and the rest from the second one. The second offspring is created the same way, except the roles of parents are exchanged. An example for $n=10$ is in Figure \ref{fig:gaonepointcrossover}. In order not to modify all the individuals in the population, only $p_c\in\left[0,1\right]$ percent of individuals undergo the crossover, and the children replace their parents \citep{IntroductionToEA}.
 
 \begin{figure}
     \begin{subfigure}[b]{0.4\textwidth}
         \includegraphics[width=\textwidth]{img/master_onepointcrossover.pdf}
-        \caption{One point crossover}
+        \caption{One--point crossover}
         \label{fig:gaonepointcrossover}
     \end{subfigure}
     \hfill
@@ -110,18 +110,18 @@ The typical crossover operator is \emph{one--point crossover}\index{crossover \a
         \caption{Bit--flip mutation}
         \label{fig:bitflipmutation}
     \end{subfigure}
-    \caption{Genetic algorithm operators}
+    \caption{Genetic Algorithms operators}
 \end{figure}
 
-The mutation\index{mutation \acrshort*{acc:ga}} operator for \acrshort{acc:ga} is in the most cases bit--flip mutation\index{mutation \acrshort*{acc:ga}!bit--flip}. During this mutation, each gene in the genotype mutates with probability $p_m$. One example of mutation is in Figure \ref{fig:bitflipmutation}. Mutation has two objectives -- it makes sure the algorithm is not trapped in local optima and sustains genetic diversity in the population. As a side effect, mutation serves as a secondary search operator \citep{IntroToGA}.
+The mutation\index{mutation \acrshort*{acc:ga}} operator for \acrshort{acc:ga} is in the most cases bit--flip mutation\index{mutation \acrshort*{acc:ga}!bit--flip}. During this mutation, each gene mutates with probability $p_m$. One example of mutation is in Figure \ref{fig:bitflipmutation}. Mutation has two objectives -- it makes sure the algorithm is not trapped in local optima and sustains genetic diversity in the population. As a side effect, mutation serves as a secondary search operator \citep{IntroToGA}.
 
 The difference between crossover and mutation is such that crossover is rather \enquote{search} exploitation technique. It combines individuals from the current population and exploits them to find possibly better individuals. On the other hand, the mutation is a more local search technique, and based on the probability $p_m$, it searches over the whole representation space.
 
-Finally, the selection stage takes place. There are various selection techniques, and in this particular case, I will use tournament selection\index{selection!tournament}. Tournament selection compares two random individuals' fitness values and places the better individual into the new population. This repeats as many times as needed to form a new population.
+Finally, the selection stage takes place. There are various selection techniques, and in this particular case, I will use tournament selection\index{selection!tournament}. Tournament selection compares two random individuals' fitness values and places the better individual into the new population. This repeats as many times as needed to form a new generation.
 
-For cases where the population's size does not change between generations, there is a high probability that the same individual will be in the following population multiple times. Nonetheless, because variation operators (crossover and mutation) keep diversity in the population, duplicities in the population are not a problem.
+For cases where the population size does not change between generations, there is a high probability that the same individual will be in the following population multiple times. Nonetheless, because variation operators (crossover and mutation) keep diversity in the population, duplicities in the population are not a problem.
 
-The pseudocode of the simple genetic algorithm described above is depicted in algorithm \ref{alg:SGA}. Firstly, the population is randomly initialized, and then it undergoes crossover, mutation, evaluation, and selection operators in the loop. Finally, the evolved population is returned from the algorithm.
+The pseudocode of the simple genetic algorithm described above is depicted in algorithm \ref{alg:SGA}. Firstly, the population is randomly initialized, and then it undergoes crossover, mutation, evaluation, and selection in the loop. Finally, the evolved population is returned from the algorithm.
 
 \begin{algorithm}
     \KwIn{$d$ problem dimension, $l$ population size, $g$ generations, $\fitnessfn$, $p_c$, $p_m$}
@@ -147,12 +147,12 @@ I will refer to the algorithm described above as \enquote{Simple Genetic Algorit
 %%%%%%%%%%%%%%%%%%%%%%
 \subsection{Advanced crossover operators}
 
-The simple genetic algorithm used one point crossover. It is straightforward to extend it into \emph{two--points crossover}\index{crossover \acrshort*{acc:ga}!two--points} where each genome is split into three parts. Each offspring then receives first and third part of the genome from one parent and the middle one from the second one. An example of two points crossover is in the picture \ref{fig:gatwopointcrossover}.
+The simple genetic algorithm used one--point crossover. It is straightforward to extend it into \emph{two--points crossover}\index{crossover \acrshort*{acc:ga}!two--points} where each genome is split into three parts. Each offspring then receives first and third part of the genome from one parent and the middle one from the second one. An example of two points crossover is in the picture \ref{fig:gatwopointcrossover}.
 
 \begin{figure}
     \begin{subfigure}[b]{0.4\textwidth}
         \includegraphics[width=\textwidth]{img/master_twopointcrossover.pdf}
-        \caption{Two point crossover}
+        \caption{Two--point crossover}
         \label{fig:gatwopointcrossover}
     \end{subfigure}
     \hfill
@@ -164,29 +164,29 @@ The simple genetic algorithm used one point crossover. It is straightforward to 
     \caption{Advanced crossover operators}
 \end{figure}
 
-Sometimes, the crossover operator is generalized even more and forms $k$--point crossover. The genotype partitions into $k$ parts, and these parts are interleaved in the offsprings. A special case is \emph{uniform crossover}\index{crossover \acrshort*{acc:ga}!uniform} -- the offsprings are constructed in such a way that they are a uniform combination of their parents. Each gene in the offspring has an equal probability of whether it will be received from the first or second parent. The second offspring will follow the same pattern, except with parents swapped. An example of the uniform crossover is in Figure \ref{fig:uniformcrossover}.
+Sometimes, the crossover operator is generalized even more and forms $k$--point crossover. The genotype partitions into $k$ parts, and these parts are interleaved in the offspring. A special case is \emph{uniform crossover}\index{crossover \acrshort*{acc:ga}!uniform} -- the offspring are constructed in such a way that they are a uniform combination of their parents. Each gene in the offspring has an equal probability of whether it will be received from the first or second parent. The second offspring will follow the same pattern except with parents swapped. An example of the uniform crossover is in Figure \ref{fig:uniformcrossover}.
 % Introduction into GA presents few more types - three parents crossover, crossover with a reduced surrogate, and shuffle crossover. These are irrelevant for my implementation, but I can potentially describe them here.
 
-I have described the crossover operators such that the offsprings replace their parents. That is a popular design decision, however, one does not need to enforce it and may decide to create offspring in addition to the parents. To ensure the population does not increase in size over the generations, the selection operator can be implemented in a way that a specified number of individuals will be drawn up. I will discuss this possibility in chapter \ref{chap:realcodedea}.
+I have described the crossover operators such that the offspring replace their parents. That is a popular design decision, however, one does not need to enforce it and may decide to create offspring in addition to the parents. To ensure the population does not increase in size over the generations, the selection operator can be implemented in a way that a specified number of individuals will be drawn up. I will discuss this possibility in chapter \ref{chap:realcodedea}.
 
 %%%%%%%%%%%%%%%%%%%%%
 %%%%  SELECTION  %%%%
 %%%%%%%%%%%%%%%%%%%%%
 \subsection{Selection operators}
 
-The selection operator is one of the most important ones. It is the only operator working with fitness values; therefore, the operator is responsible for the exploitation part of the algorithm. The simple genetic algorithm presented in algorithm \ref{alg:SGA} uses tournament selection -- I will analyze other types of selections through the following paragraphs.
+The selection operator is one of the most important ones. It is the only operator working with fitness values; therefore, the operator is responsible for the exploitation part of the algorithm. The simple genetic algorithm presented in algorithm \ref{alg:SGA} used tournament selection -- I will analyze other types of selections through the following paragraphs.
 
-Selection operators are equivalent to Darwin's selection process in Nature. It allows to preserve perspective genetic traits and discard the bad ones. That corresponds to the \enquote{Survival of the fittest} idea. The distinction between good and bad individuals is in respect to the fitness function; selection operators, therefore, favor individuals with better fitness value.
+Selection operators are equivalent to Darwin's selection process in the Nature. It allows to preserve perspective genetic traits and discard the bad ones. That corresponds to the \enquote{Survival of the fittest} idea. The distinction between good and bad individuals is in respect to the fitness function; selection operators, therefore, favor individuals with better fitness value.
 
 The degree into which operators endorse better individuals is called \emph{selection pressure}\index{selection pressure}. Selection pressure is a primary indicator of the algorithm and needs to be balanced with other variation operators. Too immense selection pressure may cause the algorithm to converge prematurely. On the other hand, too weak selection pressure may prolong the convergence, and the algorithm may need unfeasible amount of steps before convergence.
 
-\emph{Tournament selection}\index{selection!tournament} is one of the most popular selection operators because it is easy to implement, and the absolute values of fitness are not relevant (rather relative order of the individuals is what matter). Tournament selection, therefore, keeps the selection pressure constant. We may extend it naturally to $k$ parents -- it increases the probability of being drawn for better individuals and thus increases the operator's selection pressure.
+\emph{Tournament selection}\index{selection!tournament} is one of the most popular selection operators because it is easy to implement, and the absolute values of fitness are not relevant (rather relative order of the individuals is what matter). Tournament selection, therefore, keeps the selection pressure constant. We may extend it naturally to $k$ parents -- it increases the drawn probability for better individuals and thus increases the operator's selection pressure.
 
 Another popular operator is \emph{Roulette Wheel selection}\index{selection!roulette}. In this operator, the probability of selection is equal to the absolute value of the fitness.
 $$ P\left[\individual_i\right] = \frac{\fitnessfn(\individual_i)}{\sum_{j=0}^{l}\fitnessfn(\individual_j)} $$
-This can be imagined as a roulette wheel, where individuals represent a sector of a wheel. The size of the sector is proportional to the fitness value of the individual. The selection procedure to pick up $n$ individuals simply spins the roulette $n$--times and selects the individual on which the roulette stopped. An example of roulette wheel selection is in Figure \ref{fig:roulettewheelselection}. Selection operators that depend on the absolute values of fitness value are usually called proportional--based selection\index{selection!proportional--based}.
+This can be imagined as a roulette wheel, where individuals represent a sector of a wheel. The size of the sector is proportional to the fitness value of the individual. The selection procedure simply spins the roulette $n$--times and selects the individual on which the roulette stopped (for population size equal $n$). An example of roulette wheel selection is in Figure \ref{fig:roulettewheelselection}. Selection operators that depend on the absolute values of fitness value are usually called proportional--based selection\index{selection!proportional--based} operators.
 
-A slight improvement of roulette wheel selection is \emph{\acrlong*{acc:sus}}\index{selection!stochastic universal sampling} (\acrshort{acc:sus}). Because roulette wheel selection samples individuals independently, it may select the same individuals more time than would be expected given its proportion to the rest of the population. In the example in Figure \ref{fig:roulettewheelselection}, the expected number of draws for individual $p_3$ is one. However, it has been drawn two times. \acrlong{acc:sus} handles this issue by sampling only one number in the range $\left[0,\frac{\sum_i^l\fitnessfn(p_i)}{l} \right]$ and drawing each new individual with $\frac{\sum_i^l\fitnessfn(p_i)}{l}$ offset. The \acrshort{acc:sus} is unbiased, and the distribution of drawn individuals is closer to the fitness values distribution in contrast to the roulette wheel selection. An example of \acrshort{acc:sus} is in Figure \ref{fig:USB}.
+A slight improvement of roulette wheel selection is \emph{\acrlong*{acc:sus}}\index{selection!stochastic universal sampling} (\acrshort{acc:sus}). Because roulette wheel selection samples individuals independently, it may select the same individuals more time than would be expected given its sector size. In the example in Figure \ref{fig:roulettewheelselection}, the expected number of draws for individual $p_3$ is one. However, it has been drawn two times. \acrlong{acc:sus} handles this issue by sampling only one number in the range $\left[0,\frac{\sum_i\fitnessfn(p_i)}{n} \right]$ and drawing each new individual with $\frac{\sum_i\fitnessfn(p_i)}{n}$ offset (where $n$ is population size). The \acrshort{acc:sus} is unbiased, and the drawn distribution is closer to the fitness values distribution in contrast to the roulette wheel selection. An example of \acrshort{acc:sus} is in Figure \ref{fig:USB}.
 
 \begin{figure}
     \begin{subfigure}[t]{0.47\textwidth}
@@ -200,17 +200,17 @@ A slight improvement of roulette wheel selection is \emph{\acrlong*{acc:sus}}\in
         \caption{Stochastic universal sampling. Red line represent sampled number and dotted lines are sampled individuals with $\frac{1}{7}$ offset.}
         \label{fig:USB}
     \end{subfigure}
-    \caption{Roulette based selections}
+    \caption{Roulette based selection}
 \end{figure}
 
-Notice that for both selection operators, individuals with the higher fitness value have a higher probability of being picked up to the successive population. These operators are therefore intended for maximization problems. Also, because the fitness value directly affects the circle sector's size, the fitness function must be positive over the whole domain. It is possible to discard individuals with non--positive fitness values; however, then the whole selection procedure would lose relevance.
+Notice that for both selection operators, individuals with the higher fitness value have a higher probability of being picked up to the successive population. These operators are therefore intended for maximization problems. Also, because the fitness value directly affects the sector size, the fitness function must be positive over the whole domain. It is possible to discard individuals with non--positive fitness values; however, then the whole selection procedure would lose relevance.
 
-One more drawback of both roulette wheel selection and \acrshort{acc:sus} is that the probabilities depend on fitness's absolute values. Lets look at two cases:
+One more drawback of both roulette wheel selection and \acrshort{acc:sus} is that the probabilities depend on fitness's absolute values. Let's look at two cases:
 \begin{itemize}
     \item The population fitness values are distributed in the range $\left[ 99,100 \right]$.
     \item The population fitness values are distributed in the range $\left[ 1, 2\right]$.
 \end{itemize}
-In both cases, the expected difference of fitness between any two individuals is the same. Nevertheless, because roulette--based selection takes into account absolute values of fitness, the probability of drawing the best individual from the first case is much smaller compared to the second case. This is a side effect of proportional--based selection.
+In both cases, the expected difference of fitness between any two individuals is the same. Nevertheless, because roulette--based selection takes into account absolute values of fitness, the probability of drawing the best individual in the first case is much smaller compared to the second case. This is a side effect of proportional--based selection.
 
 The drawback of proportional--based selection is that it does not create enough selection pressure when the population has roughly the same fitness value. This problem occurs at the end of the evolution because all the individuals are optimized over the generations and usually have very similar fitness values. Note that tournament selection does not suffer from this, as only the order of the individuals determines the selection order.
 
@@ -220,9 +220,9 @@ f_{scale}(\individual)=\frac{\fitnessfn(\individual) - \min\limits_{i}\fitnessfn
 $$
 Alternatively, logarithmic respectively exponential scale is possible as well, so there will be more, respectively less emphasis on individuals from the beginning of the sorted sequence.
 
-Special example of fitness scaling is \emph{rank selection}\index{selection!rank}. To eliminate dependency on the fitness function's absolute values, rank selection assigns artificial fitness values to the individuals based on their order in the sorted sequence. One common rank evaluation function is linear -- it assigns new fitness values in the interval $\left[l,u\right]$ such that the best individual has new fitness value $l$, the worst one $u$, and the rest of the population is uniformly distributed in this interval \citep{razali2011genetic} (I expect minimization problem). Different scaling functions are possible as well.
+Special example of fitness scaling is \emph{rank selection}\index{selection!rank}. To eliminate dependency on the fitness function's absolute values, rank selection assigns artificial fitness values to the individuals based on their order. One common rank evaluation function is linear -- it assigns new fitness values in the interval $\left[l,u\right]$ such that the best individual has new fitness value $l$, the worst one $u$, and the rest of the population is uniformly distributed in this interval \citep{razali2011genetic} (I expect minimization problem). Different scaling functions are possible as well.
 
-The advantage of rank selection is a steady selection pressure, and unlike mentioned roulette wheel selection, it can handle fitness functions with negative values. Moreover, it is easy to control selection pressure using interval size, as shown in table \ref{tab:rankselection}. It also does not suffer from outliers -- individuals with very high or low fitness in comparison to the rest of the population. Rank selection can avoid premature convergence, but computation costs can be very costly because the population needs to be sorted, fitness values reevaluated, and another proportional--based selection operator needs to follow.
+The advantage of rank selection is a steady selection pressure, and unlike mentioned roulette wheel selection, it can handle fitness functions with negative values. Moreover, it is easy to control selection pressure using interval size, as shown in table \ref{tab:rankselection}. It also does not suffer from outliers -- individuals with very high or low fitness in comparison to the rest of the population. Rank selection can avoid premature convergence, but computation costs can be very high because the population needs to be sorted, fitness values reevaluated, and another proportional--based selection operator needs to follow.
 
 \begin{table}
     \centering
@@ -245,13 +245,13 @@ The advantage of rank selection is a steady selection pressure, and unlike menti
     \label{tab:rankselection}
 \end{table}
 
-Selection operators may use traditional approaches from search algorithms -- for example \emph{simulated annealing}\index{selection!simulated annealing}. Simulated annealing is an analogy to metallurgy, whereby precise control of heating and cooling of material improves its physical and chemical properties. In general, it accepts worse solutions as long as the temperature $\tau$ is high enough. The temperature $\tau$ starts high, so almost all the solutions are accepted from the beginning. The temperature slowly decreases during a run of the algorithm down to zero. Decrease is usually exponential: $\tau_g=\tau_0(1-\alpha)^{1+\frac{\beta\cdot g}{G}}$ where $g$ is current generation, $G$ maximum number of generations, $\alpha\in\left[0,1\right]$, $\beta\in\mathbb{R}^+$, and $\tau_0\in\mathbb{R}^+$ are parameters. 
+Selection operators may use traditional approaches from search algorithms, for example \emph{simulated annealing}\index{selection!simulated annealing}. Simulated annealing is an analogy to metallurgy, whereby precise control of heating and cooling of material improves its physical and chemical properties. In general, it accepts worse solutions as long as the temperature $\tau$ is high enough. The temperature $\tau$ starts high, so almost all the solutions are accepted from the beginning. The temperature slowly decreases over the generations down to zero. Decrease is usually exponential: $\tau_g=\tau_0(1-\alpha)^{1+\frac{\beta\cdot g}{G}}$ where $g$ is current generation, $G$ maximum number of generations, $\alpha\in\left[0,1\right]$, $\beta\in\mathbb{R}^+$, and $\tau_0\in\mathbb{R}^+$ are parameters. 
 
 One example of simulated annealing is the Boltzmann selection operator. It draws the individuals with probability 
 $P\propto exp\left(-\frac{f_{max} - \fitnessfn(\individual)}{\tau}\right)$
 where $f_{max}$ is the best fitness in the population and $\tau$ is the current temperature (known as Boltzmann probability). Note that Boltzmann selection is once again proportional--based selection operator and may suffer from the same problems as roulette wheel selection.
 
-The last selection operator, I would like to discuss, is \emph{elitism}\index{elitism}. For some problems it may be beneficial to preserve the best individuals from the population. This is especially helpful for problems where the algorithm can find the optimal solution using small local steps. Mutation and crossover may destroy the best individual in the population, and it may be difficult for the algorithm to find it once again if its genetic material has not been propagated yet.
+The last selection operator, I would like to discuss, is \emph{elitism}\index{elitism}. Some problems may benefit by preserving the best individuals from the population. This is especially helpful for problems where the algorithm can find the optimal solution using small local steps. Mutation and crossover may destroy the best individual in the population, and it may be difficult for the algorithm to find it once again if its genetic material has not been propagated yet.
 
 The elitism mechanism is an operator, which makes sure the best individuals endure in the population. It is usually implemented in a way it copies the $k$ best individuals from the population before all other operators execute, and copy them back afterward. Alternatively it prohibits their change, or appends them to the population afterward. Note that elitism is not truly a selection operator, but rather an insurance mechanism not to lose the population's best individuals. Traditional selection operator still needs to be present in order for the algorithm to work. 
 
@@ -270,9 +270,9 @@ Real--coded evolutionary algorithms are natural extension of \acrshort{acc:ga} b
 $$
 \individual \in \mathbb{R}^{n}
 $$
-Alternatively, the relaxed definition allows genotype of an arbitrary number of dimensions. That may be helpful for problems, which expect a particular structure of the solution -- for example image processing filters \citep{WVDF}. Note that using the different genotype structure disallows direct use of some operators, like one-- and two--point crossovers, because the split point may be ambiguous. On the other hand, some operators, like the uniform crossover, can easily handle multidimensional genotypes without much change.
+Alternatively, the relaxed definition allows genotype of an arbitrary number of dimensions. That may be helpful for problems, which expect a particular structure of the solution -- for example image processing filters \citep{WVDF}. Note that using the different genotype structure disallows direct use of some operators, like one-- and two--point crossovers, because the split point may be ambiguous. On the other hand, some operators, like the uniform crossover, can easily handle multidimensional genotype without much change.
 
-Origin of real--coded evolutionary algorithms, more precisely \acrfull{acc:es}, dates back to 1970s at Technical University in Technische Universität Berlin, where \citeauthor*{ES-original} presented \acrshort{acc:es} for the first time \citep{ES-original}. Originally, \acrshort{acc:es} has not been used as an optimization algorithm for real functions, but \enquote{rather as a set of rules for the automatic design and analysis of consecutive experiments with stepwise variable adjustement driving a suitable object/system into the optimal state in spite of environmental noise} \citep{EScomprehensiveintroduction}. It turned out that this simple stochastic search technique outperformed traditional--based methods. Although there is no guarantee \acrshort{acc:es} will find the optimal solution, they are in most cases able to find near--optimal and sufficiently good enough solution.
+Origin of real--coded evolutionary algorithms, more precisely \acrfull{acc:es}, dates back to 1970s at Technische Universität Berlin, where \citeauthor*{ES-original} presented \acrshort{acc:es} for the first time \citep{ES-original}. Originally, \acrshort{acc:es} have not been used as an optimization algorithm for real functions, but \enquote{rather as a set of rules for the automatic design and analysis of consecutive experiments with stepwise variable adjustement driving a suitable object/system into the optimal state in spite of environmental noise} \citep{EScomprehensiveintroduction}. It turned out that this simple stochastic search technique outperformed traditional--based methods. Although there is no guarantee \acrshort{acc:es} will find the optimal solution, they are in most cases able to find near--optimal and sufficiently good enough solution.
 
 This section takes inspiration mainly from the work of \citet*{IntroductionToEA} and \citet*{EScomprehensiveintroduction}. Moreover, some techniques originated in \acrshort{acc:es} are applicable for general real--coded evolutionary algorithms as well. Therefore, I will not make rigorous distinction between real--coded evolutionary algorithms and \acrshort{acc:es} through this section.
 
@@ -285,21 +285,21 @@ Real--coded evolutionary algorithms can use the same selection and crossover ope
 \end{itemize}
 Crossover operators from \acrshort{acc:ga} may fulfill these requirements, however, real--coded encoding allows a more diverse set of operators. I will describe them a bit later.
 
-\acrshort{acc:es} also introduced two different selection schemas\index{selection schema}:
+\acrshort{acc:es} also introduced different selection schemes\index{selection schema}:
 \begin{itemize}
     \item $\left(\mu+\lambda\right)$ evolution strategy, also known as \emph{plus schema}.
     \item  $\left(\mu,\lambda\right)$ evolution strategy, also known as \emph{comma schema},
     \item\label{enum:steadystate} steady--state evolution strategy.
 \end{itemize}
-Here, the $\mu$ represents a number of parents and $\lambda$ number of offspring. In the first two cases, $\abs{\mu}$ individuals are picked to the next generation. In the plus schema, these individuals are taken from both parents and offspring. For the comma schema, $\abs{\mu}$ individuals are drawn only from the offspring, and parents are discarded. Obviously, to have at least $\abs{\mu}$ distinct individuals in the next generation, it must hold $\lambda\geq\mu$. For stochastic selection operators, where it is possible to draw the same individual multiple times, it may be beneficial to have more offspring than parents.
+Here, the $\mu$ represents a number of parents and $\lambda$ number of offspring. In the first two cases, $\mu$ individuals are picked to the next generation. In the plus schema, these individuals are taken from both parents and offspring. For the comma schema, $\mu$ individuals are drawn only from the offspring and parents are discarded. Obviously, to have at least $\mu$ distinct individuals in the next generation, it must hold $\lambda\geq\mu$. For stochastic selection operators, where it is possible to draw the same individual multiple times, it may be beneficial to have more offspring than parents.
 
-Both plus and comma selection schemas generate $\mu$ offsprings and therefore resample the whole population for the next generation. Steady--state evolution strategy, on the other hand, generates just one (or a very few) individuals in each generation and tries to reintegrate them back into the population. The steps of the algorithm are:
+Both plus and comma selection schemes generate $\mu$ offsprings and resample the whole population for the next generation. Steady--state evolution strategy, on the other hand, generates just one (or a very few) individuals in each generation and tries to reintegrate them back into the population. The steps of the algorithm are:
 \begin{enumerate}
     \item Generate a new individual and evaluate it using the fitness function.
     \item\label{enum:steadystateparentpickup} Choose an individual from the population that the new one can replace.
     \item\label{enum:steadystatereplacement} Decide whether the new individual should replace the old one.
 \end{enumerate}
-The step \ref{enum:steadystateparentpickup} is known as the replacement strategy, and some common variants are to replace the oldest, worst, or random individual. The step \ref{enum:steadystatereplacement} is known as the replacement condition. The most common variant is to replace the old individual only if the new one is better; however, it is as well possible to use simulated annealing.
+The step \ref{enum:steadystateparentpickup} is known as the replacement strategy, and some common variants are to replace the oldest, worst, or random individual. The step \ref{enum:steadystatereplacement} is known as the replacement condition. The most common variant is to replace the old individual only if the new one is better; however, it is also possible to use simulated annealing.
 The steady--state expresses the idea that the population undergoes only a tiny change in each generation \citep{SteadyStateEvolutionStrategy}.
 
 %%%%%%%%%%%%%%%%%%%%%%
@@ -325,12 +325,12 @@ Encoding genotype as a vector of real numbers allows, except crossover operators
     \label{fig:separationfucntions}
 \end{figure}
 
-Lets take for example two functions:
+Let's take for example two functions:
 \begin{align*}
     f_{sep}(x,y)&=x^2+3y^2 \\
     f_{nosep}(x,y)&=x^2+3y^2+2xy
 \end{align*}
-These functions are shown in Ffigure \ref{fig:separationfucntions}. Running simple hill climber algorithm \citep{HandbookOfMetaheuristics}, one may get trajectories displayed in the figure by orange. Notice that the trajectory of the function $f_{nosep}$ is much longer -- it took $200$ steps to achieve global minimum for the function $f_{sep}$, however up to $400$ steps for the function $f_{nosep}$ (the step size was equal for both runs). The cause of this is that the first function is separable -- it can be written in the form $f_{sep}(x,y)=f(x)+f(y)$. Hill climbing algorithm can easily find optimum because $\min f_{sep}(x,y)=\min f(x)+\min f(y)$, therefore it can search for the optimum for each variable and then aggregate the results. That is not true for the function $f_{nosep}$, because it is not separable, and using the local search technique is not as straightforward. Separable functions are more challenging and harder in some sense, exactly the kind of problems \acrshort{acc:ea} should solve efficiently.
+These functions are shown in Figure \ref{fig:separationfucntions}. Running simple hill climber algorithm \citep{HandbookOfMetaheuristics}, one may get trajectories displayed in the figure. Notice that the trajectory of the function $f_{nosep}$ is much longer -- it took $200$ steps to achieve global minimum for the function $f_{sep}$, however up to $400$ steps for the function $f_{nosep}$ (the step size was equal for both runs). The first function is separable, it can be written in the form $f_{sep}(x,y)=f(x)+f(y)$, which causes this behavior. Hill climbing algorithm can easily find optimum because $\min f_{sep}(x,y)=\min f(x)+\min f(y)$, therefore, it can search for the optimum for each variable and then aggregate the results. That is not true for the function $f_{nosep}$, because it is not separable, and using the local search technique is not as straightforward. Separable functions are more challenging and harder in some sense, exactly the kind of problems \acrshort{acc:ea} should solve efficiently.
 
 The problem of crossover operators from \acrshort{acc:ga} is precisely the same as I have just shown. These operators work on the genes independently and do not use knowledge about the correlation of the genotype space within the population. It is therefore necessary to use different crossover operators tailored for the real--coded \acrshort{acc:ea}.
 
@@ -342,8 +342,8 @@ where $\alpha \sim U(0,1)$ (uniformly distributed variable in interval $\left[0,
 $$
 \mathbf{o} = \boldsymbol{\alpha}\cdot\mathbf{p_1}+\left(1-\boldsymbol{\alpha}\right)\cdot\mathbf{p_2}
 $$
-where $\cdot$ is an element--wise multiplication of vectors.
-Natural extension of the algorithm is to use up to $k$ parents $\mathbf{p_1}, \mathbf{p_2},\dots,\mathbf{p_k}$ and create offspring by their linear combination.
+where $\cdot$ is an element--wise vector multiplication.
+Further extension of the algorithm is to use up to $k$ parents $\mathbf{p_1}, \mathbf{p_2},\dots,\mathbf{p_k}$ and create offspring by their linear combination.
 $$
 \mathbf{o} = 
 \boldsymbol{\alpha}_1\cdot\mathbf{p_1}+
@@ -353,14 +353,14 @@ $$
 $$
 where $\sum_{i=1}^{k}\boldsymbol{\alpha}_i=\boldsymbol{1}$.
 
-Arithmetic crossover is just a linear combination of parents, it does not satisfy condition on page \pageref{enum:espopulationvariance} to \enquote{\snipescondition}. Authors \citeauthor*{BlendCrossoverOriginal} address this issue in \emph{blend crossover}\index{crossover real--coded!blend} operator. For parents $\mathbf{x}$ and $\mathbf{y}$, the genes of offspring $\mathbf{o}$ is generated randomly from uniform distribution specified by it's parents.
+Arithmetic crossover is just a linear combination of parents, it does not satisfy condition on page \pageref{enum:espopulationvariance} to \enquote{\snipescondition}. Authors \citet{BlendCrossoverOriginal} address this issue in \emph{blend crossover}\index{crossover real--coded!blend} operator. For parents $\mathbf{x}$ and $\mathbf{y}$, the genes of offspring $\mathbf{o}$ are sampled randomly from uniform distribution specified by the parents.
 $$
 o_i = U\left( 
     x_i - \alpha \left( y_i - x_i \right),
     y_i + \alpha \left( y_i - x_i \right)
 \right)
 $$
-Here, the $\alpha$ is user specified parameter and algorithms is sometimes called \acrshort{acc:blx}--$\alpha$ crossover. Example of \acrshort{acc:blx} is in the figure \ref{fig:blendcrossoverexample}.
+Here, the $\alpha$ is user specified parameter and algorithms is sometimes called \acrshort{acc:blx}--$\alpha$ crossover. An example of \acrshort{acc:blx} is in the Figure \ref{fig:blendcrossoverexample}.
 
 \begin{figure}
     \begin{subfigure}[t]{0.45\textwidth}
@@ -377,37 +377,35 @@ Here, the $\alpha$ is user specified parameter and algorithms is sometimes calle
     \caption{Real--coded crossover operators}
 \end{figure}
 
-Another type of crossover operator is \emph{simplex crossover}\index{crossover real--coded!simplex}. It uses simplex to sample offsprings. Simplex is a generalization of triangle into more dimensions. It is defined in $n$-dimensional space using $n+1$ points. For two-dimensional space the simplex is a triangle, for three-dimensional space the simplex is a tetrahedron and so on. From the definition, the simplex crossover require $n+1$ parents $\mathbf{p_1}, \mathbf{p_2}, \dots, \mathbf{p_n}, \mathbf{p_{n+1}}$. It calculates their centroid
+Another type of crossover operator is \emph{simplex crossover}\index{crossover real--coded!simplex}. It uses simplex to sample offspring. Simplex is a generalization of triangle into more dimensions. It is defined in $n$-dimensional space using $n+1$ points. For two-dimensional space the simplex is a triangle, for three-dimensional space the simplex is a tetrahedron, and so on. From the definition, the simplex crossover require $n+1$ parents $\mathbf{p_1}, \mathbf{p_2}, \dots, \mathbf{p_n}, \mathbf{p_{n+1}}$. It calculates their centroid
 $$
 \mathbf{k}=\frac{\sum_{i=1}^{n+1} \mathbf{p_i}}{n+1}
 $$
 and then expand the simplex by $\varepsilon$ along each of the direction $\mathbf{p_k} - \mathbf{k}$. As a result, this new, expanded simplex is defined by the points
-\boldmath
 $$
-p'_i = p_i + \varepsilon\left( p_i - k \right).
+\mathbf{p'_i} = \mathbf{p_i} + \varepsilon\left( \mathbf{p_i} - \mathbf{k} \right).
 $$
-\unboldmath
 The algorithm then samples the offspring from this simplex. An example of a simplex crossover in two-dimensional space is in the Figure \ref{fig:simplexcrossoverexample} with $\varepsilon=1.5$.
-I would argue that the hypersphere sample space can be used as well, as is shown in Figure \ref{fig:simplexcrossoverexample} with $\varepsilon=1.2$.
+I would argue the hypersphere sample space can be used as well, as is shown in Figure \ref{fig:simplexcrossoverexample} with $\varepsilon=1.2$.
 
 %%%%%%%%%%%%%%%%%%%%
 %%%%  MUTATION  %%%%
 %%%%%%%%%%%%%%%%%%%%
 \subsection{Real--coded mutation operators}
 
-The equivalent of bit--flip mutation in \acrshort{acc:ga} is \emph{uniform mutation}\index{mutation real--coded!uniform}. It replaces each gene by random value sampled from $U(l,u)$ with small probability $p_m$, where interval $\left[l,u\right]$ is the scalar's domain. This operator basically tries random numbers and can rarely lead to a good solution. Moreover, it does not exploit the distribution of the population.
+The equivalent of bit--flip mutation in \acrshort{acc:ga} is \emph{uniform mutation}\index{mutation real--coded!uniform}. With small probability $p_m$ it replaces gene by a random value sampled from $U(l,u)$, where interval $\left[l,u\right]$ is the scalar's domain. This operator basically tries random numbers and can rarely lead to a good solution. Moreover, it does not exploit the distribution of the population.
 
-More successful and frequently used is \emph{normal mutation}\index{mutation real--coded!normal}. It performs a little change of the individual by adding sample from a normal distribution with zero mean to each gene.
+More successful and frequently used is \emph{normal mutation}\index{mutation real--coded!normal}. It performs a little change of the individual by adding sample from a normal distribution with zero mean.
 $$
 p_i = p_i + N(0,\sigma)
 $$
 The $\sigma$ is the mutation strength parameter and is usually kept low. Notice that normal mutation does not use mutation probability $p_m$. Because the $\sigma$ is usually small and the distribution has zero mean, the changes do not have significant impact on the population.
 
-Normal mutation can be further extended to adapt to more complicated problems. Instead of the $\sigma$ variable, it is possible to introduce $\boldsymbol{\sigma}$ vector, which allows different deviation in each dimension.
+Normal mutation can be further extended to perform well on more complicated problems. Instead of the $\sigma$ variable, it is possible to introduce $\boldsymbol{\sigma}$ vector, which allows different deviation in each dimension.
 $$
 p_i = p_i + N(0,\sigma_i)
 $$ 
-To address non--separable functions, we may need the whole covariance matrix $\Sigma^{n \times n}$ for successful adaptation. Normal mutation with covariance matrix is sometimes called \emph{correlated mutation}. Notice that in order to use correlated mutation in $n$ dimensions, the algorithm needs $\frac{n\left(n+1\right)}{2}$ parameters just for the correlation matrix. Correlated mutation has therefore just a trivial practical usage on its own. Other algorithms address this issue by setting these parameters based on the observation -- the \acrfull{acc:cma} is the best--known of them.
+To address non--separable functions, we may need the whole covariance matrix $\Sigma$ for successful adaptation. Normal mutation with covariance matrix is sometimes called \emph{correlated mutation}. Notice that in order to use correlated mutation in $n$ dimensions, the algorithm needs $\frac{n\left(n+1\right)}{2}$ parameters just for the correlation matrix. Correlated mutation has therefore just a trivial practical usage on its own. Other algorithms address this issue by setting these parameters based on the observations -- the \acrfull{acc:cma} is the best--known of them.
 
 \begin{figure}[b]
     \begin{subfigure}[t]{0.45\textwidth}
@@ -424,7 +422,7 @@ To address non--separable functions, we may need the whole covariance matrix $\S
     \caption{Mutation distributions}
 \end{figure}
 
-The normal distribution is probably the most used mutation distribution, but it can be replaced by different zero--mean distribution. \citet*{CauchyDistributionMutation} used Cauchy distribution to fasten the search. As shown in Figure \ref{fig:mutationdistributionnormalcacuchy}, Cauchy distribution does not decrease as fast as normal distribution and therefore searches wider genotype space. On the other hand, if we desire to shrink the searche space, we may use polynomial distribution, which probability density function is defined as
+The normal distribution is probably the most used mutation distribution, but different zero--mean distribution can replace it. \citet*{CauchyDistributionMutation} used Cauchy distribution to fasten the search. As shown in Figure \ref{fig:mutationdistributionnormalcacuchy}, Cauchy distribution does not decrease as fast as normal distribution and therefore searches wider genotype space. On the other hand, if we desire to shrink the searche space, we may use polynomial distribution, which probability density function is defined as
 $$
 p(x)=0.5 \left(n + 1\right)\left( 1 - \abs{x} \right)^n
 $$ 
@@ -436,9 +434,9 @@ where $n$ is user--defined parameter and function domain is interval $\left[-1,1
 \subsection{Adaptive operators}
 \label{chap:adaptiveoperators}
 
-It is usually helpful to alter algorithm parameters through evolution to better adjust to the problem at hand. For example, one may decrease the deviation of the distribution as the population is converging to the optimum. \emph{Adaptive operators}\index{adaptive operators} is a general term for operators, which adjust their parameters based on the algorithm's progress.
+It is usually helpful to alter algorithm parameters through evolution to better adjust to the problem at hand. For example, one may decrease the deviation of the distribution as the population is converging to the optima. \emph{Adaptive operators}\index{adaptive operators} is a general term for operators, which adjust their parameters based on the algorithm's progress.
 
-Decay operators\index{adaptive operators!decay} decrease their value based on the generation number. It may decrease the mutation and crossover probability \citep{DecayGA}, mutation strength, population size, and many more. The central idea behind is that the changes are getting smaller as the algorithm proceeds, and the algorithm has a better chance to converge.
+Decay operators\index{adaptive operators!decay} decrease their value based on the generation number. It may decrease the mutation or crossover probability \citep{DecayGA}, mutation strength, population size, and many more. The central idea behind is that the changes are getting smaller as the algorithm proceeds, and the algorithm has a better chance to converge.
 
 One of the most straightforward decay function is linear, that linearly decrease the parameter value from $u$ to $l$.
 $$
@@ -476,14 +474,14 @@ Another popular approach is the \emph{one--fifth rule}\index{adaptive operators!
 
 As a rule, authors \citet*{onefifthruleoriginal} suggested $1/5$ success rate as the threshold value. If at least $20\%$ offspring are better, then the step--size should be increased by a factor of $1.5$ and decreased by a factor of $1.5^{-1/4}$ otherwise \citep{onefifthrule}.
 
-However, the proof of this rule by \citeauthor*{onefifthruleoriginal} was done only for unimodal function and small populations. It is generally not a good balance for more complex problems. Better results can be achieved using more advanced techniques to adapt parameters, such as \acrshort{acc:cma}.
+However, the proof of this rule by \citeauthor*{onefifthruleoriginal} was done only for unimodal function and small populations. It is generally not a good balance for a more complex problems. Better results can be achieved using more advanced techniques to adapt parameters, such as \acrshort{acc:cma}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%  DIFFERENTIAL EVOLUTION  %%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{\texorpdfstring{\acrlong*{acc:de}}{Differential evolution}}
+\subsection{\texorpdfstring{\acrlong*{acc:de}}{Differential Evolution}}
 
-\acrfull{acc:de}\index{differential evolution} is a kind of real--coded evolutionary algorithm, suggested by \citet*{differentialevolutionoriginal}. \acrshort{acc:de} applies special operation to the population, that combines crossover, mutation, and selection. \acrshort{acc:de} is sometimes considered as a directional--based search technique, because it takes into account distribution of the individuals in the representation space. It can therefore solve non--separable functions better in comparison to traditional real--coded evolutionary algorithms.
+\acrfull{acc:de}\index{differential evolution} is a kind of real--coded evolutionary algorithm, suggested by \citet*{differentialevolutionoriginal}. \acrshort{acc:de} applies special operation to the population, that combines crossover, mutation, and selection. \acrshort{acc:de} is sometimes considered as a directional--based search technique, because it takes into account distribution of the individuals in the genotype space. It can therefore solve non--separable func\-tions better in comparison to traditional real--coded evolutionary algorithms.
 
 \acrshort{acc:de} uses four distinct parents $\mathbf{p_1}, \mathbf{p_2}, \mathbf{p_3}, \mathbf{p_4}$. It first constructs trial vector $\mathbf{v}$ such that
 $$
@@ -491,14 +489,14 @@ $$
 $$
 where $F$ is user--defined positive parameter controlling the strength of the direction. The vector $\mathbf{p_2} - \mathbf{p_3}$ is the direction from parent $\mathbf{p_3}$ to parent $\mathbf{p_2}$ and reflects the correlation within the population. One example is in the Figure \ref{fig:differentialevolution}. Notice how a newly created individual is much closer to the optimum compared to its parents.
 
-There is a possibility to use more parents and combine them. Moreover, there are possibilities not to sample parents uniformly but substitute the best individual in the population as either $\mathbf{p_1}$ or $\mathbf{p_2}$. Alternatively, it is possible to use the same individual as the source of the direction, as well as the starting position.Mathematically expressed by substitution $\mathbf{p_1} = \mathbf{p_3}$. The formula for the crossover with five parents is
+There is a possibility to use more parents and combine them. Moreover, there are possibilities not to sample parents uniformly but substitute the best individual in the population as either $\mathbf{p_1}$ or $\mathbf{p_2}$. Alternatively, it is possible to use the same individual as the source of the direction, as well as the starting position. Mathematically expressed by substitution $\mathbf{p_1} = \mathbf{p_3}$. The formula for the crossover with five parents is
 $$
 \mathbf{v} = \mathbf{p_1} + F_1\left( \mathbf{p_2} - \mathbf{p_3} \right) + F_2\left( \mathbf{p_4} - \mathbf{p_5} \right)
 $$
 
-Last but not least, this crossover operator can be easily used within traditional real--coded evolutionary algorithms as well.
+Last but not least, this crossover operator can be easily used within traditional real--coded evolutionary algorithms.
 
-After the crossover, \acrshort{acc:de} performs uniform crossover between the trial vector $\mathbf{v}$ and parent $\mathbf{p_4}$ to finally create offspring $\mathbf{o}$. The mutation rate is controlled by a parameter $C\in\left[0,1\right]$ that represent a probability of offspring $\mathbf{o}$ inherits gene from trial vector $\mathbf{v}$. Finally, the offspring $\mathbf{o}$ is compared to the original parent $\mathbf{p_4}$ and replaces it, if it is better. This step is equivalent to selection and \acrshort{acc:de} is a kind of steady--state evolution strategy, as defined on page \pageref{enum:steadystate}.
+After the crossover, \acrshort{acc:de} performs uniform crossover between the trial vector $\mathbf{v}$ and parent $\mathbf{p_4}$ to finally create offspring $\mathbf{o}$. The mutation rate is controlled by the parameter $C\in\left[0,1\right]$ that represent a probability of offspring $\mathbf{o}$ inherits gene from trial vector $\mathbf{v}$. Finally, the offspring $\mathbf{o}$ is compared to the original parent $\mathbf{p_4}$ and replaces it, if it is better. This step is equivalent to selection and \acrshort{acc:de} is a kind of steady--state evolution strategy, as defined on page \pageref{enum:steadystate}.
 
 
 
@@ -510,7 +508,7 @@ After the crossover, \acrshort{acc:de} performs uniform crossover between the tr
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\texorpdfstring{\acrlong*{acc:pso}}{Particle Swarm Optimization}}
 
-\acrfull{acc:pso}\index{particle swarm optimization} is another population--based stochastic optimization technique inspired by a flocking of birds and schooling of fish in Nature. It was introduced by \citet*{PSOOriginal}. The \acrshort{acc:pso} is somehow similar to the real--coded evolutionary algorithms and \acrshort{acc:es} in the sense that the individual is a vector of real numbers. In the \acrshort{acc:pso} terminology, the individuals are called \emph{particles}.
+\acrfull{acc:pso}\index{particle swarm optimization} is another population--based stochastic optimization technique inspired by a flocking of birds and schooling of fish in the Nature. It was introduced by \citet*{PSOOriginal}. The \acrshort{acc:pso} is somehow similar to the real--coded evolutionary algorithms and \acrshort{acc:es} in the sense that the individual is a vector of real numbers. In the \acrshort{acc:pso} terminology, the individuals are called \emph{particles}.
 
 \begin{algorithm}[b!]
     \KwIn{$s$ population size, $steps$ number of steps, $\fitnessfn$ fitness function}
@@ -538,15 +536,15 @@ After the crossover, \acrshort{acc:de} performs uniform crossover between the tr
     \label{alg:PSOgeneral}
 \end{algorithm}
 
-Through the time, the \acrshort{acc:pso} went through plenty of improvements. Two major versions, namely \acrfull{acc:spso2006} and \acrfull{acc:spso2011}, were released as a baseline for further improvements. I will focus on these versions as specified by \citet{SPSO}.
+Through the time, the \acrshort{acc:pso} went over plenty of improvements. Two major versions, namely \acrfull{acc:spso2006} and \acrfull{acc:spso2011}, were released as a baseline for further improvements. I will focus on these versions as specified by \citet{SPSO}.
 
-Except for the position, each particle $\mathbf{p_i}$ has velocity vector $\mathbf{v_i}$, which defines the particle's direction and speed. The velocity vector is then used for a position update. Unlike real--coded evolutionary algorithms, modifications to the particles are not made directly on their positions, but by manipulating with the velocity vector. These two components are the cause why the \acrshort{acc:pso} got its name.
+Except for the position, each particle $\mathbf{p_i}$ has velocity vector $\mathbf{v_i}$, which defines the particle's direction and speed. The velocity vector is then used for a position update. Unlike real--coded evolutionary algorithms, modifications to the particles are not made directly to their positions, but by manipulating with the velocity vector. These two components are the cause why the \acrshort{acc:pso} got its name.
 
 Additionally to velocity, each particle $\mathbf{p_i}$ remembers its own best position, usually called \emph{local best}\index{particle swarm optimization!local best} and denoted by $\mathbf{L_i}$. This variable is updated after every step if the particle's fitness value is better than the fitness value of $\mathbf{L_i}$.
 
-Similarly, each particle remembers the best position it received from the swarm, usually called \emph{global best}\index{particle swarm optimization!global best} and denoted by $\mathbf{G_i}$. After each step, each particle informs surrounding particles about its position and fitness value. Each particle may inform a different set of particles. Which particles to inform is defined by particle's \emph{neighborhood}, and I will focus on it a bit later. Each particle then accumulates information from its surrounding and may update its global best position $\mathbf{G_i}$.
+Similarly, each particle remembers the best position it received from the swarm, usually called \emph{global best}\index{particle swarm optimization!global best} and denoted by $\mathbf{G_i}$. After each step, particle informs surrounding particles about its position and fitness value. Each particle may inform a different set of particles. Which particles to inform is defined by particle's \emph{neighborhood}, and I will focus on it a bit later. Each particle then accumulates information from its surrounding (the information it received from other particles) and may update its global best position $\mathbf{G_i}$.
 
-The algorithm of general \acrshort{acc:pso} algorithm is in algorithm \ref{alg:PSOgeneral}. The difference between \acrshort{acc:spso2006} and \acrshort{acc:spso2011} is in the way they update the velocity $\mathbf{v_i}$.
+The general \acrshort{acc:pso} implementation is in algorithm \ref{alg:PSOgeneral}. The difference between \acrshort{acc:spso2006} and \acrshort{acc:spso2011} is in the way they update the velocity $\mathbf{v_i}$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 %%%%  NEIGHBORHOOD  %%%%
@@ -596,12 +594,12 @@ Neighborhood\index{particle swarm optimization!neighborhood}, or also called top
         \caption{Compact grid topology}
         \label{fig:topologygridcompact}
     \end{subfigure}
-    \caption[\acrshort*{acc:pso} grid topologies]{\acrshort*{acc:pso} grid topologies. Population is colored blue, active particle orange, and it's neighborhood by green.s}
+    \caption[\acrshort*{acc:pso} grid topologies]{\acrshort*{acc:pso} grid topologies. Population is colored blue, active particle orange, and its neighborhood by green.}
 \end{figure}
 
-Some of the popular neighborhood topologies are ring (Figure \ref{fig:topologyring}), dense ring (Figure \ref{fig:topologydensering}), and star (Figure \ref{fig:topologystar}). Moreover, particles can be organized in the grid and communicate only with the nearest particles. Some popular grid topologies are linear (Figure \ref{fig:topologygridlinear}), diamond (Figure \ref{fig:topologygriddiamond}), and compact (Figure \ref{fig:topologygridcompact}) \citep{PSOtopologies}.
+Some of the popular neighborhood topologies are ring (Figure \ref{fig:topologyring}), dense ring (Figure \ref{fig:topologydensering}), and star (Figure \ref{fig:topologystar}). Moreover, particles can be organized in the grid and communicate only with the surrounding particles. Some popular grid topologies are linear (Figure \ref{fig:topologygridlinear}), diamond (Figure \ref{fig:topologygriddiamond}), and compact (Figure \ref{fig:topologygridcompact}) \citep{PSOtopologies}.
 
-Notice that all these topologies are static and do not change during the run of the algorithm. Dynamic topologies were proposed, such as random topology and closest neighbors topology. In the random topology, each particle informs $k$ random particles from the swarm. The $k$ is usually kept small, for example $k=3$ \citep{SPSObenchmark}. Note that different neighborhood is generated after each step. In the closest neighbors topology, each particle informs $k$ closest particles -- except this topology is very computation--intensive, it usually leads to premature convergence because particles begin to create clusters and share their position only with their cluster. On the other hand, it has prerequisites to find multiple local minima in a single run.
+Notice that all these topologies are static and do not change during the run of the algorithm. Dynamic topologies were proposed, such as random topology and closest neighbors topology. In the random topology, each particle informs $k$ random particles from the swarm. The $k$ is usually kept small, for example $k=3$ \citep{SPSObenchmark}. Note that different neighborhood is generated after each step. In the closest neighbors topology, each particle informs $k$ closest particles. Except this topology is very computation--intensive, it usually leads to premature convergence because particles begin to create clusters and share their position only within it. On the other hand, it has prerequisites to find multiple local optima in a single run.
 
 %%%%%%%%%%%%%%%%%%%%
 %%%%  VELOCITY  %%%%
@@ -629,14 +627,14 @@ $$
 + c_l U_d\left( 0,1 \right) \cdot \left( \mathbf{L_i} - \mathbf{p_i} \right)
 + c_g U_d\left( 0,1 \right) \cdot \left( \mathbf{G_i} - \mathbf{p_i} \right)
 $$ 
-where $\omega$ is inertia weight, $c_l$ and $c_g$ are cognitive respectively social acceleration coefficients, and $U_d(0,1)$ is independent and uniformly distributed random $d$-dimensional vector in the range $\left[ 0,1 \right]$. The $\cdot$ is an element--wise multiplication. The inertia weight prevents the velocity explosion, constants $c_l$ and $c_g$ controls how much the local best respectively the global best attracts the particle. These parameters are specified by the user. The particle position is then updated simply by applying velocity on the particle.
+where $\omega$ is inertia weight, $c_l$ and $c_g$ are cognitive respectively social acceleration coefficients, and $U_d(0,1)$ is independent and uniformly distributed random $d$-dimensional vector in the range $\left[ 0,1 \right]$. The $\cdot$ is an element--wise multiplication. The inertia weight prevents the velocity explosion, constants $c_l$ and $c_g$ controls how much the local best respectively the global best attracts the particle. These parameters are specified by the user. The particle position is then updated simply by applying new velocity on the particle.
 $$
 \mathbf{p_i} = \mathbf{p_i} + \mathbf{v_i}
 $$
 
 One may further limit the particle's velocity or position, so it stays in the interval of interest. We may limit the velocity using its magnitude (then no particle can move faster than a specified threshold) or per coordinate, similarly to the position \citep{PSOvelocitylimit}.
 
-Because the velocity update in \acrshort{acc:spso2006} is done dimension by dimension, the algorithm's performance is rotation sensitive and coordinate system dependent. This phenomenon is visible in Figure \ref{fig:samplingspso2006}. The sampled point for the local respectively global best position is sampled from the blue respectively orange region. As these regions align with axes, the resulting sampling is aligned with axes as well. It has been shown by \citet{psobiasinzero} that it is easier for \acrshort{acc:spso2006} to find optimum if it lies in the center of coordinate systems or on the axis.
+Because the velocity update in \acrshort{acc:spso2006} is done per dimension, the algorithm's performance is rotation sensitive and coordinate system dependent. This phenomenon is visible in Figure \ref{fig:samplingspso2006}. The sampled point for the local respectively global best position is sampled from the blue respectively orange region. As these regions align with axes, the resulting sampling is aligned with axes as well. It has been shown by \citet{psobiasinzero} that it is easier for \acrshort{acc:spso2006} to find optimum if it lies in the center of coordinate systems or on the axis.
 
 \acrshort{acc:spso2011} address this issue by sampling the point from hypersphere. First of all, it finds center of gravity $\mathbf{T}$ between current, local best, and global best positions.
 \begin{align*}
@@ -644,7 +642,7 @@ Because the velocity update in \acrshort{acc:spso2006} is done dimension by dime
     \mathbf{g_i} &= \mathbf{p_i} + c_g U_d\left( 0,1 \right) \cdot \left( \mathbf{G_i} - \mathbf{p_i} \right) \\
     \mathbf{T_i} &= \frac{\mathbf{p_i}+\mathbf{l_i}+\mathbf{g_i}}{3}
 \end{align*}
-Random point is then sampled from the hypersphere with the center $\mathbf{T_i}$ and radius $\norm{\mathbf{p_i} - \mathbf{T_i}}$
+Random point is then sampled from the hypersphere with the center $\mathbf{T_i}$ and radius $\norm{\mathbf{p_i} - \mathbf{T_i}}$.
 $$
 \mathbf{u_i} = \mathcal{H}_i\left(\mathbf{T_i}, \norm{\mathbf{p_i} - \mathbf{T_i}}\right)
 $$
