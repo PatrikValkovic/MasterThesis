@@ -1,7 +1,7 @@
 \chapter{Results}
 \label{chap:results}
 
-All the algorithms were run with hyperparameters given in appendix \ref{chap:hyperparameters}. Each configuration ran a hundred times and the plotted values are mean of specified metric. Results in higher resolution are in the attachment.
+All the algorithms were run with hyperparameters given in appendix \ref{chap:hyperparameters}. Each configuration ran a hundred times and the plotted values are mean of the specified metric. Results in higher resolution are in the attachment.
 
 
 
@@ -246,7 +246,7 @@ All the algorithms were run with hyperparameters given in appendix \ref{chap:hyp
         \includegraphics[width=0.8\textwidth]{img/runs/time_es_mutation_legend.pdf}
     \end{minipage}
 
-    \caption[Running time of mutation operators]{Running time of real--coded evolutionary algorithm with various mutation operators. I chose to measure only \acrshort{acc:bbob} functions $f_{19}$ and $f_{22}$. Algorithm used hyperparameters specified in table \ref{tab:esmutationhyperparmarameters} and run for $1000$ generations.}
+    \caption[Running time of mutation operators]{Running time of real--coded evolutionary algorithm with various mutation operators. I chose to measure only \acrshort{acc:bbob} functions $f_{19}$ and $f_{22}$. Algorithm used hyperparameters specified in Table \ref{tab:esmutationhyperparmarameters} and run for $1000$ generations.}
     \label{meas:muttime}
 \end{figure}
 
@@ -318,7 +318,7 @@ All the algorithms were run with hyperparameters given in appendix \ref{chap:hyp
         \includegraphics[width=\textwidth]{img/runs/fitness_es_mutation_legend.pdf}
     \end{minipage}
 
-    \caption[Fitness of various mutation operators in real--coded evolutionary algorithms]{Fitness of real--coded evolutionary algorithm with various mutation operators. Measured on \acrshort{acc:bbob} functions $f_{19}$ and $f_{24}$ (available in attachment). Algorithm used hyperparameters specified in table \ref{tab:esmutationhyperparmarameters}.}
+    \caption[Fitness of various mutation operators in real--coded evolutionary algorithms]{Fitness of real--coded evolutionary algorithm with various mutation operators. Measured on \acrshort{acc:bbob} functions $f_{19}$ and $f_{24}$ (available in attachment). Algorithm used hyperparameters specified in Table \ref{tab:esmutationhyperparmarameters}.}
     \label{meas:mutfitness}
 \end{figure}
 
@@ -365,7 +365,7 @@ All the algorithms were run with hyperparameters given in appendix \ref{chap:hyp
         \includegraphics[width=\textwidth]{img/runs/time_es_crossover_legend.pdf}
     \end{minipage}
 
-    \caption[Running time of crossover operators]{Running time of real--coded evolutionary algorithm with various crossover operators. I chose to measure only \acrshort{acc:bbob} functions $f_{19}$ and $f_{24}$. Algorithm used hyperparameters specified in table \ref{tab:escrossoverhyperparmarameters} and run for $1000$ generations.}
+    \caption[Running time of crossover operators]{Running time of real--coded evolutionary algorithm with various crossover operators. I chose to measure only \acrshort{acc:bbob} functions $f_{19}$ and $f_{24}$. Algorithm used hyperparameters specified in Table \ref{tab:escrossoverhyperparmarameters} and run for $1000$ generations.}
     \label{meas:crosstime}
 \end{figure}
 
@@ -424,7 +424,7 @@ All the algorithms were run with hyperparameters given in appendix \ref{chap:hyp
         \includegraphics[width=\textwidth]{img/runs/fitness_es_crossovers_legend.pdf}
     \end{minipage}
 
-    \caption[Fitness of various crossover operators in real--coded evolutionary algorithms]{Fitness of real--coded evolutionary algorithm with various crossover operators. Measured only on \acrshort{acc:bbob} functions $f_{19}$ and $f_{24}$ with dimensions $24$, $128$, and $384$. Algorithm used hyperparameters specified in table \ref{tab:escrossoverhyperparmarameters}. I present only function $f_{19}$ with $24$ dimensions and function $f_{24}$ with $384$ dimensions, rest of the measurements are in the attachment.}
+    \caption[Fitness of various crossover operators in real--coded evolutionary algorithms]{Fitness of real--coded evolutionary algorithm with various crossover operators. Measured only on \acrshort{acc:bbob} functions $f_{19}$ and $f_{24}$ with dimensions $24$, $128$, and $384$. Algorithm used hyperparameters specified in Table \ref{tab:escrossoverhyperparmarameters}. I present only function $f_{19}$ with $24$ dimensions and function $f_{24}$ with $384$ dimensions, rest of the measurements are in the attachment.}
     \label{meas:crossfitness}
 \end{figure}
 
@@ -472,7 +472,7 @@ All the algorithms were run with hyperparameters given in appendix \ref{chap:hyp
         \includegraphics[width=0.6\textwidth]{img/runs/time_es_schema_legend.pdf}
     \end{minipage}
 
-    \caption[Running time of crossover schemes]{Running time of real--coded evolutionary algorithm with various crossover schemes. I measure the algorithm on \acrshort{acc:bbob} functions $f_{19}$ and $f_{22}$ with $24$, $128$, and $384$ dimensions. Algorithm used hyperparameters specified in table \ref{tab:esschemehyperparmarameters} and run for $1000$ generations.}
+    \caption[Running time of crossover schemes]{Running time of real--coded evolutionary algorithm with various crossover schemes. I measure the algorithm on \acrshort{acc:bbob} functions $f_{19}$ and $f_{22}$ with $24$, $128$, and $384$ dimensions. Algorithm used hyperparameters specified in Table \ref{tab:esschemehyperparmarameters} and run for $1000$ generations.}
     \label{meas:schema}
 \end{figure}
 
@@ -608,7 +608,7 @@ All the algorithms were run with hyperparameters given in appendix \ref{chap:hyp
         \includegraphics[width=0.6\textwidth]{img/runs/time_pso_neigh_legend.pdf}
     \end{minipage}
 
-    \caption[PSO2006 neighborhood running time]{Running time of \acrlong{acc:spso2006} algorithm with different neighborhood types. The algorithm run for 1000 generations on problem with 128 dimensions. Neighborhood sizes are at table \ref{tab:psohyperparameters}. The nearest neighborhood topology was run only to population of size 4900, as it compares all pairs of individuals and the device did not have enough memory. The minimum population size for grid topologies were 225, because topologies size were specified as a fraction of population size and for smaller population neighborhood could not be constructed. The grid topologies were always assembled into square. Running times of circle, linear grid, compact grid, and diamond grid were almost identical (depending only on the size of neighborhood, see chapter \ref{chap:impl}), so I plot only measurements for circle and diamond grid.}
+    \caption[PSO2006 neighborhood running time]{Running time of \acrlong{acc:spso2006} algorithm with different neighborhood types. The algorithm run for 1000 generations on problem with 128 dimensions. Neighborhood sizes are at Table \ref{tab:psohyperparameters}. The nearest neighborhood topology was run only to population of size 4900, as it compares all pairs of individuals and the device did not have enough memory. The minimum population size for grid topologies were 225, because topologies size were specified as a fraction of population size and for smaller population neighborhood could not be constructed. The grid topologies were always assembled into square. Running times of circle, linear grid, compact grid, and diamond grid were almost identical (depending only on the size of neighborhood, see Chapter \ref{chap:impl}), so I plot only measurements for circle and diamond grid.}
     \label{meas:psoneigtime}
 \end{figure}
 
