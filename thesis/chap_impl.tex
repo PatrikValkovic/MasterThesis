@@ -30,7 +30,7 @@ The library is split into several modules, focusing on different kinds of evolut
 \begin{itemize}
     \item \incode{ffeat.flow} module includes basic classes to control the flow of the algorithm with the Pipe and Filter architecture in mind.
     \item \incode{ffeat.genetic} implements genetic algorithms operators and assume binary encoding.
-    \item \incode{ffeat.strategies} contains all the real--coded operators. Although not all of them are adaptive, therefore, they cannot be considered as evolution strategies, I decided to put them into the shared module for convenience.
+    \item \incode{ffeat.strategies} contains all the real--\kern0.04em coded operators. Although not all of them are adaptive, therefore, they cannot be considered as evolution strategies, I decided to put them into the shared module for convenience.
     \item \incode{ffeat.pso} handles \acrlong{acc:pso} algorithms, their neighborhood and velocity update algorithms.
     \item \incode{ffeat.measure} implements aggregations functions focusing on fitness metrics.
     \item \incode{ffeat.utils} is a support module containing various useful functions like fitness scaling, decay, and early termination implementation.
@@ -127,7 +127,7 @@ Example of a genetic algorithm in the \acrshort{acc:ffeat} library is in the Alg
 %%%%%%%%%%%%%%%%%%%%%
 \section{Real--Coded Evolutionary Algorithms}
 
-Real--coded evolutionary algorithms are encapsulated in the \incode{ffeat.strategies} module. It has a similar structure to \acrshort{acc:ga} module described above. Except for the operators mentioned above, I implemented operators specific to real--value encoding.
+Real--\kern0.04em coded evolutionary algorithms are encapsulated in the \incode{ffeat.strategies} module. It has a similar structure to \acrshort{acc:ga} module described above. Except for the operators mentioned above, I implemented operators specific to real--value encoding.
 
 In the \incode{ffeat.strategies.crossover} submodule are uniform, one--point, and two--point crossovers identical to the one for \acrshort{acc:ga}. Besides, it contains:
 \begin{itemize}
@@ -163,7 +163,7 @@ alg = ES.EvolutionStrategy(
 )
 alg() # run the evolution
 \end{lstlisting}
-\caption{Simple real--coded algorithm in \acrshort*{acc:ffeat}}
+\caption{Simple real--\kern0.04em coded algorithm in \acrshort*{acc:ffeat}}
 \label{alg:esffeat}
 \end{algorithm}
 
@@ -174,7 +174,7 @@ From the mutation operators, I implemented the following operators in the \incod
     \item Normal mutation with adaptive step implemented in the \incode{AdaptiveStep} class. It supports only the simplest adaptive algorithm by sharing the same deviation for all the dimensions. It allows specifying initial, maximal, and minimal deviation, as well as the step size and a number of better offspring needed to increase the deviation. This class may be used to implement the one--fifth rule.
 \end{itemize}
 
-The \incode{ffeat.strategy.EvolutionStrategy} class wraps together all the steps for real--coded evolutionary algorithms. Simple real--coded algorithm is in Algorithm \ref{alg:esffeat}.
+The \incode{ffeat.strategy.EvolutionStrategy} class wraps together all the steps for real--\kern0.04em coded evolutionary algorithms. Simple real--\kern0.04em coded algorithm is in Algorithm \ref{alg:esffeat}.
     
 
 
@@ -215,7 +215,7 @@ The \acrlong{acc:pso} algorithms are implemented in the \incode{ffeat.pso} modul
     \item Grid neighborhood with either linear, compact, or diamond shape, as specified in Chapter \ref{chap:psoneig}. The compact and diamond shapes are tricky to build in an arbitrary number of dimensions, so these are implemented only for two-dimensional cases and encapsulated in the \incode{Grid2D} class.
 \end{itemize}
 
-In the \incode{ffeat.pso.clip} submodule are classes allowing to clip either particles position or velocity. The whole \acrshort{acc:pso} algorithm is wraped inside the \incode{PSO} class. Because of the more complicated algorithm flow, this class does not allow as much freedom as previous \acrshort{acc:ga} or real--coded \acrshort{acc:ea} implementations. The example of \acrshort{acc:pso} algorithm in \acrshort{acc:ffeat} is in Algorithm \ref{alg:psoffeat}.
+In the \incode{ffeat.pso.clip} submodule are classes allowing to clip either particles position or velocity. The whole \acrshort{acc:pso} algorithm is wraped inside the \incode{PSO} class. Because of the more complicated algorithm flow, this class does not allow as much freedom as previous \acrshort{acc:ga} or real--\kern0.04em coded \acrshort{acc:ea} implementations. The example of \acrshort{acc:pso} algorithm in \acrshort{acc:ffeat} is in Algorithm \ref{alg:psoffeat}.
 
 \begin{algorithm}[b!]
 \begin{lstlisting}[language=Python, xrightmargin=18pt]
