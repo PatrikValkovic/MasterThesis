@@ -1,0 +1,22 @@
+%%% A template for a simple PDF/A file like a stand-alone abstract of the thesis.
+
+\documentclass[12pt]{report}
+
+\usepackage[a4paper, hmargin=1in, vmargin=1in]{geometry}
+\usepackage[a-2u]{pdfx}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{textcomp}
+\usepackage[toc,acronym,nogroupskip]{glossaries}
+
+\input{acronyms}
+\input{definitions}
+
+\begin{document}
+
+Grafické karty stojí za úspěchem neuronových sítí v posledních letech a jejich rozšíření do běžného života. Dalším úspěšným oborem umělé inteligence jsou evoluční algoritmy. Jejich schopnost paralelizace je známá již řadu let a byla prakticky aplikována na řadu problémů. Paralelizace evolučních algoritmů se ovšem zpravidla zaměřuje na vícejádrové nebo víceprocesorové stroje, popřípadě na cluster takových strojů.
+
+Cílem této práce je prozkoumat možnost paralelizace evolučních algoritmů na grafic\-kých kartách. V rámci práce představuji jejich implementaci v knihovně PyTorch, která umožňuje spuštění stejného zdrojového kódu jak na CPU, tak na GPU. Implementace poskytuje nejběžnější evoluční operátory pro genetické algoritmy, algoritmy s reálným kódováním a algoritmy optimalizace hejnem částic. Implementace je podrobena inten\-zivnímu testování a ukazuji, že jejich spuštěním na GPU lze dosáhnout několika\-násobnému zrychlení pro středně velké až velké problémy a populace.
+
+\end{document}
