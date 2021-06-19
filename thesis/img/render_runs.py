@@ -271,7 +271,7 @@ if not SHOW_LEGEND:
     plt.gca().get_yaxis().set_major_formatter(mticker.ScalarFormatter(useOffset=False))
     plt.minorticks_off()
     plt.ylabel('Objective function')
-    plt.title(f"Fitness of PSO2006 algorithm$")
+    plt.title(f"Fitness of PSO2006 algorithm")
     plt.legend(LEG_LINES, LEG_LABELS, loc='upper right')
     plt.savefig(f'runs/fitness_pso2006_with_legend.pdf')
     plt.close()
